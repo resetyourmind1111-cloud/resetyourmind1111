@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const footerLinks = {
   product: [
@@ -28,11 +29,11 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-6 h-6 text-accent" />
-              <span className="font-serif text-xl font-semibold">
-                Reset Your Mind <span className="text-accent">1111</span>
-                <span className="text-xs align-super opacity-60">™</span>
-              </span>
+              <img 
+                src={logo} 
+                alt="Reset Your Mind 1111" 
+                className="h-12 w-auto"
+              />
             </Link>
             <p className="text-background/70 text-sm leading-relaxed max-w-sm mb-6">
               Stop settling for crumbs. Discover your Worth Thermostat and recalibrate 
