@@ -9,6 +9,7 @@ import logo from "@/assets/logo.png";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Assessment", href: "/assessment" },
+  { name: "Dashboard", href: "/dashboard" },
   { name: "Oracle Cards", href: "/oracle" },
   { name: "Meditations", href: "/meditations" },
   { name: "Workbook", href: "/workbook" },
