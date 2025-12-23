@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OracleCard as OracleCardType } from '@/data/oracleCards';
+import { getCardImage } from '@/data/cardImageMap';
 
 interface OracleCardProps {
   card: OracleCardType;
@@ -20,6 +21,7 @@ export const OracleCard = ({
   showDetails = false 
 }: OracleCardProps) => {
   const [flipped, setFlipped] = useState(isFlipped);
+  const cardImage = getCardImage(card.title);
 
   const handleFlip = () => {
     if (!flipped && onFlip) {
@@ -29,9 +31,9 @@ export const OracleCard = ({
   };
 
   const sizeClasses = {
-    sm: 'w-24 h-36',
-    md: 'w-40 h-56',
-    lg: 'w-56 h-80',
+    sm: 'w-28 h-40',
+    md: 'w-44 h-64',
+    lg: 'w-64 h-96',
   };
 
   const isPermissionDeck = card.deck_name === 'Permission Granted';
@@ -39,15 +41,16 @@ export const OracleCard = ({
   return (
     <div className="flex flex-col items-center gap-2">
       {position && (
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider text-center">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider text-center max-w-[120px]">
           {position}
         </span>
       )}
       <motion.div
-        className={`${sizeClasses[size]} cursor-pointer perspective-1000`}
+        className={`${sizeClasses[size]} cursor-pointer`}
         onClick={handleFlip}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        style={{ perspective: 1000 }}
       >
         <motion.div
           className="relative w-full h-full"
@@ -58,9 +61,9 @@ export const OracleCard = ({
         >
           {/* Card Back */}
           <div
-            className={`absolute inset-0 rounded-xl flex items-center justify-center ${
+            className={`absolute inset-0 rounded-xl shadow-xl ${
               isPermissionDeck 
-                ? 'bg-gradient-to-br from-primary via-purple-600 to-primary-foreground/20' 
+                ? 'bg-gradient-to-br from-primary via-purple-600 to-primary/80' 
                 : 'bg-gradient-to-br from-accent via-amber-500 to-yellow-600'
             }`}
             style={{ backfaceVisibility: 'hidden' }}
@@ -82,35 +85,80 @@ export const OracleCard = ({
 
           {/* Card Front */}
           <div
-            className="absolute inset-0 rounded-xl bg-card border border-border shadow-lg overflow-hidden flex flex-col"
+            className="absolute inset-0 rounded-xl shadow-xl overflow-hidden"
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >
-            <div className={`p-3 text-center ${
-              isPermissionDeck 
-                ? 'bg-gradient-to-r from-primary/10 to-purple-500/10' 
-                : 'bg-gradient-to-r from-accent/10 to-amber-500/10'
-            }`}>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {card.category}
-              </span>
-            </div>
-            <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-              <h3 className={`font-serif text-base md:text-lg font-semibold mb-2 ${
-                isPermissionDeck ? 'text-primary' : 'text-accent'
-              }`}>
-                {card.title}
-              </h3>
-              <p className="text-xs md:text-sm text-muted-foreground italic leading-relaxed">
-                "{card.message}"
-              </p>
-            </div>
-            <div className={`py-2 text-center text-[10px] text-muted-foreground ${
-              isPermissionDeck 
-                ? 'bg-gradient-to-r from-primary/5 to-purple-500/5' 
-                : 'bg-gradient-to-r from-accent/5 to-amber-500/5'
-            }`}>
-              Card {card.card_number}
-            </div>
+            {cardImage ? (
+              // Display actual card image
+              <div className="relative w-full h-full">
+                <img 
+                  src={cardImage} 
+                  alt={card.title}
+                  className="w-full h-full object-cover"
+                />
+                {/* Subtle overlay for text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+                
+                {/* Card title overlay at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+                  <h3 className="font-serif text-sm md:text-base font-bold text-white drop-shadow-lg uppercase tracking-wide">
+                    {card.title}
+                  </h3>
+                  <p className="text-[10px] text-white/80 mt-1 italic line-clamp-2">
+                    {card.message}
+                  </p>
+                </div>
+                
+                {/* Category badge at top */}
+                <div className="absolute top-2 left-2 right-2">
+                  <span className="inline-block text-[8px] uppercase tracking-wider text-white/90 bg-black/40 px-2 py-1 rounded-full">
+                    {card.category}
+                  </span>
+                </div>
+                
+                {/* Card number */}
+                <div className="absolute top-2 right-2">
+                  <span className="text-[10px] text-white/80 bg-black/40 px-2 py-0.5 rounded-full">
+                    {card.card_number}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              // Fallback design when no image available
+              <div className="w-full h-full bg-card border border-border flex flex-col">
+                <div className={`p-2 text-center ${
+                  isPermissionDeck 
+                    ? 'bg-gradient-to-r from-primary/20 to-purple-500/20' 
+                    : 'bg-gradient-to-r from-accent/20 to-amber-500/20'
+                }`}>
+                  <span className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                    {card.category}
+                  </span>
+                </div>
+                <div className="flex-1 flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-background to-muted/20">
+                  <div className={`text-4xl mb-3 ${
+                    isPermissionDeck ? 'text-primary' : 'text-accent'
+                  }`}>
+                    ✨
+                  </div>
+                  <h3 className={`font-serif text-sm md:text-base font-semibold mb-2 ${
+                    isPermissionDeck ? 'text-primary' : 'text-accent'
+                  }`}>
+                    {card.title}
+                  </h3>
+                  <p className="text-[10px] md:text-xs text-muted-foreground italic leading-relaxed">
+                    "{card.message}"
+                  </p>
+                </div>
+                <div className={`py-1.5 text-center text-[9px] text-muted-foreground ${
+                  isPermissionDeck 
+                    ? 'bg-gradient-to-r from-primary/10 to-purple-500/10' 
+                    : 'bg-gradient-to-r from-accent/10 to-amber-500/10'
+                }`}>
+                  Card {card.card_number}
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
       </motion.div>
