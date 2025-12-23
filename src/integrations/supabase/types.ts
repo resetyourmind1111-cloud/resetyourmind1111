@@ -14,7 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assessment_results: {
+        Row: {
+          answers: Json
+          category_scores: Json
+          completed_at: string
+          email: string
+          first_name: string
+          id: string
+          percentage_score: number
+          thermostat_type: string
+          total_score: number
+          user_id: string | null
+        }
+        Insert: {
+          answers: Json
+          category_scores: Json
+          completed_at?: string
+          email: string
+          first_name: string
+          id?: string
+          percentage_score: number
+          thermostat_type: string
+          total_score: number
+          user_id?: string | null
+        }
+        Update: {
+          answers?: Json
+          category_scores?: Json
+          completed_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          percentage_score?: number
+          thermostat_type?: string
+          total_score?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          current_streak: number | null
+          full_name: string | null
+          human_design_type: string | null
+          id: string
+          last_login: string | null
+          phone: string | null
+          profile_photo_url: string | null
+          subscription_tier: string | null
+          total_points: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number | null
+          full_name?: string | null
+          human_design_type?: string | null
+          id?: string
+          last_login?: string | null
+          phone?: string | null
+          profile_photo_url?: string | null
+          subscription_tier?: string | null
+          total_points?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number | null
+          full_name?: string | null
+          human_design_type?: string | null
+          id?: string
+          last_login?: string | null
+          phone?: string | null
+          profile_photo_url?: string | null
+          subscription_tier?: string | null
+          total_points?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
