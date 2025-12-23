@@ -53,6 +53,39 @@ export type Database = {
         }
         Relationships: []
       }
+      card_pulls: {
+        Row: {
+          cards_pulled: Json
+          created_at: string
+          id: string
+          journal_entry: string | null
+          points_awarded: number
+          question_asked: string | null
+          reading_type: string
+          user_id: string
+        }
+        Insert: {
+          cards_pulled: Json
+          created_at?: string
+          id?: string
+          journal_entry?: string | null
+          points_awarded?: number
+          question_asked?: string | null
+          reading_type: string
+          user_id: string
+        }
+        Update: {
+          cards_pulled?: Json
+          created_at?: string
+          id?: string
+          journal_entry?: string | null
+          points_awarded?: number
+          question_asked?: string | null
+          reading_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
@@ -74,6 +107,54 @@ export type Database = {
           first_name?: string
           id?: string
           source?: string | null
+        }
+        Relationships: []
+      }
+      oracle_cards: {
+        Row: {
+          affirmation: string
+          card_number: number
+          category: string
+          created_at: string
+          deck_name: string
+          deep_love_question: string
+          guidebook_text: string
+          id: string
+          image_url: string | null
+          integration_prompt: string
+          message: string
+          related_meditation_id: string | null
+          title: string
+        }
+        Insert: {
+          affirmation: string
+          card_number: number
+          category: string
+          created_at?: string
+          deck_name: string
+          deep_love_question: string
+          guidebook_text: string
+          id?: string
+          image_url?: string | null
+          integration_prompt: string
+          message: string
+          related_meditation_id?: string | null
+          title: string
+        }
+        Update: {
+          affirmation?: string
+          card_number?: number
+          category?: string
+          created_at?: string
+          deck_name?: string
+          deep_love_question?: string
+          guidebook_text?: string
+          id?: string
+          image_url?: string | null
+          integration_prompt?: string
+          message?: string
+          related_meditation_id?: string | null
+          title?: string
         }
         Relationships: []
       }
