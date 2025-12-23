@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { User, Phone, Save, ArrowLeft } from "lucide-react";
+import { User, Phone, Save, ArrowLeft, Camera, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { Link } from "react-router-dom";
 
@@ -34,11 +35,14 @@ interface Profile {
 export default function Settings() {
   const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -61,6 +65,7 @@ export default function Settings() {
         setProfile(data);
         setFullName(data.full_name || "");
         setPhone(data.phone || "");
+        setPhotoUrl(data.profile_photo_url);
       }
       setIsLoading(false);
     }
@@ -69,6 +74,72 @@ export default function Settings() {
       fetchProfile();
     }
   }, [user]);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please upload a valid image (JPG, PNG, WebP, or GIF)");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be less than 5MB");
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from("profile-photos")
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("profile-photos")
+        .getPublicUrl(fileName);
+
+      const newPhotoUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      // Update profile with new photo URL
+      if (profile) {
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ profile_photo_url: newPhotoUrl })
+          .eq("user_id", user.id);
+
+        if (updateError) throw updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("profiles")
+          .insert({
+            user_id: user.id,
+            profile_photo_url: newPhotoUrl,
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      setPhotoUrl(newPhotoUrl);
+      toast.success("Profile photo updated!");
+    } catch (error: any) {
+      console.error("Error uploading photo:", error);
+      toast.error("Failed to upload photo. Please try again.");
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +161,6 @@ export default function Settings() {
 
     try {
       if (profile) {
-        // Update existing profile
         const { error } = await supabase
           .from("profiles")
           .update({
@@ -101,7 +171,6 @@ export default function Settings() {
 
         if (error) throw error;
       } else {
-        // Create new profile
         const { error } = await supabase
           .from("profiles")
           .insert({
@@ -120,6 +189,18 @@ export default function Settings() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const getInitials = () => {
+    if (fullName) {
+      return fullName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    return user?.email?.charAt(0).toUpperCase() || "U";
   };
 
   if (authLoading) {
@@ -154,6 +235,7 @@ export default function Settings() {
                 <Skeleton className="h-6 w-48" />
               </CardHeader>
               <CardContent className="space-y-4">
+                <Skeleton className="h-24 w-24 rounded-full mx-auto" />
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-32" />
@@ -167,6 +249,40 @@ export default function Settings() {
                   <CardDescription>Update your personal details</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Profile Photo */}
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="relative">
+                      <Avatar className="h-24 w-24">
+                        <AvatarImage src={photoUrl || undefined} alt="Profile photo" />
+                        <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                          {getInitials()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploadingPhoto}
+                        className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                      >
+                        {isUploadingPhoto ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Camera className="h-4 w-4" />
+                        )}
+                      </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Click the camera icon to upload a photo
+                    </p>
+                  </div>
+
                   {/* Email (read-only) */}
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-foreground">Email Address</Label>
