@@ -1,0 +1,164 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Navigation } from "@/components/Navigation";
+import { Footer } from "@/components/landing/Footer";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, Calendar, Target, ArrowRight } from "lucide-react";
+import { format } from "date-fns";
+import { thermostatTypes, ThermostatType } from "@/data/thermostatTypes";
+
+interface AssessmentResult {
+  id: string;
+  completed_at: string;
+  thermostat_type: string;
+  total_score: number;
+  percentage_score: number;
+  category_scores: Record<string, number>;
+}
+
+export default function Dashboard() {
+  const { user, isLoading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [results, setResults] = useState<AssessmentResult[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    async function fetchResults() {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("assessment_results")
+        .select("id, completed_at, thermostat_type, total_score, percentage_score, category_scores")
+        .eq("user_id", user.id)
+        .order("completed_at", { ascending: false });
+
+      if (!error && data) {
+        setResults(data as AssessmentResult[]);
+      }
+      setIsLoading(false);
+    }
+
+    if (user) {
+      fetchResults();
+    }
+  }, [user]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  const getTypeInfo = (typeKey: string): ThermostatType | undefined => {
+    return thermostatTypes.find(t => t.name === typeKey);
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      <main className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Your Dashboard</h1>
+            <p className="text-muted-foreground">Track your growth and view past assessment results</p>
+          </div>
+
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-48" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : results.length === 0 ? (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No assessments yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  Take your first assessment to discover your thermostat type
+                </p>
+                <Button onClick={() => navigate("/assessment")}>
+                  Start Assessment
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {results.map((result) => {
+                const typeInfo = getTypeInfo(result.thermostat_type);
+                return (
+                  <Card key={result.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <Badge variant="secondary" className="mb-2">
+                            {typeInfo?.name || result.thermostat_type}
+                          </Badge>
+                          <CardTitle className="text-lg">
+                            {typeInfo?.tagline || "Assessment Result"}
+                          </CardTitle>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">
+                            {result.percentage_score}%
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {result.total_score} points
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {format(new Date(result.completed_at), "MMM d, yyyy")}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="h-4 w-4" />
+                          {Object.keys(result.category_scores).length} categories analyzed
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+
+              <div className="pt-4 text-center">
+                <Button variant="outline" onClick={() => navigate("/assessment")}>
+                  Take New Assessment
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
