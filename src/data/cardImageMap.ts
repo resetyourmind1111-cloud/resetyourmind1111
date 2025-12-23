@@ -30,9 +30,33 @@ import stopExplaining from '@/assets/cards/permission-granted-stop-explaining.pn
 import takeUpSpace from '@/assets/cards/permission-granted-take-up-space.png';
 import wantMore from '@/assets/cards/permission-granted-want-more.png';
 
+// New batch of images
+import beProud from '@/assets/cards/permission-granted-33-be-proud.png';
+import buildAnEmpire from '@/assets/cards/permission-granted-34-build-an-empire.png';
+import beAmbitious from '@/assets/cards/permission-granted-31-be-ambitious.png';
+import expectMore from '@/assets/cards/permission-granted-39-expect-more.png';
+import bePowerful from '@/assets/cards/permission-granted-be-powerful.png';
+import askForWhatYouNeed from '@/assets/cards/permission-granted-37-ask-for-what-you-need.png';
+import failPublicly from '@/assets/cards/permission-granted-fail-publicly.png';
+import chooseYourselfFirst from '@/assets/cards/permission-granted-choose-yourself-first.png';
+import lead from '@/assets/cards/permission-granted-35-lead.png';
+import requireEffort from '@/assets/cards/permission-granted-require-effort.png';
+import trustYourKnowing from '@/assets/cards/permission-granted-trust-your-knowing.png';
+import wantPassion from '@/assets/cards/permission-granted-41-want-passion.png';
+import youAreThePermission from '@/assets/cards/permission-granted-49-you-are-the-permission.png';
+import buildYourEmpireFirst from '@/assets/cards/permission-granted-build-your-empire-first.png';
+import goFirst from '@/assets/cards/permission-granted-47-go-first.png';
+import leaveLove from '@/assets/cards/permission-granted-leave-love.png';
+import stopWaiting from '@/assets/cards/permission-granted-stop-waiting.png';
+import deepLoveQuestion from '@/assets/cards/permission-granted-45-deep-love-question.png';
+import yourWorthIsNotNegotiable from '@/assets/cards/permission-granted-your-worth-is-not-negotiable.png';
+import wantLove from '@/assets/cards/permission-granted-43-want-love.png';
+import chooseYourselfFinal from '@/assets/cards/permission-granted-51-choose-yourself-final.png';
+import thisIsYourPermissionSlip from '@/assets/cards/permission-granted-this-is-your-permission-slip.png';
+
 // Map card titles (lowercase, normalized) to their images
 const cardImageMap: Record<string, string> = {
-  // Cards with numbers in filename
+  // Cards with numbers in filename (original batch)
   'walk away': walkAway,
   'cut ties': cutTies,
   'release toxic family': releaseToxicFamily,
@@ -40,20 +64,20 @@ const cardImageMap: Record<string, string> = {
   'forgive yourself': forgiveYourself,
   'release guilt': releaseGuilt,
   'demand celebration': demandCelebration,
-  'charge what you\'re worth': chargeWhatYoureWorth,
+  "charge what you're worth": chargeWhatYoureWorth,
   'be unavailable': beUnavailable,
   'say no': sayNo,
   'receive': receive,
   'be angry': beAngry,
   'feel your anger': beAngry,
   'not be okay': notBeOkay,
-  'it\'s okay to not be okay': notBeOkay,
+  "it's okay to not be okay": notBeOkay,
   'feel joy': feelJoy,
   'feel your pleasure': feelJoy,
   'grieve the future': grieveTheFuture,
   'start over': startOver,
   
-  // Cards without numbers in filename
+  // Cards without numbers in filename (original batch)
   'be selfish': beSelfish,
   'change your mind': changeYourMind,
   'choose yourself': chooseYourself,
@@ -74,6 +98,34 @@ const cardImageMap: Record<string, string> = {
   'claim your space': takeUpSpace,
   'want more': wantMore,
   'claim your desires': wantMore,
+  
+  // New batch of images
+  'be proud': beProud,
+  'build an empire': buildAnEmpire,
+  'be ambitious': beAmbitious,
+  'expect more': expectMore,
+  'be powerful': bePowerful,
+  'claim your power': bePowerful,
+  'ask for what you need': askForWhatYouNeed,
+  'fail publicly': failPublicly,
+  'choose yourself first': chooseYourselfFirst,
+  'lead': lead,
+  'require effort': requireEffort,
+  'trust your knowing': trustYourKnowing,
+  'want passion': wantPassion,
+  'you are the permission': youAreThePermission,
+  'build your empire first': buildYourEmpireFirst,
+  'go first': goFirst,
+  'leave love': leaveLove,
+  'stop waiting': stopWaiting,
+  'the deep love question': deepLoveQuestion,
+  'your worth is not negotiable': yourWorthIsNotNegotiable,
+  'claim your worth': yourWorthIsNotNegotiable,
+  'want love': wantLove,
+  'feel your love': wantLove,
+  'choose yourself final': chooseYourselfFinal,
+  'this is your permission slip': thisIsYourPermissionSlip,
+  'permission slip': thisIsYourPermissionSlip,
 };
 
 export const getCardImage = (title: string): string | null => {
