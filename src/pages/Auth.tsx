@@ -77,12 +77,14 @@ export default function Auth() {
       return;
     }
 
+    const normalizedEmail = result.data.email.toLowerCase();
+
     setIsSubmitting(true);
-    
+
     try {
       const response = await supabase.functions.invoke("send-password-reset", {
         body: {
-          email,
+          email: normalizedEmail,
           redirectUrl: `${window.location.origin}/auth?type=recovery`,
         },
       });
@@ -133,26 +135,47 @@ export default function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
-    const schema = view === "signUp" ? signUpSchema : signInSchema;
-    const data = view === "signUp" ? { firstName, email, password } : { email, password };
-    
-    const result = schema.safeParse(data);
-    
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
-      });
-      setErrors(fieldErrors);
-      return;
+
+    let normalizedEmail = "";
+    let normalizedPassword = "";
+    let normalizedFirstName: string | undefined;
+
+    if (view === "signUp") {
+      const result = signUpSchema.safeParse({ firstName, email, password });
+
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.errors.forEach((err) => {
+          if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+
+      normalizedFirstName = result.data.firstName;
+      normalizedEmail = result.data.email.toLowerCase();
+      normalizedPassword = result.data.password;
+    } else {
+      const result = signInSchema.safeParse({ email, password });
+
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.errors.forEach((err) => {
+          if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+
+      normalizedEmail = result.data.email.toLowerCase();
+      normalizedPassword = result.data.password;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       if (view === "signUp") {
-        const { error } = await signUp(email, password, firstName);
+        const { error } = await signUp(normalizedEmail, normalizedPassword, normalizedFirstName);
         if (error) {
           if (error.message.includes("already registered")) {
             toast.error("This email is already registered. Please sign in instead.");
@@ -164,10 +187,13 @@ export default function Auth() {
           setView("signIn");
         }
       } else {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(normalizedEmail, normalizedPassword);
         if (error) {
-          if (error.message.includes("Invalid login")) {
-            toast.error("Invalid email or password. Please try again.");
+          const msg = error.message.toLowerCase();
+          if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+            toast.error("No account found for that email, or the password is wrong. Try 'Forgot your password?' or 'Sign Up'.");
+          } else if (msg.includes("email not confirmed")) {
+            toast.error("Please confirm your email address, then try again.");
           } else {
             toast.error(error.message);
           }
