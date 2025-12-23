@@ -13,9 +13,10 @@ const emailSchema = z.object({
 
 interface EmailCaptureProps {
   onSubmit: (firstName: string, email: string) => void;
+  isLoading?: boolean;
 }
 
-export function EmailCapture({ onSubmit }: EmailCaptureProps) {
+export function EmailCapture({ onSubmit, isLoading = false }: EmailCaptureProps) {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<{ firstName?: string; email?: string }>({});
@@ -38,12 +39,8 @@ export function EmailCapture({ onSubmit }: EmailCaptureProps) {
     }
 
     setIsSubmitting(true);
-    // Simulate a brief delay for UX
-    setTimeout(() => {
-      onSubmit(result.data.firstName, result.data.email);
-    }, 500);
+    onSubmit(result.data.firstName, result.data.email);
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-16 px-4 flex items-center justify-center">
       <motion.div
@@ -110,10 +107,10 @@ export function EmailCapture({ onSubmit }: EmailCaptureProps) {
 
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoading}
               className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground py-6 text-lg font-semibold rounded-xl"
             >
-              {isSubmitting ? "Loading..." : "See My Results"}
+              {isSubmitting || isLoading ? "Saving..." : "See My Results"}
             </Button>
           </form>
 

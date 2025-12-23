@@ -4,7 +4,10 @@ import { AssessmentQuestion } from "@/components/assessment/AssessmentQuestion";
 import { EmailCapture } from "@/components/assessment/EmailCapture";
 import { AssessmentResults } from "@/components/assessment/AssessmentResults";
 import { assessmentQuestions } from "@/data/assessmentQuestions";
-import { getThermostatType, calculateTotalScore, calculatePercentage } from "@/data/thermostatTypes";
+import { getThermostatType, calculateTotalScore, calculatePercentage, calculateCategoryScores } from "@/data/thermostatTypes";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 type AssessmentStep = "welcome" | "questions" | "email" | "results";
 
@@ -13,6 +16,9 @@ export default function Assessment() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [userData, setUserData] = useState({ firstName: "", email: "" });
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const { user } = useAuth();
 
   const handleStart = () => setStep("questions");
 
@@ -29,8 +35,48 @@ export default function Assessment() {
     }, 300);
   };
 
-  const handleEmailSubmit = (firstName: string, email: string) => {
+  const saveResultsToDatabase = async (firstName: string, email: string) => {
+    const totalScore = calculateTotalScore(answers);
+    const percentage = calculatePercentage(totalScore);
+    const thermostatType = getThermostatType(totalScore);
+    const categoryScores = calculateCategoryScores(answers);
+
+    try {
+      // Save lead first
+      await supabase.from("leads").insert({
+        first_name: firstName,
+        email: email,
+        source: "assessment",
+      });
+
+      // Save assessment results
+      const { error } = await supabase.from("assessment_results").insert({
+        first_name: firstName,
+        email: email,
+        total_score: totalScore,
+        percentage_score: percentage,
+        thermostat_type: thermostatType.name,
+        category_scores: categoryScores,
+        answers: answers,
+        user_id: user?.id || null,
+      });
+
+      if (error) {
+        console.error("Error saving results:", error);
+        toast.error("Failed to save results, but you can still view them.");
+      }
+    } catch (error) {
+      console.error("Error saving to database:", error);
+    }
+  };
+
+  const handleEmailSubmit = async (firstName: string, email: string) => {
+    setIsSaving(true);
     setUserData({ firstName, email });
+    
+    await saveResultsToDatabase(firstName, email);
+    
+    setIsSaving(false);
     setStep("results");
   };
 
@@ -53,7 +99,7 @@ export default function Assessment() {
     );
   }
 
-  if (step === "email") return <EmailCapture onSubmit={handleEmailSubmit} />;
+  if (step === "email") return <EmailCapture onSubmit={handleEmailSubmit} isLoading={isSaving} />;
 
   return (
     <AssessmentResults
