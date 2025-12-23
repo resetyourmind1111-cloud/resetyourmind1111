@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -21,14 +22,11 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <Sparkles className="w-6 h-6 text-primary transition-transform duration-300 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-            <span className="font-serif text-lg md:text-xl font-semibold text-foreground">
-              Reset Your Mind <span className="text-primary">1111</span>
-              <span className="text-xs align-super text-muted-foreground">™</span>
-            </span>
+            <img 
+              src={logo} 
+              alt="Reset Your Mind 1111" 
+              className="h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop Navigation */}
