@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, Calendar, Target, ArrowRight } from "lucide-react";
+import { TrendingUp, Calendar, Target, ArrowRight, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { thermostatTypes, ThermostatType } from "@/data/thermostatTypes";
 
@@ -72,9 +73,17 @@ export default function Dashboard() {
       
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Your Dashboard</h1>
-            <p className="text-muted-foreground">Track your growth and view past assessment results</p>
+          <div className="flex items-start justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Your Dashboard</h1>
+              <p className="text-muted-foreground">Track your growth and view past assessment results</p>
+            </div>
+            <Link to="/settings">
+              <Button variant="outline" size="sm">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+            </Link>
           </div>
 
           {isLoading ? (
