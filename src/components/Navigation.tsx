@@ -11,9 +11,11 @@ const navLinks = [
   { name: "Assessment", href: "/assessment" },
   { name: "Dashboard", href: "/dashboard" },
   { name: "Oracle Cards", href: "/oracle" },
+  { name: "Card Gallery", href: "/card-gallery" },
   { name: "Meditations", href: "/meditations" },
   { name: "Workbook", href: "/workbook" },
 ];
+
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
