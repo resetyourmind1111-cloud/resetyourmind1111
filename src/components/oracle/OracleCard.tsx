@@ -99,7 +99,7 @@ export const OracleCard = ({
                   alt={`${card.title} oracle card image`}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-card"
                   onError={() => setImageFailed(true)}
                 />
 
