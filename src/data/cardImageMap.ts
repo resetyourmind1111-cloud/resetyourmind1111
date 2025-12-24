@@ -130,20 +130,34 @@ const cardImageMap: Record<string, string> = {
 
 export const getCardImage = (title: string): string | null => {
   const normalizedTitle = title.toLowerCase().trim();
-  
+
   // Direct match
   if (cardImageMap[normalizedTitle]) {
     return cardImageMap[normalizedTitle];
   }
-  
+
   // Partial match - check if any key is contained in the title or vice versa
   for (const [key, image] of Object.entries(cardImageMap)) {
     if (normalizedTitle.includes(key) || key.includes(normalizedTitle)) {
       return image;
     }
   }
-  
+
   return null;
 };
 
+// Deterministic fallback: ensures every card can show *some* image even if the title
+// doesn't match our current mapping keys (keeps the Oracle experience visual).
+const allCardImages = Object.values(cardImageMap);
+
+export const getCardImageForNumber = (cardNumber: number): string | null => {
+  if (!Number.isFinite(cardNumber) || allCardImages.length === 0) return null;
+
+  const idx = (Math.trunc(cardNumber) - 1) % allCardImages.length;
+  const normalizedIdx = (idx + allCardImages.length) % allCardImages.length;
+
+  return allCardImages[normalizedIdx] ?? null;
+};
+
 export default cardImageMap;
+
