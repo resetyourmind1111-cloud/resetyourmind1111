@@ -26,7 +26,7 @@ type Step = 'deck' | 'reading-type' | 'question' | 'pulling' | 'results';
 
 const Oracle = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const [step, setStep] = useState<Step>('deck');
   const [selectedDeck, setSelectedDeck] = useState<'Permission Granted' | 'Abundance' | 'both'>('Permission Granted');
   const [selectedReading, setSelectedReading] = useState<ReadingType | null>(null);
@@ -36,25 +36,28 @@ const Oracle = () => {
   const [subscriptionTier, setSubscriptionTier] = useState('free');
 
   useEffect(() => {
+    if (isLoading) return;
+
+    // Allow guests to use Oracle. Sign-in is only required for saving readings.
     if (!user) {
-      navigate('/auth');
+      setSubscriptionTier('free');
       return;
     }
-    
+
     const fetchProfile = async () => {
       const { data } = await supabase
         .from('profiles')
         .select('subscription_tier')
         .eq('user_id', user.id)
         .single();
-      
+
       if (data?.subscription_tier) {
         setSubscriptionTier(data.subscription_tier);
       }
     };
-    
+
     fetchProfile();
-  }, [user, navigate]);
+  }, [user, isLoading]);
 
   const getAvailableCards = (): OracleCardType[] => {
     if (selectedDeck === 'both') {
@@ -94,7 +97,13 @@ const Oracle = () => {
   const allCardsFlipped = pulledCards.length > 0 && flippedCards.length === pulledCards.length;
 
   const handleSaveReading = async (journalEntry: string) => {
-    if (!user || !selectedReading) return;
+    if (!selectedReading) return;
+
+    if (!user) {
+      toast.info('Sign in to save your readings to your profile.');
+      navigate('/auth');
+      return;
+    }
 
     const cardsData = pulledCards.map((card, index) => ({
       deck: card.deck_name,
@@ -103,7 +112,7 @@ const Oracle = () => {
       position: selectedReading.positions?.[index] || null,
     }));
 
-    await supabase.from('card_pulls').insert({
+    const { error } = await supabase.from('card_pulls').insert({
       user_id: user.id,
       reading_type: selectedReading.id,
       cards_pulled: cardsData,
@@ -112,8 +121,14 @@ const Oracle = () => {
       points_awarded: selectedReading.points,
     });
 
-    // Points are tracked in the card_pulls table
+    if (error) {
+      toast.error('Failed to save reading. Please try again.');
+      return;
+    }
+
+    toast.success('Reading saved to your profile!');
   };
+
 
   const resetReading = () => {
     setStep('deck');
@@ -142,6 +157,11 @@ const Oracle = () => {
           <p className="text-muted-foreground">
             Receive divine guidance through our sacred card decks
           </p>
+          {!isLoading && !user && (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Guest mode: you can pull cards, but you’ll need to sign in to save readings.
+            </p>
+          )}
         </motion.div>
 
         {/* Back Button */}
@@ -254,9 +274,10 @@ const Oracle = () => {
                 <p className="text-muted-foreground">
                   {allCardsFlipped 
                     ? 'All cards revealed! View your reading below.' 
-                    : 'Click each card to reveal your guidance'}
+                    : 'Tap each card to reveal its image and guidance'}
                 </p>
               </div>
+
               
               <CardSpread
                 reading={selectedReading}
@@ -289,6 +310,7 @@ const Oracle = () => {
                 question={question}
                 onSaveReading={handleSaveReading}
                 onNewReading={resetReading}
+                canSave={Boolean(user)}
               />
             </motion.div>
           )}

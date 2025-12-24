@@ -13,24 +13,31 @@ interface ReadingResultsProps {
   question?: string;
   onSaveReading: (journalEntry: string) => Promise<void>;
   onNewReading: () => void;
+  canSave?: boolean;
 }
+
 
 export const ReadingResults = ({ 
   reading, 
   cards, 
   question,
   onSaveReading, 
-  onNewReading 
+  onNewReading,
+  canSave = true,
 }: ReadingResultsProps) => {
   const [journalEntry, setJournalEntry] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
 
   const handleSave = async () => {
+    if (!canSave) {
+      toast.info('Sign in to save your readings.');
+      return;
+    }
+
     setIsSaving(true);
     try {
       await onSaveReading(journalEntry);
-      toast.success('Reading saved to your profile!');
     } catch (error) {
       toast.error('Failed to save reading');
     } finally {
@@ -158,9 +165,9 @@ export const ReadingResults = ({
             className="resize-none"
           />
           <div className="flex flex-wrap gap-3">
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button onClick={handleSave} disabled={isSaving || !canSave}>
               <Save className="w-4 h-4 mr-2" />
-              {isSaving ? 'Saving...' : 'Save Reading'}
+              {!canSave ? 'Sign in to Save' : isSaving ? 'Saving...' : 'Save Reading'}
             </Button>
             <Button variant="outline" onClick={handleShare}>
               <Share2 className="w-4 h-4 mr-2" />
