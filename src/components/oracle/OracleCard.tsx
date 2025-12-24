@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OracleCard as OracleCardType } from '@/data/oracleCards';
-import { getCardImage } from '@/data/cardImageMap';
+import { getCardImage, getCardImageForNumber } from '@/data/cardImageMap';
 
 interface OracleCardProps {
   card: OracleCardType;
@@ -21,7 +21,11 @@ export const OracleCard = ({
   showDetails = false 
 }: OracleCardProps) => {
   const [flipped, setFlipped] = useState(isFlipped);
-  const cardImage = getCardImage(card.title);
+  const [imageFailed, setImageFailed] = useState(false);
+
+  const mappedCardImage = getCardImage(card.title);
+  const cardImage = mappedCardImage ?? getCardImageForNumber(card.card_number);
+  const showTextOverlay = Boolean(mappedCardImage);
 
   const handleFlip = () => {
     if (!flipped && onFlip) {
@@ -88,40 +92,47 @@ export const OracleCard = ({
             className="absolute inset-0 rounded-xl shadow-xl overflow-hidden"
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >
-            {cardImage ? (
-              // Display actual card image
+            {cardImage && !imageFailed ? (
               <div className="relative w-full h-full">
-                <img 
-                  src={cardImage} 
-                  alt={card.title}
+                <img
+                  src={cardImage}
+                  alt={`${card.title} oracle card image`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
+                  onError={() => setImageFailed(true)}
                 />
-                {/* Subtle overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-                
-                {/* Card title overlay at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
-                  <h3 className="font-serif text-sm md:text-base font-bold text-white drop-shadow-lg uppercase tracking-wide">
-                    {card.title}
-                  </h3>
-                  <p className="text-[10px] text-white/80 mt-1 italic line-clamp-2">
-                    {card.message}
-                  </p>
-                </div>
-                
-                {/* Category badge at top */}
-                <div className="absolute top-2 left-2 right-2">
-                  <span className="inline-block text-[8px] uppercase tracking-wider text-white/90 bg-black/40 px-2 py-1 rounded-full">
-                    {card.category}
-                  </span>
-                </div>
-                
-                {/* Card number */}
-                <div className="absolute top-2 right-2">
-                  <span className="text-[10px] text-white/80 bg-black/40 px-2 py-0.5 rounded-full">
-                    {card.card_number}
-                  </span>
-                </div>
+
+                {showTextOverlay && (
+                  <>
+                    {/* Subtle overlay for text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+
+                    {/* Card title overlay at bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+                      <h3 className="font-serif text-sm md:text-base font-bold text-white drop-shadow-lg uppercase tracking-wide">
+                        {card.title}
+                      </h3>
+                      <p className="text-[10px] text-white/80 mt-1 italic line-clamp-2">
+                        {card.message}
+                      </p>
+                    </div>
+
+                    {/* Category badge at top */}
+                    <div className="absolute top-2 left-2 right-2">
+                      <span className="inline-block text-[8px] uppercase tracking-wider text-white/90 bg-black/40 px-2 py-1 rounded-full">
+                        {card.category}
+                      </span>
+                    </div>
+
+                    {/* Card number */}
+                    <div className="absolute top-2 right-2">
+                      <span className="text-[10px] text-white/80 bg-black/40 px-2 py-0.5 rounded-full">
+                        {card.card_number}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               // Fallback design when no image available
@@ -196,3 +207,4 @@ export const OracleCard = ({
     </div>
   );
 };
+
