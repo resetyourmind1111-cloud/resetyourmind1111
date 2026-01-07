@@ -14,6 +14,47 @@ interface ResetRequest {
   redirectUrl: string;
 }
 
+// Simple in-memory rate limiting (per instance)
+const rateLimitMap = new Map<string, { count: number; firstRequest: number }>();
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS_PER_WINDOW = 5; // 5 requests per hour per email
+
+function isRateLimited(email: string): boolean {
+  const now = Date.now();
+  const emailKey = email.toLowerCase().trim();
+  const existing = rateLimitMap.get(emailKey);
+
+  if (!existing) {
+    rateLimitMap.set(emailKey, { count: 1, firstRequest: now });
+    return false;
+  }
+
+  // Reset window if expired
+  if (now - existing.firstRequest > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(emailKey, { count: 1, firstRequest: now });
+    return false;
+  }
+
+  // Check if over limit
+  if (existing.count >= MAX_REQUESTS_PER_WINDOW) {
+    return true;
+  }
+
+  // Increment count
+  existing.count++;
+  return false;
+}
+
+// Clean up old entries periodically
+function cleanupRateLimitMap() {
+  const now = Date.now();
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now - value.firstRequest > RATE_LIMIT_WINDOW_MS) {
+      rateLimitMap.delete(key);
+    }
+  }
+}
+
 const handler = async (req: Request): Promise<Response> => {
   console.log("Password reset request received");
 
@@ -23,15 +64,37 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { email, redirectUrl }: ResetRequest = await req.json();
-    console.log("Processing reset for email:", email);
+    console.log("Processing reset request");
 
     if (!email || !redirectUrl) {
-      console.error("Missing required fields");
+      console.log("Missing required fields");
       return new Response(
         JSON.stringify({ error: "Email and redirect URL are required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid email format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Rate limiting check
+    if (isRateLimited(email)) {
+      console.log("Rate limit exceeded for email");
+      // Return success to prevent enumeration, but don't send email
+      return new Response(
+        JSON.stringify({ success: true, message: "If an account exists, a reset email will be sent." }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Cleanup old rate limit entries
+    cleanupRateLimitMap();
 
     // Create Supabase admin client
     const supabaseAdmin = createClient(
@@ -50,7 +113,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (resetError) {
-      console.error("Error generating reset link:", resetError);
+      console.log("Error generating reset link");
       // Don't reveal if user exists or not for security
       return new Response(
         JSON.stringify({ success: true, message: "If an account exists, a reset email will be sent." }),
@@ -61,7 +124,7 @@ const handler = async (req: Request): Promise<Response> => {
     const resetLink = data.properties?.action_link;
 
     if (!resetLink) {
-      console.error("No reset link generated");
+      console.log("No reset link generated");
       return new Response(
         JSON.stringify({ success: true, message: "If an account exists, a reset email will be sent." }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -106,14 +169,14 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    console.log("Email sent successfully");
 
     return new Response(
       JSON.stringify({ success: true, message: "If an account exists, a reset email will be sent." }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("Error in password reset function:", error);
+    console.error("Error in password reset function");
     return new Response(
       JSON.stringify({ error: "An error occurred processing your request" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

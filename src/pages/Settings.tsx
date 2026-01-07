@@ -134,7 +134,9 @@ export default function Settings() {
       setPhotoUrl(newPhotoUrl);
       toast.success("Profile photo updated!");
     } catch (error: any) {
-      console.error("Error uploading photo:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error uploading photo:", error);
+      }
       toast.error("Failed to upload photo. Please try again.");
     } finally {
       setIsUploadingPhoto(false);
@@ -184,7 +186,9 @@ export default function Settings() {
 
       toast.success("Profile updated successfully!");
     } catch (error: any) {
-      console.error("Error updating profile:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error updating profile:", error);
+      }
       toast.error("Failed to update profile. Please try again.");
     } finally {
       setIsSaving(false);

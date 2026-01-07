@@ -62,11 +62,15 @@ export default function Assessment() {
       });
 
       if (error) {
-        console.error("Error saving results:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error saving results:", error);
+        }
         toast.error("Failed to save results, but you can still view them.");
       }
     } catch (error) {
-      console.error("Error saving to database:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error saving to database:", error);
+      }
     }
   };
 
