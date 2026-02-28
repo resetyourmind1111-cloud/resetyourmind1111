@@ -11,10 +11,15 @@ import {
   CheckCircle,
   ArrowRight,
   Share2,
-  Download
+  RefreshCw,
+  Sparkles,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { useRef, useCallback } from "react";
+import { toast } from "sonner";
+import html2canvas from "html2canvas";
 
 interface AssessmentResultsProps {
   firstName: string;
@@ -22,6 +27,7 @@ interface AssessmentResultsProps {
   percentage: number;
   thermostatType: ThermostatType;
   answers: Record<number, number>;
+  onRetake?: () => void;
 }
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -40,40 +46,48 @@ const categoryLabels: Record<string, string> = {
   action: "Action & Manifestation",
 };
 
-const categoryColors: Record<string, string> = {
-  love: "text-pink-500",
-  money: "text-accent",
-  career: "text-primary",
-  boundaries: "text-emerald-500",
-  action: "text-orange-500",
-};
-
 export function AssessmentResults({
   firstName,
   totalScore,
   percentage,
   thermostatType,
   answers,
+  onRetake,
 }: AssessmentResultsProps) {
   const categoryScores = calculateCategoryScores(answers);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
-  const handleShare = () => {
-    const text = `I just discovered I'm "${thermostatType.name}" on the Worth Thermostat Assessment! My worth temperature is ${thermostatType.temperature}. Take the free assessment to discover yours!`;
-    if (navigator.share) {
-      navigator.share({
-        title: "My Worth Thermostat Results",
-        text,
-        url: window.location.origin + "/assessment",
+  const handleShareImage = useCallback(async () => {
+    if (!shareCardRef.current) return;
+    try {
+      const canvas = await html2canvas(shareCardRef.current, {
+        backgroundColor: "#0a0a0a",
+        scale: 2,
       });
-    } else {
-      navigator.clipboard.writeText(text + " " + window.location.origin + "/assessment");
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], "worth-thermostat-results.png", { type: "image/png" });
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: "My Worth Thermostat Results" });
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "worth-thermostat-results.png";
+          a.click();
+          URL.revokeObjectURL(url);
+          toast.success("Results image downloaded!");
+        }
+      });
+    } catch {
+      toast.error("Could not generate share image");
     }
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        {/* Celebration Header */}
+        {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -100,57 +114,47 @@ export function AssessmentResults({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="font-display text-3xl md:text-4xl font-bold gradient-text mb-4"
+            className="font-display text-3xl md:text-4xl font-bold text-accent mb-2"
+            style={{ fontFamily: "'Playfair Display', serif" }}
           >
             {thermostatType.name}
           </motion.h2>
-          
-          <p className="text-xl text-muted-foreground italic max-w-lg mx-auto">
-            "{thermostatType.tagline}"
+
+          <p className="text-lg text-muted-foreground">
+            Thermostat Temperature: <span className="text-foreground font-semibold">{thermostatType.temperature}</span> — <span className="text-accent italic">{thermostatType.temperatureLabel}</span>
           </p>
         </motion.div>
 
-        {/* Score Summary */}
+        {/* Overall Score */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="glass-card p-8 mb-8"
+          className="glass-card p-8 mb-8 text-center"
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Thermostat Visual */}
-            <div className="flex items-center gap-6">
-              <div className="relative">
-                <Thermometer className="w-16 h-16 text-primary" />
-                <div 
-                  className={cn(
-                    "absolute bottom-1 left-1/2 -translate-x-1/2 w-3 rounded-full bg-gradient-to-t",
-                    thermostatType.color
-                  )}
-                  style={{ height: `${Math.max(20, percentage)}%`, maxHeight: '60%' }}
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative w-32 h-32">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" strokeWidth="8" className="stroke-secondary" />
+                <motion.circle
+                  cx="60" cy="60" r="52" fill="none" strokeWidth="8"
+                  strokeLinecap="round"
+                  className="stroke-accent"
+                  strokeDasharray={`${2 * Math.PI * 52}`}
+                  initial={{ strokeDashoffset: 2 * Math.PI * 52 }}
+                  animate={{ strokeDashoffset: 2 * Math.PI * 52 * (1 - percentage / 100) }}
+                  transition={{ delay: 0.8, duration: 1, ease: "easeOut" }}
                 />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground uppercase tracking-wide">Temperature Setting</p>
-                <p className="text-3xl font-bold text-foreground">{thermostatType.temperature}</p>
-              </div>
-            </div>
-
-            {/* Score Display */}
-            <div className="flex gap-8 text-center">
-              <div>
-                <p className="text-sm text-muted-foreground uppercase tracking-wide">Total Score</p>
-                <p className="text-4xl font-bold text-foreground">{totalScore}<span className="text-xl text-muted-foreground">/125</span></p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground uppercase tracking-wide">Percentage</p>
-                <p className="text-4xl font-bold gradient-text">{percentage}%</p>
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-4xl font-bold text-accent">{percentage}%</span>
               </div>
             </div>
+            <p className="text-muted-foreground">Score: <span className="text-foreground font-semibold">{totalScore}</span> / 125</p>
           </div>
         </motion.div>
 
-        {/* Category Breakdown */}
+        {/* 5 Category Sub-Score Bars */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,31 +164,25 @@ export function AssessmentResults({
           <h3 className="font-display text-2xl font-semibold text-foreground mb-6">
             Category Breakdown
           </h3>
-          
-          <div className="space-y-4">
-            {Object.entries(categoryScores).map(([category, score]) => {
+          <div className="space-y-5">
+            {Object.entries(categoryScores).map(([category, score], i) => {
               const Icon = categoryIcons[category];
               const maxScore = 25;
               const percent = (score / maxScore) * 100;
-              
               return (
-                <div key={category} className="flex items-center gap-4">
-                  <div className={cn("p-2 rounded-full bg-secondary", categoryColors[category])}>
-                    <Icon className="w-5 h-5" />
+                <div key={category}>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Icon className="w-5 h-5 text-accent shrink-0" />
+                    <span className="text-sm font-medium text-foreground flex-1">{categoryLabels[category]}</span>
+                    <span className="text-sm font-semibold text-accent">{score}/25</span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-foreground">{categoryLabels[category]}</span>
-                      <span className="text-sm text-muted-foreground">{score}/25</span>
-                    </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percent}%` }}
-                        transition={{ delay: 0.8, duration: 0.5 }}
-                        className="h-full bg-gradient-to-r from-primary to-accent"
-                      />
-                    </div>
+                  <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${percent}%` }}
+                      transition={{ delay: 0.9 + i * 0.1, duration: 0.6 }}
+                      className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
+                    />
                   </div>
                 </div>
               );
@@ -199,14 +197,51 @@ export function AssessmentResults({
           transition={{ delay: 0.8 }}
           className="glass-card p-8 mb-8"
         >
-          <h3 className="font-display text-2xl font-semibold text-foreground mb-4">
-            What This Means
-          </h3>
-          <p className="text-muted-foreground leading-relaxed mb-6">
+          <p className="text-foreground/90 leading-relaxed text-lg">
             {thermostatType.description}
           </p>
-          <p className="text-foreground leading-relaxed">
-            {thermostatType.whatThisMeans}
+        </motion.div>
+
+        {/* What This Means */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          className="glass-card p-8 mb-8"
+        >
+          <h3 className="font-display text-2xl font-semibold text-foreground mb-5 flex items-center gap-2">
+            <Star className="w-6 h-6 text-accent" />
+            What This Means
+          </h3>
+          <ul className="space-y-3">
+            {thermostatType.whatThisMeans.map((item, index) => (
+              <motion.li
+                key={index}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1 + index * 0.08 }}
+                className="flex items-start gap-3 text-foreground/80"
+              >
+                <span className="mt-1.5 w-2 h-2 rounded-full bg-accent shrink-0" />
+                <span>{item}</span>
+              </motion.li>
+            ))}
+          </ul>
+        </motion.div>
+
+        {/* The Good News */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+          className="glass-card p-8 mb-8 border-l-4 border-accent"
+        >
+          <h3 className="font-display text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-accent" />
+            The Good News
+          </h3>
+          <p className="text-foreground/90 leading-relaxed text-lg italic">
+            {thermostatType.goodNews}
           </p>
         </motion.div>
 
@@ -214,37 +249,37 @@ export function AssessmentResults({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
+          transition={{ delay: 1.1 }}
           className="glass-card p-8 mb-8"
         >
-          <h3 className="font-display text-2xl font-semibold text-foreground mb-6">
+          <h3 className="font-display text-2xl font-semibold text-foreground mb-5">
             What You Need
           </h3>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <ul className="space-y-3">
             {thermostatType.whatYouNeed.map((item, index) => (
-              <motion.div
+              <motion.li
                 key={index}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1 + index * 0.1 }}
-                className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50"
+                transition={{ delay: 1.2 + index * 0.08 }}
+                className="flex items-start gap-3"
               >
-                <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                <span className="text-foreground">{item}</span>
-              </motion.div>
+                <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <span className="text-foreground/80">{item}</span>
+              </motion.li>
             ))}
-          </div>
+          </ul>
         </motion.div>
 
-        {/* Next Steps */}
+        {/* Your Next Steps in the App */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 1.2 }}
           className="glass-card p-8 mb-8 bg-gradient-to-br from-primary/10 to-accent/10"
         >
           <h3 className="font-display text-2xl font-semibold text-foreground mb-6">
-            Your Personalized Next Steps
+            Your Next Steps in the App
           </h3>
           <div className="space-y-3">
             {thermostatType.nextSteps.map((step, index) => (
@@ -252,44 +287,79 @@ export function AssessmentResults({
                 key={index}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.1 + index * 0.1 }}
-                className="flex items-start gap-3 p-4 rounded-lg bg-background/50"
+                transition={{ delay: 1.3 + index * 0.1 }}
               >
-                <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">
-                  {index + 1}
-                </span>
-                <span className="text-foreground">{step}</span>
+                <Link
+                  to={step.link}
+                  className="flex items-start gap-3 p-4 rounded-lg bg-background/50 hover:bg-background/80 transition-colors group"
+                >
+                  <span className="w-7 h-7 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-sm font-bold shrink-0">
+                    {index + 1}
+                  </span>
+                  <span className="text-foreground flex-1">{step.text}</span>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-colors shrink-0 mt-1" />
+                </Link>
               </motion.div>
             ))}
           </div>
         </motion.div>
 
+        {/* Share Card (hidden, used for image generation) */}
+        <div className="absolute -left-[9999px]">
+          <div
+            ref={shareCardRef}
+            className="w-[600px] p-10 text-white"
+            style={{ background: "linear-gradient(135deg, #0a0a0a, #1a1a2e)" }}
+          >
+            <div className="text-center mb-6">
+              <p className="text-sm tracking-widest uppercase opacity-60 mb-2">Worth Thermostat Assessment</p>
+              <p className="text-4xl font-bold mb-1" style={{ color: "#D4AF37" }}>{thermostatType.name}</p>
+              <p className="text-lg opacity-70">{thermostatType.temperature} — {thermostatType.temperatureLabel}</p>
+            </div>
+            <div className="text-center mb-6">
+              <p className="text-6xl font-bold" style={{ color: "#D4AF37" }}>{percentage}%</p>
+              <p className="opacity-60">{totalScore} / 125</p>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(categoryScores).map(([category, score]) => (
+                <div key={category} className="flex items-center gap-3">
+                  <span className="text-sm w-40 opacity-70">{categoryLabels[category]}</span>
+                  <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${(score / 25) * 100}%`, background: "#D4AF37" }} />
+                  </div>
+                  <span className="text-sm opacity-70">{score}/25</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-center mt-6 text-sm opacity-40">resetyourmind1111.com</p>
+          </div>
+        </div>
+
         {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center"
+          transition={{ delay: 1.4 }}
+          className="flex flex-col items-center gap-4 mb-6"
         >
-          <Link to="/#pricing">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground px-8 py-6 text-lg font-semibold rounded-full"
-            >
-              Start Your Transformation
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
-          
           <Button
-            variant="outline"
             size="lg"
-            onClick={handleShare}
-            className="px-8 py-6 text-lg rounded-full"
+            onClick={handleShareImage}
+            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground px-8 py-6 text-lg font-semibold rounded-full w-full sm:w-auto"
           >
             <Share2 className="mr-2 w-5 h-5" />
-            Share Results
+            Share Results as Image
           </Button>
+
+          {onRetake && (
+            <button
+              onClick={onRetake}
+              className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 text-sm"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retake Assessment
+            </button>
+          )}
         </motion.div>
       </div>
     </div>

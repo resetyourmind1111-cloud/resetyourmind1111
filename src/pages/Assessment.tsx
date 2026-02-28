@@ -105,6 +105,13 @@ export default function Assessment() {
 
   if (step === "email") return <EmailCapture onSubmit={handleEmailSubmit} isLoading={isSaving} />;
 
+  const handleRetake = () => {
+    setStep("welcome");
+    setCurrentQuestionIndex(0);
+    setAnswers({});
+    setUserData({ firstName: "", email: "" });
+  };
+
   return (
     <AssessmentResults
       firstName={userData.firstName}
@@ -112,6 +119,7 @@ export default function Assessment() {
       percentage={percentage}
       thermostatType={thermostatType}
       answers={answers}
+      onRetake={handleRetake}
     />
   );
 }
