@@ -55,6 +55,15 @@ export default function Auth() {
     if (type === "recovery") {
       setView("updatePassword");
     }
+
+    // Also listen for PASSWORD_RECOVERY event from Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setView("updatePassword");
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [searchParams]);
 
   useEffect(() => {
@@ -120,9 +129,22 @@ export default function Auth() {
     setIsSubmitting(true);
     
     try {
+      // Ensure we have a session before updating password
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Your reset link has expired. Please request a new one.");
+        setView("forgotPassword");
+        return;
+      }
+
       const { error } = await updatePassword(password);
       if (error) {
-        toast.error(error.message);
+        if (error.message.toLowerCase().includes("session")) {
+          toast.error("Your reset session has expired. Please request a new reset link.");
+          setView("forgotPassword");
+        } else {
+          toast.error(error.message);
+        }
       } else {
         toast.success("Password updated successfully!");
         navigate("/");
