@@ -12,9 +12,13 @@ const Index = () => {
       <Navigation />
       <main>
         <HeroSection />
+        <div className="section-divider" />
         <FeaturesSection />
+        <div className="section-divider" />
         <TestimonialsSection />
+        <div className="section-divider" />
         <PricingSection />
+        <div className="section-divider" />
         <CTASection />
       </main>
       <Footer />

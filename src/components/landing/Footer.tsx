@@ -23,7 +23,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background py-16">
+    <footer className="bg-muted/50 border-t border-border py-16">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
@@ -35,24 +35,24 @@ export function Footer() {
                 className="h-12 w-auto"
               />
             </Link>
-            <p className="text-background/70 text-sm leading-relaxed max-w-sm mb-6">
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mb-6">
               Stop settling for crumbs. Discover your Worth Thermostat and recalibrate 
               your life for the celebration you truly deserve.
             </p>
-            <p className="text-sm text-background/50">
+            <p className="text-sm text-muted-foreground/70">
               By Lorie Wu | The Emotional Surgeon
             </p>
           </div>
 
           {/* Product Links */}
           <div>
-            <h4 className="font-semibold text-background mb-4">Product</h4>
+            <h4 className="font-semibold text-foreground mb-4">Product</h4>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.href} 
-                    className="text-sm text-background/70 hover:text-accent transition-colors"
+                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -63,13 +63,13 @@ export function Footer() {
 
           {/* Support Links */}
           <div>
-            <h4 className="font-semibold text-background mb-4">Support</h4>
+            <h4 className="font-semibold text-foreground mb-4">Support</h4>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.href} 
-                    className="text-sm text-background/70 hover:text-accent transition-colors"
+                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -80,13 +80,13 @@ export function Footer() {
 
           {/* Legal Links */}
           <div>
-            <h4 className="font-semibold text-background mb-4">Legal</h4>
+            <h4 className="font-semibold text-foreground mb-4">Legal</h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.href} 
-                    className="text-sm text-background/70 hover:text-accent transition-colors"
+                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -96,12 +96,15 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Divider */}
+        <div className="section-divider mb-8" />
+
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-background/50">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground/70">
             © {new Date().getFullYear()} Reset Your Mind 1111™. All rights reserved.
           </p>
-          <p className="text-sm text-background/50 flex items-center gap-1">
+          <p className="text-sm text-muted-foreground/70 flex items-center gap-1">
             Made with <Heart className="w-4 h-4 text-brand-pink fill-brand-pink" /> for your transformation
           </p>
         </div>
