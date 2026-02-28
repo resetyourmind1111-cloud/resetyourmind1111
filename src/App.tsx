@@ -11,6 +11,13 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Oracle from "./pages/Oracle";
 import CardGallery from "./pages/CardGallery";
+import MeditationLibrary from "./pages/MeditationLibrary";
+import PermissionSlips from "./pages/PermissionSlips";
+import HealingTools from "./pages/HealingTools";
+import HumanDesign from "./pages/HumanDesign";
+import Manifesto from "./pages/Manifesto";
+import MyProgress from "./pages/MyProgress";
+import MyAccount from "./pages/MyAccount";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +37,13 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/oracle" element={<Oracle />} />
             <Route path="/card-gallery" element={<CardGallery />} />
+            <Route path="/meditations" element={<MeditationLibrary />} />
+            <Route path="/permission-slips" element={<PermissionSlips />} />
+            <Route path="/healing-tools" element={<HealingTools />} />
+            <Route path="/human-design" element={<HumanDesign />} />
+            <Route path="/manifesto" element={<Manifesto />} />
+            <Route path="/my-progress" element={<MyProgress />} />
+            <Route path="/my-account" element={<MyAccount />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -40,4 +54,3 @@ const App = () => (
 );
 
 export default App;
-

@@ -8,14 +8,17 @@ import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "Assessment", href: "/assessment" },
   { name: "Dashboard", href: "/dashboard" },
-  { name: "Oracle Cards", href: "/oracle" },
-  { name: "Card Gallery", href: "/card-gallery" },
+  { name: "Worth Thermostat", href: "/assessment" },
   { name: "Meditations", href: "/meditations" },
-  { name: "Workbook", href: "/workbook" },
+  { name: "Oracle Cards", href: "/oracle" },
+  { name: "Permission Slips", href: "/permission-slips" },
+  { name: "Healing Tools", href: "/healing-tools" },
+  { name: "Human Design", href: "/human-design" },
+  { name: "Manifesto", href: "/manifesto" },
+  { name: "My Progress", href: "/my-progress" },
+  { name: "My Account", href: "/my-account" },
 ];
-
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,12 +43,12 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5 overflow-x-auto">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-secondary/50"
+                className="px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-muted/50 whitespace-nowrap"
               >
                 {link.name}
               </Link>
@@ -53,28 +56,19 @@ export function Navigation() {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
             {user ? (
-              <>
-                <span className="text-sm text-muted-foreground">
-                  {user.email}
-                </span>
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
-                </Button>
-              </>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
             ) : (
               <>
                 <Link to="/auth">
-                  <Button variant="ghost" size="sm">
-                    Sign In
-                  </Button>
+                  <Button variant="ghost" size="sm">Sign In</Button>
                 </Link>
                 <Link to="/auth">
-                  <Button size="sm">
-                    Get Started
-                  </Button>
+                  <Button size="sm" variant="gold">Get Started</Button>
                 </Link>
               </>
             )}
@@ -83,7 +77,7 @@ export function Navigation() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+            className="lg:hidden p-2 text-foreground hover:bg-muted rounded-lg transition-colors"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -99,20 +93,20 @@ export function Navigation() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="lg:hidden bg-background/95 backdrop-blur-xl border-b border-border"
+            className="lg:hidden bg-background/95 backdrop-blur-xl border-b border-border max-h-[80vh] overflow-y-auto"
           >
-            <div className="container mx-auto px-4 py-4 space-y-2">
+            <div className="container mx-auto px-4 py-4 space-y-1">
               {navLinks.map((link, index) => (
                 <motion.div
                   key={link.name}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: index * 0.03 }}
                 >
                   <Link
                     to={link.href}
                     onClick={() => setIsOpen(false)}
-                    className="block px-4 py-3 text-base font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
+                    className="block px-4 py-3 text-base font-medium text-foreground hover:bg-muted rounded-lg transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -120,26 +114,17 @@ export function Navigation() {
               ))}
               <div className="pt-4 flex flex-col gap-2 border-t border-border mt-4">
                 {user ? (
-                  <>
-                    <p className="text-sm text-muted-foreground text-center px-4">
-                      {user.email}
-                    </p>
-                    <Button variant="outline" className="w-full justify-center" onClick={handleSignOut}>
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
-                    </Button>
-                  </>
+                  <Button variant="outline" className="w-full justify-center" onClick={handleSignOut}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
                 ) : (
                   <>
                     <Link to="/auth" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" className="w-full justify-center">
-                        Sign In
-                      </Button>
+                      <Button variant="outline" className="w-full justify-center">Sign In</Button>
                     </Link>
                     <Link to="/auth" onClick={() => setIsOpen(false)}>
-                      <Button className="w-full justify-center">
-                        Get Started
-                      </Button>
+                      <Button variant="gold" className="w-full justify-center">Get Started</Button>
                     </Link>
                   </>
                 )}
