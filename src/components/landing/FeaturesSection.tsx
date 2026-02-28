@@ -20,7 +20,7 @@ const features = [
   {
     icon: Sparkles,
     title: "Oracle Card Guidance",
-    description: "Access 104 beautifully designed oracle cards across two powerful decks. Permission Granted and Abundance cards offer daily wisdom and deep reflection.",
+    description: "Access 156 beautifully designed oracle cards across three powerful decks — Permission Granted, Abundance, and Relationships — offering daily wisdom and deep reflection.",
     color: "accent",
   },
   {
