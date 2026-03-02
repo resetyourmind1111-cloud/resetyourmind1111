@@ -19,6 +19,12 @@ import BoundaryBuilder from "@/components/healing-tools/BoundaryBuilder";
 import AttachmentStyleAnalyzer from "@/components/healing-tools/AttachmentStyleAnalyzer";
 import MoonPhaseTracker from "@/components/healing-tools/MoonPhaseTracker";
 import AngelNumberJournal from "@/components/healing-tools/AngelNumberJournal";
+import SomaticBreathing from "@/components/healing-tools/SomaticBreathing";
+import BodyMapJournal from "@/components/healing-tools/BodyMapJournal";
+import AffirmationBuilder from "@/components/healing-tools/AffirmationBuilder";
+import VisibilityChallengeTracker from "@/components/healing-tools/VisibilityChallengeTracker";
+import CEOSelfAssessment from "@/components/healing-tools/CEOSelfAssessment";
+import ValuesClarityTool from "@/components/healing-tools/ValuesClarityTool";
 
 const toolComponents: Record<string, React.ComponentType> = {
   "limiting-belief-rewriter": LimitingBeliefRewriter,
@@ -33,6 +39,12 @@ const toolComponents: Record<string, React.ComponentType> = {
   "attachment-style-analyzer": AttachmentStyleAnalyzer,
   "moon-phase-tracker": MoonPhaseTracker,
   "angel-number-journal": AngelNumberJournal,
+  "somatic-breathing": SomaticBreathing,
+  "body-map-journal": BodyMapJournal,
+  "affirmation-builder": AffirmationBuilder,
+  "visibility-challenge": VisibilityChallengeTracker,
+  "ceo-self-assessment": CEOSelfAssessment,
+  "values-clarity-tool": ValuesClarityTool,
 };
 
 export default function HealingToolPage() {
