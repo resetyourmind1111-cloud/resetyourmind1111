@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BodyTypeAssessment } from "@/components/wellness/BodyTypeAssessment";
 import { NutritionPlans } from "@/components/wellness/NutritionPlans";
+import { MovementPlans } from "@/components/wellness/MovementPlans";
 import { motion } from "framer-motion";
 import { Construction } from "lucide-react";
 
@@ -55,7 +56,7 @@ export default function WellnessHub() {
               <NutritionPlans />
             </TabsContent>
             <TabsContent value="movement">
-              <ComingSoon label="Movement Medicine" />
+              <MovementPlans />
             </TabsContent>
             <TabsContent value="avini">
               <ComingSoon label="Avini Health Products" />
