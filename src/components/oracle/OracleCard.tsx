@@ -12,6 +12,12 @@ interface OracleCardProps {
   showDetails?: boolean;
 }
 
+const deckColors: Record<string, { gradient: string; label: string }> = {
+  'Permission Granted': { gradient: 'from-[hsl(271,60%,27%)] via-[hsl(280,50%,35%)] to-[hsl(271,60%,27%)]/80', label: 'Permission Granted' },
+  'Abundance': { gradient: 'from-[hsl(130,15%,55%)] via-[hsl(130,20%,40%)] to-[hsl(43,52%,54%)]', label: 'Abundance' },
+  'Relationship Guidance': { gradient: 'from-[hsl(340,40%,55%)] via-[hsl(340,45%,40%)] to-[hsl(340,40%,55%)]/80', label: 'Relationship' },
+};
+
 export const OracleCard = ({ 
   card, 
   position, 
@@ -23,8 +29,8 @@ export const OracleCard = ({
   const [flipped, setFlipped] = useState(isFlipped);
   const [imageFailed, setImageFailed] = useState(false);
 
-  const mappedCardImage = getCardImage(card.title);
-  const cardImage = mappedCardImage ?? getCardImageForNumber(card.card_number);
+  const mappedCardImage = card.deck_name === 'Permission Granted' ? getCardImage(card.title) : null;
+  const cardImage = mappedCardImage ?? (card.deck_name === 'Permission Granted' ? getCardImageForNumber(card.card_number) : null);
   const showTextOverlay = Boolean(mappedCardImage);
 
   const handleFlip = () => {
@@ -40,7 +46,7 @@ export const OracleCard = ({
     lg: 'w-64 h-96',
   };
 
-  const isPermissionDeck = card.deck_name === 'Permission Granted';
+  const deckStyle = deckColors[card.deck_name] || deckColors['Permission Granted'];
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -65,26 +71,20 @@ export const OracleCard = ({
         >
           {/* Card Back */}
           <div
-            className={`absolute inset-0 rounded-xl shadow-xl ${
-              isPermissionDeck 
-                ? 'bg-gradient-to-br from-primary via-purple-600 to-primary/80' 
-                : 'bg-gradient-to-br from-accent via-amber-500 to-yellow-600'
-            }`}
+            className={`absolute inset-0 rounded-xl shadow-xl bg-gradient-to-br ${deckStyle.gradient}`}
             style={{ backfaceVisibility: 'hidden' }}
           >
-            <div className="absolute inset-2 rounded-lg border-2 border-white/30 flex items-center justify-center">
-              <div className="text-center text-white p-4">
+            <div className="absolute inset-2 rounded-lg border-2 border-foreground/20 flex items-center justify-center">
+              <div className="text-center p-4">
                 <div className="text-3xl mb-2">✨</div>
-                <div className="font-serif text-sm font-semibold">
-                  {isPermissionDeck ? 'Permission Granted' : 'Abundance'}
+                <div className="font-serif text-sm font-semibold text-foreground">
+                  {deckStyle.label}
                 </div>
-                <div className="text-xs opacity-70 mt-1">Oracle</div>
+                <div className="text-xs opacity-70 mt-1 text-foreground">Oracle</div>
               </div>
             </div>
-            {/* Decorative elements */}
-            <div className="absolute top-3 left-3 w-6 h-6 border border-white/40 rotate-45" />
-            <div className="absolute bottom-3 right-3 w-6 h-6 border border-white/40 rotate-45" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl" />
+            <div className="absolute top-3 left-3 w-6 h-6 border border-foreground/30 rotate-45" />
+            <div className="absolute bottom-3 right-3 w-6 h-6 border border-foreground/30 rotate-45" />
           </div>
 
           {/* Card Front */}
@@ -96,76 +96,47 @@ export const OracleCard = ({
               <div className="relative w-full h-full">
                 <img
                   src={cardImage}
-                  alt={`${card.title} oracle card image`}
+                  alt={`${card.title} oracle card`}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-contain bg-card"
                   onError={() => setImageFailed(true)}
                 />
-
                 {showTextOverlay && (
                   <>
-                    {/* Subtle overlay for text readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-
-                    {/* Card title overlay at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
-                      <h3 className="font-serif text-sm md:text-base font-bold text-white drop-shadow-lg uppercase tracking-wide">
+                      <h3 className="font-serif text-sm md:text-base font-bold text-foreground drop-shadow-lg uppercase tracking-wide">
                         {card.title}
                       </h3>
-                      <p className="text-[10px] text-white/80 mt-1 italic line-clamp-2">
-                        {card.message}
-                      </p>
                     </div>
-
-                    {/* Category badge at top */}
-                    <div className="absolute top-2 left-2 right-2">
-                      <span className="inline-block text-[8px] uppercase tracking-wider text-white/90 bg-black/40 px-2 py-1 rounded-full">
+                    <div className="absolute top-2 left-2">
+                      <span className="inline-block text-[8px] uppercase tracking-wider text-foreground/90 bg-background/40 px-2 py-1 rounded-full">
                         {card.category}
-                      </span>
-                    </div>
-
-                    {/* Card number */}
-                    <div className="absolute top-2 right-2">
-                      <span className="text-[10px] text-white/80 bg-black/40 px-2 py-0.5 rounded-full">
-                        {card.card_number}
                       </span>
                     </div>
                   </>
                 )}
               </div>
             ) : (
-              // Fallback design when no image available
               <div className="w-full h-full bg-card border border-border flex flex-col">
-                <div className={`p-2 text-center ${
-                  isPermissionDeck 
-                    ? 'bg-gradient-to-r from-primary/20 to-purple-500/20' 
-                    : 'bg-gradient-to-r from-accent/20 to-amber-500/20'
-                }`}>
+                <div className={`p-2 text-center bg-gradient-to-r ${deckStyle.gradient} opacity-20`}>
                   <span className="text-[9px] uppercase tracking-wider text-muted-foreground">
                     {card.category}
                   </span>
                 </div>
-                <div className="flex-1 flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-background to-muted/20">
-                  <div className={`text-4xl mb-3 ${
-                    isPermissionDeck ? 'text-primary' : 'text-accent'
-                  }`}>
-                    ✨
+                <div className="flex-1 flex flex-col items-center justify-center p-3 text-center">
+                  <div className="text-4xl mb-3">
+                    {card.deck_name === 'Permission Granted' ? '💜' : card.deck_name === 'Abundance' ? '✨' : '🌹'}
                   </div>
-                  <h3 className={`font-serif text-sm md:text-base font-semibold mb-2 ${
-                    isPermissionDeck ? 'text-primary' : 'text-accent'
-                  }`}>
+                  <h3 className="font-serif text-sm md:text-base font-semibold mb-2 text-primary">
                     {card.title}
                   </h3>
                   <p className="text-[10px] md:text-xs text-muted-foreground italic leading-relaxed">
                     "{card.message}"
                   </p>
                 </div>
-                <div className={`py-1.5 text-center text-[9px] text-muted-foreground ${
-                  isPermissionDeck 
-                    ? 'bg-gradient-to-r from-primary/10 to-purple-500/10' 
-                    : 'bg-gradient-to-r from-accent/10 to-amber-500/10'
-                }`}>
+                <div className="py-1.5 text-center text-[9px] text-muted-foreground bg-muted/30">
                   Card {card.card_number}
                 </div>
               </div>
@@ -174,7 +145,6 @@ export const OracleCard = ({
         </motion.div>
       </motion.div>
 
-      {/* Card Details */}
       <AnimatePresence>
         {showDetails && flipped && (
           <motion.div
@@ -207,4 +177,3 @@ export const OracleCard = ({
     </div>
   );
 };
-

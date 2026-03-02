@@ -1,197 +1,271 @@
 import { OracleCard } from './OracleCard';
-import { OracleCard as OracleCardType, ReadingType } from '@/data/oracleCards';
+import { OracleCard as OracleCardType, SpreadTemplate } from '@/data/oracleCards';
 import { motion } from 'framer-motion';
 
 interface CardSpreadProps {
-  reading: ReadingType;
+  spread: SpreadTemplate;
   cards: OracleCardType[];
   flippedCards: number[];
   onFlipCard: (index: number) => void;
 }
 
-export const CardSpread = ({ reading, cards, flippedCards, onFlipCard }: CardSpreadProps) => {
-  const getLayoutClass = () => {
-    switch (reading.id) {
-      case 'single':
-      case 'yes-no':
-        return 'flex justify-center';
-      case 'three-card':
-      case 'relationship':
-      case 'career-money':
-      case 'decision':
-        return 'flex flex-wrap justify-center gap-6';
-      case 'weekly':
-        return 'grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4';
-      case 'monthly':
-        return 'grid grid-cols-2 md:grid-cols-4 gap-4';
-      case 'life-areas':
-        return 'flex flex-wrap justify-center gap-6';
-      default:
-        return 'flex flex-wrap justify-center gap-4';
-    }
+export const CardSpread = ({ spread, cards, flippedCards, onFlipCard }: CardSpreadProps) => {
+  const getPositionLabel = (index: number): string => {
+    const meanings = spread.position_meanings;
+    if (!meanings?.[index]) return `Card ${index + 1}`;
+    // Extract the short label before the dash
+    const full = meanings[index];
+    const dashIndex = full.indexOf('—');
+    return dashIndex > 0 ? full.substring(0, dashIndex).trim() : full;
   };
 
-  const getCardSize = () => {
-    switch (reading.id) {
-      case 'single':
-      case 'yes-no':
-        return 'lg';
-      case 'weekly':
-        return 'sm';
-      default:
-        return 'md';
-    }
+  const getCardSize = (): 'sm' | 'md' | 'lg' => {
+    if (spread.number_of_cards === 1) return 'lg';
+    if (spread.number_of_cards >= 7) return 'sm';
+    return 'md';
   };
 
-  const renderYesNoResult = () => {
-    if (reading.id !== 'yes-no' || cards.length === 0 || !flippedCards.includes(0)) return null;
-    
-    const isYes = cards[0].card_number <= 26;
-    
+  const renderCard = (index: number, size?: 'sm' | 'md' | 'lg') => {
+    if (!cards[index]) return null;
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className={`mt-6 p-6 rounded-xl text-center ${
-          isYes 
-            ? 'bg-green-500/10 border border-green-500/30' 
-            : 'bg-red-500/10 border border-red-500/30'
-        }`}
+        key={`${cards[index].deck_name}-${cards[index].card_number}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.1 }}
       >
-        <div className="text-4xl mb-2">{isYes ? '✓' : '✗'}</div>
-        <h3 className={`text-2xl font-serif font-bold ${isYes ? 'text-green-600' : 'text-red-600'}`}>
-          {isYes ? 'YES' : 'NO'}
-        </h3>
-        <p className="text-sm text-muted-foreground mt-2">
-          Cards 1-26 indicate Yes • Cards 27-52 indicate No
-        </p>
+        <OracleCard
+          card={cards[index]}
+          position={getPositionLabel(index)}
+          isFlipped={flippedCards.includes(index)}
+          onFlip={() => onFlipCard(index)}
+          size={size || getCardSize()}
+        />
       </motion.div>
     );
   };
 
-  const renderRelationshipLayout = () => {
-    if (reading.id !== 'relationship' || cards.length < 3) return null;
+  // Default grid layout
+  const renderDefaultLayout = () => (
+    <div className="flex flex-wrap justify-center gap-6">
+      {cards.map((_, index) => renderCard(index))}
+    </div>
+  );
 
+  // Two-column layout (pairs of cards)
+  const renderTwoColumnLayout = () => {
+    const pairs: number[][] = [];
+    for (let i = 0; i < cards.length; i += 2) {
+      pairs.push(i + 1 < cards.length ? [i, i + 1] : [i]);
+    }
     return (
       <div className="flex flex-col items-center gap-6">
-        {/* Top card (Dynamic) */}
-        <OracleCard
-          card={cards[2]}
-          position={reading.positions?.[2]}
-          isFlipped={flippedCards.includes(2)}
-          onFlip={() => onFlipCard(2)}
-          size="md"
-        />
-        {/* Bottom two cards (Self & Other) */}
-        <div className="flex gap-8">
-          <OracleCard
-            card={cards[0]}
-            position={reading.positions?.[0]}
-            isFlipped={flippedCards.includes(0)}
-            onFlip={() => onFlipCard(0)}
-            size="md"
-          />
-          <OracleCard
-            card={cards[1]}
-            position={reading.positions?.[1]}
-            isFlipped={flippedCards.includes(1)}
-            onFlip={() => onFlipCard(1)}
-            size="md"
-          />
-        </div>
+        {pairs.map((pair, pairIdx) => (
+          <div key={pairIdx} className="flex gap-8 justify-center">
+            {pair.map(i => renderCard(i))}
+          </div>
+        ))}
       </div>
     );
   };
 
-  const renderLifeAreasLayout = () => {
-    if (reading.id !== 'life-areas' || cards.length < 5) return null;
+  // Single card center
+  const renderSingleLayout = () => (
+    <div className="flex justify-center">
+      {renderCard(0, 'lg')}
+    </div>
+  );
 
+  // Three in a row
+  const renderThreeRowLayout = () => (
+    <div className="flex justify-center gap-6 flex-wrap">
+      {cards.map((_, i) => renderCard(i))}
+    </div>
+  );
+
+  // 2x2 grid
+  const renderTwoByTwoLayout = () => (
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex gap-8 justify-center">
+        {renderCard(0)}
+        {renderCard(1)}
+      </div>
+      <div className="flex gap-8 justify-center">
+        {renderCard(2)}
+        {cards.length > 3 && renderCard(3)}
+      </div>
+    </div>
+  );
+
+  // Deep Love spread (cross pattern): 5 center, 2 left, 3 right, 4 bottom, 1 top
+  const renderDeepLoveLayout = () => (
+    <div className="flex flex-col items-center gap-4">
+      {renderCard(4)}
+      <div className="flex gap-8 justify-center items-center">
+        {renderCard(1)}
+        {renderCard(0)}
+        {renderCard(2)}
+      </div>
+      {renderCard(3)}
+    </div>
+  );
+
+  // Stay or Go: decision tree
+  const renderStayOrGoLayout = () => (
+    <div className="flex flex-col items-center gap-4">
+      {renderCard(0, 'md')}
+      <div className="flex gap-12 justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <span className="text-xs font-serif font-bold text-muted-foreground uppercase tracking-wider">Stay</span>
+          {renderCard(1, 'sm')}
+          {renderCard(2, 'sm')}
+          {renderCard(3, 'sm')}
+        </div>
+        <div className="flex flex-col items-center gap-3">
+          <span className="text-xs font-serif font-bold text-muted-foreground uppercase tracking-wider">Go</span>
+          {renderCard(4, 'sm')}
+          {renderCard(5, 'sm')}
+          {renderCard(6, 'sm')}
+        </div>
+      </div>
+      {renderCard(7, 'md')}
+      {renderCard(8, 'md')}
+    </div>
+  );
+
+  // Staircase layout (ascending)
+  const renderStaircaseLayout = () => (
+    <div className="flex flex-col items-start gap-2 pl-4">
+      {cards.map((_, index) => (
+        <div key={index} style={{ marginLeft: `${index * 40}px` }}>
+          {renderCard(index, 'sm')}
+        </div>
+      ))}
+    </div>
+  );
+
+  // Life areas / wheel layout
+  const renderLifeAreasLayout = () => {
+    if (cards.length <= 5) {
+      return (
+        <div className="flex flex-col items-center gap-4">
+          {renderCard(4)}
+          <div className="flex gap-8 justify-center">
+            {renderCard(1)}
+            {renderCard(2)}
+            {renderCard(3)}
+          </div>
+          {renderCard(0)}
+        </div>
+      );
+    }
+    // 7 cards
     return (
       <div className="flex flex-col items-center gap-4">
-        {/* Top card (Love) */}
-        <OracleCard
-          card={cards[0]}
-          position={reading.positions?.[0]}
-          isFlipped={flippedCards.includes(0)}
-          onFlip={() => onFlipCard(0)}
-          size="md"
-        />
-        {/* Middle row (Career, Spiritual Growth) */}
-        <div className="flex gap-16">
-          <OracleCard
-            card={cards[1]}
-            position={reading.positions?.[1]}
-            isFlipped={flippedCards.includes(1)}
-            onFlip={() => onFlipCard(1)}
-            size="md"
-          />
-          <OracleCard
-            card={cards[4]}
-            position={reading.positions?.[4]}
-            isFlipped={flippedCards.includes(4)}
-            onFlip={() => onFlipCard(4)}
-            size="md"
-          />
+        {renderCard(4, 'sm')}
+        <div className="flex gap-6 justify-center">
+          {renderCard(3, 'sm')}
+          {renderCard(0, 'sm')}
+          {renderCard(1, 'sm')}
         </div>
-        {/* Bottom row (Health, Money) */}
-        <div className="flex gap-8">
-          <OracleCard
-            card={cards[2]}
-            position={reading.positions?.[2]}
-            isFlipped={flippedCards.includes(2)}
-            onFlip={() => onFlipCard(2)}
-            size="md"
-          />
-          <OracleCard
-            card={cards[3]}
-            position={reading.positions?.[3]}
-            isFlipped={flippedCards.includes(3)}
-            onFlip={() => onFlipCard(3)}
-            size="md"
-          />
+        <div className="flex gap-6 justify-center">
+          {renderCard(6, 'sm')}
+          {renderCard(5, 'sm')}
+          {renderCard(2, 'sm')}
         </div>
       </div>
     );
   };
 
-  // Special layouts
-  if (reading.id === 'relationship') {
-    return (
-      <div className="py-8">
-        {renderRelationshipLayout()}
+  // Inventory circle / wheel with 8+ cards
+  const renderInventoryLayout = () => (
+    <div className="flex flex-col items-center gap-4">
+      {renderCard(0, 'sm')}
+      <div className="flex gap-6 justify-center">
+        {renderCard(7, 'sm')}
+        {renderCard(1, 'sm')}
       </div>
-    );
-  }
+      <div className="flex gap-6 justify-center">
+        {renderCard(6, 'sm')}
+        {renderCard(2, 'sm')}
+      </div>
+      <div className="flex gap-6 justify-center">
+        {renderCard(5, 'sm')}
+        {renderCard(3, 'sm')}
+      </div>
+      {renderCard(4, 'sm')}
+    </div>
+  );
 
-  if (reading.id === 'life-areas') {
+  // Red flag cross pattern
+  const renderRedFlagLayout = () => (
+    <div className="flex flex-col items-center gap-4">
+      {renderCard(1)}
+      <div className="flex gap-8 justify-center items-center">
+        {renderCard(3)}
+        {renderCard(0)}
+        {renderCard(4)}
+      </div>
+      {renderCard(2)}
+    </div>
+  );
+
+  // Wheel layout for 11 cards
+  const renderWheelLayout = () => {
+    if (cards.length < 11) return renderDefaultLayout();
     return (
-      <div className="py-8">
-        {renderLifeAreasLayout()}
+      <div className="flex flex-col items-center gap-3">
+        {renderCard(0, 'sm')}
+        <div className="flex gap-6 justify-center">
+          {renderCard(9, 'sm')}
+          {renderCard(1, 'sm')}
+        </div>
+        <div className="flex gap-10 justify-center items-center">
+          {renderCard(8, 'sm')}
+          {renderCard(10, 'sm')}
+          {renderCard(2, 'sm')}
+        </div>
+        <div className="flex gap-6 justify-center">
+          {renderCard(7, 'sm')}
+          {renderCard(3, 'sm')}
+        </div>
+        <div className="flex gap-6 justify-center">
+          {renderCard(6, 'sm')}
+          {renderCard(4, 'sm')}
+        </div>
+        {renderCard(5, 'sm')}
       </div>
     );
-  }
+  };
+
+  // Choose layout based on layout_type
+  const renderLayout = () => {
+    switch (spread.layout_type) {
+      case 'single': return renderSingleLayout();
+      case 'three-row': return renderThreeRowLayout();
+      case 'two-column': return renderTwoColumnLayout();
+      case 'two-by-two': return renderTwoByTwoLayout();
+      case 'deep-love': return renderDeepLoveLayout();
+      case 'hard-decision': return renderDeepLoveLayout(); // Similar cross pattern
+      case 'worth-thermostat': return renderTwoColumnLayout();
+      case 'inventory-circle': return renderInventoryLayout();
+      case 'prosperity-mandala': return renderLifeAreasLayout();
+      case 'money-spread': return renderTwoColumnLayout();
+      case 'life-areas': return renderLifeAreasLayout();
+      case 'health-check': return renderLifeAreasLayout();
+      case 'red-flag': return renderRedFlagLayout();
+      case 'staircase': return renderStaircaseLayout();
+      case 'bridge': return renderTwoColumnLayout();
+      case 'stay-or-go': return renderStayOrGoLayout();
+      case 'heart-formation': return renderLifeAreasLayout();
+      case 'wheel': return renderWheelLayout();
+      default: return renderDefaultLayout();
+    }
+  };
 
   return (
     <div className="py-8">
-      <div className={getLayoutClass()}>
-        {cards.map((card, index) => (
-          <motion.div
-            key={`${card.deck_name}-${card.card_number}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <OracleCard
-              card={card}
-              position={reading.positions?.[index]}
-              isFlipped={flippedCards.includes(index)}
-              onFlip={() => onFlipCard(index)}
-              size={getCardSize() as 'sm' | 'md' | 'lg'}
-            />
-          </motion.div>
-        ))}
-      </div>
-      {renderYesNoResult()}
+      {renderLayout()}
     </div>
   );
 };

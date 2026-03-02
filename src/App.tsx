@@ -20,6 +20,7 @@ import Manifesto from "./pages/Manifesto";
 import MyProgress from "./pages/MyProgress";
 import MyAccount from "./pages/MyAccount";
 import WellnessHub from "./pages/WellnessHub";
+import SavedReadings from "./pages/SavedReadings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/my-progress" element={<MyProgress />} />
             <Route path="/my-account" element={<MyAccount />} />
             <Route path="/wellness" element={<WellnessHub />} />
+            <Route path="/saved-readings" element={<SavedReadings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
