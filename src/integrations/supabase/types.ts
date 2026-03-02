@@ -149,6 +149,45 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_completions: {
+        Row: {
+          action_step_complete: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          journal_response: string | null
+          lesson_number: number
+          lesson_title: string
+          track_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_step_complete?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          journal_response?: string | null
+          lesson_number: number
+          lesson_title: string
+          track_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_step_complete?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          journal_response?: string | null
+          lesson_number?: number
+          lesson_title?: string
+          track_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       oracle_cards: {
         Row: {
           affirmation: string
@@ -317,6 +356,45 @@ export type Database = {
           question_prompt?: string
           spread_name?: string
           tier_required?: number
+        }
+        Relationships: []
+      }
+      thirty_day_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          day_number: number
+          evening_response: string | null
+          id: string
+          marked_complete: boolean
+          morning_response: string | null
+          phase: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          day_number: number
+          evening_response?: string | null
+          id?: string
+          marked_complete?: boolean
+          morning_response?: string | null
+          phase: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          day_number?: number
+          evening_response?: string | null
+          id?: string
+          marked_complete?: boolean
+          morning_response?: string | null
+          phase?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

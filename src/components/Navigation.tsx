@@ -16,6 +16,8 @@ const navLinks = [
   { name: "Healing Tools", href: "/healing-tools" },
   { name: "Human Design", href: "/human-design" },
   { name: "Wellness Hub", href: "/wellness" },
+  { name: "30-Day Experience", href: "/30-day-experience" },
+  { name: "Emotional Surgery", href: "/emotional-surgery" },
   { name: "Manifesto", href: "/manifesto" },
   { name: "My Progress", href: "/my-progress" },
   { name: "My Account", href: "/my-account" },
