@@ -6,6 +6,7 @@ import { NutritionPlans } from "@/components/wellness/NutritionPlans";
 import { MovementPlans } from "@/components/wellness/MovementPlans";
 import { motion } from "framer-motion";
 import { Construction } from "lucide-react";
+import { AviniHealthProducts } from "@/components/wellness/AviniHealthProducts";
 
 function ComingSoon({ label }: { label: string }) {
   return (
@@ -59,7 +60,7 @@ export default function WellnessHub() {
               <MovementPlans />
             </TabsContent>
             <TabsContent value="avini">
-              <ComingSoon label="Avini Health Products" />
+              <AviniHealthProducts />
             </TabsContent>
             <TabsContent value="tips">
               <ComingSoon label="Daily Wellness Tips" />
