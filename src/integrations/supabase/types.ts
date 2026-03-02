@@ -185,6 +185,33 @@ export type Database = {
         }
         Relationships: []
       }
+      permission_slips_accepted: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_custom: boolean
+          slip_text: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          slip_text: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          slip_text?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

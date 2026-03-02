@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,10 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, Calendar, Target, ArrowRight, Settings } from "lucide-react";
+import { TrendingUp, Calendar, Target, ArrowRight, Settings, Sparkles, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { thermostatTypes, ThermostatType } from "@/data/thermostatTypes";
+import { getDailySlip } from "@/data/permissionSlipsData";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface AssessmentResult {
   id: string;
@@ -25,8 +28,11 @@ interface AssessmentResult {
 export default function Dashboard() {
   const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [results, setResults] = useState<AssessmentResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const dailySlip = useMemo(() => getDailySlip(), []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -54,6 +60,40 @@ export default function Dashboard() {
       fetchResults();
     }
   }, [user]);
+
+  // Check if daily slip is already accepted
+  const { data: acceptedSlips = [] } = useQuery({
+    queryKey: ["accepted-slips", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("permission_slips_accepted")
+        .select("slip_text")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return data as { slip_text: string }[];
+    },
+    enabled: !!user,
+  });
+
+  const isDailyAccepted = useMemo(
+    () => acceptedSlips.some((s) => s.slip_text === dailySlip.text),
+    [acceptedSlips, dailySlip]
+  );
+
+  const acceptSlip = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("permission_slips_accepted").insert({
+        user_id: user!.id,
+        slip_text: dailySlip.text,
+        category: dailySlip.category,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accepted-slips"] });
+      toast.success("Permission slip accepted ✨");
+    },
+  });
 
   if (authLoading) {
     return (
@@ -85,6 +125,58 @@ export default function Dashboard() {
               </Button>
             </Link>
           </div>
+
+          {/* Daily Permission Slip */}
+          <Card
+            className="mb-8 relative overflow-hidden border-accent/30"
+            style={{
+              background:
+                "linear-gradient(135deg, hsl(43 52% 54% / 0.1) 0%, hsl(43 52% 54% / 0.03) 100%)",
+              boxShadow: "0 8px 32px -8px hsl(43 52% 54% / 0.15)",
+            }}
+          >
+            {isDailyAccepted && (
+              <div className="absolute top-4 right-4">
+                <Check className="w-5 h-5 text-accent" />
+              </div>
+            )}
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-5 h-5 text-accent" />
+                <span className="text-xs uppercase tracking-widest text-accent/70">
+                  Today's Permission Slip
+                </span>
+              </div>
+              <p className="font-serif italic text-foreground text-xl leading-relaxed mb-4">
+                "{dailySlip.text}"
+              </p>
+              <div className="flex items-center gap-3">
+                <Button
+                  size="sm"
+                  onClick={() => acceptSlip.mutate()}
+                  disabled={isDailyAccepted || acceptSlip.isPending}
+                  className={
+                    isDailyAccepted
+                      ? "bg-accent/20 text-accent border border-accent/30"
+                      : "bg-accent text-accent-foreground hover:bg-accent/90"
+                  }
+                >
+                  {isDailyAccepted ? (
+                    <>
+                      <Check className="w-4 h-4 mr-1" /> Accepted
+                    </>
+                  ) : (
+                    "Accept This Slip"
+                  )}
+                </Button>
+                <Link to="/permission-slips">
+                  <Button variant="ghost" size="sm" className="text-accent/70 hover:text-accent">
+                    View All Slips <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
 
           {isLoading ? (
             <div className="space-y-4">

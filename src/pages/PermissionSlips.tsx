@@ -3,290 +3,422 @@ import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, RefreshCw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Check, Sparkles, Plus, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import {
+  allPermissionSlips,
+  permissionSlipCategories,
+  getDailySlip,
+  PermissionSlip,
+} from "@/data/permissionSlipsData";
 
-const categories = [
-  "Self-Worth",
-  "Boundaries",
-  "Abundance",
-  "Love",
-  "Healing",
-  "Empowerment",
-] as const;
-
-const allSlips = categories.flatMap((cat, catIndex) =>
-  Array.from({ length: Math.ceil(125 / 6) }, (_, i) => ({
-    id: `${cat}-${i + 1}`,
-    text: getSlipText(cat, i),
-    category: cat,
-  }))
-).slice(0, 125);
-
-function getSlipText(category: string, index: number): string {
-  const slips: Record<string, string[]> = {
-    "Self-Worth": [
-      "I am worthy of everything I desire.",
-      "My value is not determined by others' opinions.",
-      "I deserve to take up space in this world.",
-      "I am enough, exactly as I am right now.",
-      "My worth is inherent — it cannot be earned or lost.",
-      "I give myself permission to shine without apology.",
-      "I am deserving of love, respect, and abundance.",
-      "My presence matters and my voice deserves to be heard.",
-      "I release the need to prove my worth to anyone.",
-      "I am the prize, and I know it.",
-      "My self-worth is not up for negotiation.",
-      "I choose to see myself through the eyes of love.",
-      "I am worthy of celebrating every version of myself.",
-      "I trust that I am exactly where I need to be.",
-      "My imperfections make me beautifully human.",
-      "I refuse to shrink to make others comfortable.",
-      "I deserve joy simply because I exist.",
-      "I honor the person I am becoming.",
-      "I radiate confidence and self-assurance.",
-      "I am a masterpiece in progress.",
-      "I choose myself without guilt.",
-    ],
-    "Boundaries": [
-      "I give myself permission to say no without guilt.",
-      "My boundaries are an act of self-love.",
-      "I protect my peace above all else.",
-      "No is a complete sentence.",
-      "I release relationships that drain my energy.",
-      "I teach people how to treat me through my boundaries.",
-      "I am allowed to outgrow people and situations.",
-      "I choose quality over quantity in all relationships.",
-      "My time and energy are sacred resources.",
-      "I stop explaining myself to people who don't want to understand.",
-      "I walk away from anything that no longer serves my growth.",
-      "I deserve relationships built on mutual respect.",
-      "I am allowed to change the rules at any time.",
-      "I protect my inner peace fiercely and unapologetically.",
-      "Setting boundaries makes me stronger, not selfish.",
-      "I release the need to people-please.",
-      "I trust myself to know what's best for me.",
-      "I am allowed to disappoint others to honor myself.",
-      "My comfort zone is not a prison — I expand it on my terms.",
-      "I give myself permission to close doors that lead to chaos.",
-      "I am the gatekeeper of my own peace.",
-    ],
-    "Abundance": [
-      "I am a magnet for prosperity and abundance.",
-      "Money flows to me easily and effortlessly.",
-      "I deserve financial freedom and wealth.",
-      "I release all scarcity mindset patterns.",
-      "I am open to receiving abundance in all forms.",
-      "My bank account reflects my self-worth.",
-      "I attract opportunities that align with my highest good.",
-      "I charge what I'm worth without apology.",
-      "Abundance is my birthright.",
-      "I release guilt around wealth and success.",
-      "I am worthy of living an extraordinary life.",
-      "Financial abundance flows to me from expected and unexpected sources.",
-      "I give myself permission to want more.",
-      "I am grateful for the abundance that surrounds me.",
-      "I choose abundance over lack in every thought.",
-      "I release the belief that money is hard to come by.",
-      "I am worthy of having more than enough.",
-      "I magnetize wealth with my energy and intention.",
-      "Prosperity is drawn to me naturally.",
-      "I am financially empowered and free.",
-      "I give generously because I know more is always coming.",
-    ],
-    "Love": [
-      "I deserve a love that doesn't hurt.",
-      "I am worthy of deep, passionate connection.",
-      "I release the need to settle for less in love.",
-      "My heart knows what it deserves.",
-      "I attract love that matches my self-worth.",
-      "I am allowed to want epic, soul-shaking love.",
-      "I release past heartbreak and open to new love.",
-      "I choose partners who choose me fully.",
-      "I deserve love that feels like home.",
-      "I give myself permission to be loved loudly.",
-      "I trust that my person is on their way to me.",
-      "I refuse to beg for love I freely give.",
-      "I am worthy of a love story worth telling.",
-      "I release attachment to people who can't love me right.",
-      "I give myself the love I've been seeking from others.",
-      "I am magnetic to healthy, nurturing love.",
-      "I deserve a partner who celebrates me daily.",
-      "I choose love that empowers me, not diminishes me.",
-      "I am complete on my own and enhanced by love.",
-      "I release the fear of being truly seen.",
-      "I give myself permission to fall in love again.",
-    ],
-    "Healing": [
-      "I give myself permission to heal at my own pace.",
-      "My healing journey is valid and sacred.",
-      "I release the pain that no longer serves me.",
-      "I am allowed to grieve what I lost.",
-      "Healing is not linear, and that's okay.",
-      "I forgive myself for what I didn't know then.",
-      "I am stronger than what tried to break me.",
-      "I release shame and embrace radical self-compassion.",
-      "My wounds are transforming into wisdom.",
-      "I give myself permission to not be okay right now.",
-      "I trust the process of my own healing.",
-      "I am allowed to feel everything fully.",
-      "I release the need to have it all figured out.",
-      "I honor my scars as evidence of my survival.",
-      "Healing begins when I stop running from myself.",
-      "I am allowed to rest as part of my healing.",
-      "I release the trauma responses that kept me safe but small.",
-      "I choose to heal the parts of me that are still hurting.",
-      "I am worthy of a life that feels peaceful.",
-      "I forgive those who hurt me — for my own freedom.",
-      "I am becoming the person my younger self needed.",
-    ],
-    "Empowerment": [
-      "I am powerful beyond measure.",
-      "I give myself permission to be ambitious.",
-      "I lead with confidence and grace.",
-      "I am the author of my own story.",
-      "I refuse to play small to make others comfortable.",
-      "I build my empire on my own terms.",
-      "I am unstoppable when I believe in myself.",
-      "I give myself permission to take the lead.",
-      "I am bold, fierce, and unapologetic.",
-      "I trust my own decisions completely.",
-      "I am capable of achieving anything I set my mind to.",
-      "I give myself permission to be proud of my achievements.",
-      "I rise above every challenge placed before me.",
-      "I am the most powerful force in my own life.",
-      "I choose courage over comfort.",
-      "I give myself permission to demand excellence.",
-      "I am a force of nature.",
-      "My dreams are valid and achievable.",
-      "I show up as the most powerful version of myself.",
-      "I give myself permission to go first.",
-      "I am the permission I've been waiting for.",
-    ],
-  };
-  return slips[category]?.[index] || `Permission granted to embrace your ${category.toLowerCase()} journey.`;
+interface AcceptedSlip {
+  id: string;
+  slip_text: string;
+  category: string;
+  is_custom: boolean;
+  created_at: string;
 }
 
-function SlipCard({ slip, isAccepted, onAccept, index }: { 
-  slip: typeof allSlips[0]; 
-  isAccepted: boolean; 
+export default function PermissionSlips() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<string>("daily");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [customText, setCustomText] = useState("");
+
+  const dailySlip = useMemo(() => getDailySlip(), []);
+
+  const { data: acceptedSlips = [] } = useQuery({
+    queryKey: ["accepted-slips", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("permission_slips_accepted")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as AcceptedSlip[];
+    },
+    enabled: !!user,
+  });
+
+  const acceptedTexts = useMemo(
+    () => new Set(acceptedSlips.map((s) => s.slip_text)),
+    [acceptedSlips]
+  );
+
+  const acceptSlip = useMutation({
+    mutationFn: async ({
+      text,
+      category,
+      isCustom = false,
+    }: {
+      text: string;
+      category: string;
+      isCustom?: boolean;
+    }) => {
+      const { error } = await supabase.from("permission_slips_accepted").insert({
+        user_id: user!.id,
+        slip_text: text,
+        category,
+        is_custom: isCustom,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accepted-slips"] });
+      toast.success("Permission slip accepted ✨");
+    },
+    onError: () => toast.error("Failed to accept slip"),
+  });
+
+  const removeSlip = useMutation({
+    mutationFn: async (slipText: string) => {
+      const { error } = await supabase
+        .from("permission_slips_accepted")
+        .delete()
+        .eq("user_id", user!.id)
+        .eq("slip_text", slipText);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accepted-slips"] });
+      toast.success("Slip removed from collection");
+    },
+  });
+
+  const handleAccept = (slip: PermissionSlip) => {
+    if (acceptedTexts.has(slip.text)) return;
+    acceptSlip.mutate({ text: slip.text, category: slip.category });
+  };
+
+  const handleCustomSubmit = () => {
+    if (!customText.trim()) return;
+    acceptSlip.mutate({
+      text: customText.trim(),
+      category: "Custom",
+      isCustom: true,
+    });
+    setCustomText("");
+  };
+
+  const filteredSlips =
+    activeCategory === "all"
+      ? allPermissionSlips
+      : allPermissionSlips.filter((s) => s.category === activeCategory);
+
+  return (
+    <AuthenticatedLayout
+      title="Permission Slips"
+      subtitle="125 permission slips across 25 categories — accept the ones you need today"
+    >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="bg-muted/50 h-auto gap-1 p-1">
+          <TabsTrigger value="daily">✨ Daily Slip</TabsTrigger>
+          <TabsTrigger value="browse">Browse All</TabsTrigger>
+          <TabsTrigger value="collection">
+            My Collection ({acceptedSlips.length})
+          </TabsTrigger>
+        </TabsList>
+
+        {/* ===== DAILY SLIP ===== */}
+        <TabsContent value="daily">
+          <div className="max-w-xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center mb-8"
+            >
+              <Sparkles className="w-10 h-10 text-accent mx-auto mb-4" />
+              <h2 className="font-serif text-2xl font-bold text-foreground mb-2">
+                Today's Permission Slip
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Your daily message of empowerment
+              </p>
+            </motion.div>
+            <FeaturedSlipCard
+              slip={dailySlip}
+              isAccepted={acceptedTexts.has(dailySlip.text)}
+              onAccept={() => handleAccept(dailySlip)}
+            />
+          </div>
+        </TabsContent>
+
+        {/* ===== BROWSE ALL ===== */}
+        <TabsContent value="browse">
+          {/* Category filter */}
+          <ScrollArea className="w-full mb-6">
+            <div className="flex gap-2 pb-3">
+              <Button
+                variant={activeCategory === "all" ? "default" : "outline"}
+                size="sm"
+                className={
+                  activeCategory === "all"
+                    ? "bg-accent text-accent-foreground"
+                    : "border-accent/30 text-accent hover:bg-accent/10"
+                }
+                onClick={() => setActiveCategory("all")}
+              >
+                All ({allPermissionSlips.length})
+              </Button>
+              {permissionSlipCategories.map((cat) => (
+                <Button
+                  key={cat}
+                  variant={activeCategory === cat ? "default" : "outline"}
+                  size="sm"
+                  className={`whitespace-nowrap ${
+                    activeCategory === cat
+                      ? "bg-accent text-accent-foreground"
+                      : "border-accent/30 text-accent hover:bg-accent/10"
+                  }`}
+                  onClick={() => setActiveCategory(cat)}
+                >
+                  {cat}
+                </Button>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredSlips.map((slip, i) => (
+              <SlipCard
+                key={slip.id}
+                slip={slip}
+                isAccepted={acceptedTexts.has(slip.text)}
+                onAccept={() => handleAccept(slip)}
+                index={i}
+              />
+            ))}
+          </div>
+
+          {/* Create Your Own */}
+          <div className="mt-12 max-w-xl mx-auto">
+            <Card className="border-accent/20 bg-card/60 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Plus className="w-5 h-5 text-accent" />
+                  <h3 className="font-serif text-lg font-semibold text-foreground">
+                    Create Your Own Permission Slip
+                  </h3>
+                </div>
+                <Textarea
+                  placeholder="Permission to..."
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  className="mb-3 bg-muted/50 border-accent/20 focus:border-accent resize-none"
+                  rows={3}
+                />
+                <Button
+                  onClick={handleCustomSubmit}
+                  disabled={!customText.trim() || acceptSlip.isPending}
+                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Accept & Save
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* ===== MY COLLECTION ===== */}
+        <TabsContent value="collection">
+          {acceptedSlips.length === 0 ? (
+            <div className="text-center py-16">
+              <Sparkles className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-2">
+                You haven't accepted any permission slips yet.
+              </p>
+              <Button
+                variant="outline"
+                className="border-accent/30 text-accent"
+                onClick={() => setActiveTab("daily")}
+              >
+                Start with Today's Slip
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {acceptedSlips.map((slip, i) => (
+                <motion.div
+                  key={slip.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                >
+                  <Card
+                    className="relative overflow-hidden border-accent/20 transition-all duration-300"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, hsl(43 52% 54% / 0.08) 0%, hsl(43 52% 54% / 0.03) 100%)",
+                      boxShadow: "0 4px 20px -4px hsl(43 52% 54% / 0.12)",
+                    }}
+                  >
+                    <CardContent className="p-5">
+                      <div className="absolute top-3 right-3">
+                        <Check className="w-4 h-4 text-accent" />
+                      </div>
+                      <p className="text-xs uppercase tracking-widest text-accent/70 mb-3">
+                        {slip.category}
+                      </p>
+                      <p className="font-serif italic text-foreground text-base leading-relaxed">
+                        "{slip.slip_text}"
+                      </p>
+                      {slip.is_custom && (
+                        <span className="inline-block mt-2 text-xs text-accent/50 uppercase tracking-wider">
+                          Custom
+                        </span>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </AuthenticatedLayout>
+  );
+}
+
+/* ===== Featured Slip (Daily) ===== */
+function FeaturedSlipCard({
+  slip,
+  isAccepted,
+  onAccept,
+}: {
+  slip: PermissionSlip;
+  isAccepted: boolean;
   onAccept: () => void;
-  index: number;
 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03 }}
     >
-      <Card className={`glass-card-hover transition-all ${isAccepted ? "ring-2 ring-accent/50" : ""}`}>
-        <CardContent className="p-5">
-          <p className="font-serif text-foreground text-lg leading-relaxed mb-4">
+      <Card
+        className="relative overflow-hidden border-accent/30"
+        style={{
+          background:
+            "linear-gradient(135deg, hsl(43 52% 54% / 0.12) 0%, hsl(43 52% 54% / 0.04) 100%)",
+          boxShadow: "0 8px 40px -8px hsl(43 52% 54% / 0.2)",
+        }}
+      >
+        {isAccepted && (
+          <div className="absolute top-4 right-4">
+            <Check className="w-5 h-5 text-accent" />
+          </div>
+        )}
+        <CardContent className="p-8 text-center">
+          <p className="text-xs uppercase tracking-widest text-accent/70 mb-4">
+            {slip.category}
+          </p>
+          <p className="font-serif italic text-foreground text-2xl leading-relaxed mb-6">
             "{slip.text}"
           </p>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase tracking-wider">{slip.category}</span>
-            <Button
-              variant={isAccepted ? "gold" : "outline"}
-              size="sm"
-              onClick={onAccept}
-              disabled={isAccepted}
-            >
-              {isAccepted ? (
-                <>
-                  <Check className="w-4 h-4 mr-1" /> Accepted
-                </>
-              ) : (
-                "Accept This Slip"
-              )}
-            </Button>
-          </div>
+          <Button
+            onClick={onAccept}
+            disabled={isAccepted}
+            className={
+              isAccepted
+                ? "bg-accent/20 text-accent border border-accent/30"
+                : "bg-accent text-accent-foreground hover:bg-accent/90"
+            }
+          >
+            {isAccepted ? (
+              <>
+                <Check className="w-4 h-4 mr-2" /> Accepted
+              </>
+            ) : (
+              "Accept This Slip"
+            )}
+          </Button>
         </CardContent>
       </Card>
     </motion.div>
   );
 }
 
-export default function PermissionSlips() {
-  const [acceptedSlips, setAcceptedSlips] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<string>("daily");
-
-  const dailySlip = useMemo(() => {
-    const today = new Date();
-    const dayIndex = (today.getFullYear() * 366 + today.getMonth() * 31 + today.getDate()) % allSlips.length;
-    return allSlips[dayIndex];
-  }, []);
-
-  const handleAccept = (id: string) => {
-    setAcceptedSlips((prev) => new Set(prev).add(id));
-  };
-
+/* ===== Standard Slip Card ===== */
+function SlipCard({
+  slip,
+  isAccepted,
+  onAccept,
+  index,
+}: {
+  slip: PermissionSlip;
+  isAccepted: boolean;
+  onAccept: () => void;
+  index: number;
+}) {
   return (
-    <AuthenticatedLayout title="Permission Slips" subtitle="125 permission slips across 6 categories — accept the ones you need today">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
-          <TabsTrigger value="daily">✨ Daily Slip</TabsTrigger>
-          <TabsTrigger value="collection">My Collection ({acceptedSlips.size})</TabsTrigger>
-          {categories.map((cat) => (
-            <TabsTrigger key={cat} value={cat}>{cat}</TabsTrigger>
-          ))}
-        </TabsList>
-
-        <TabsContent value="daily">
-          <div className="max-w-xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center mb-6"
-            >
-              <Sparkles className="w-10 h-10 text-accent mx-auto mb-4" />
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Today's Permission Slip</h2>
-              <p className="text-muted-foreground text-sm">Your daily message of empowerment</p>
-            </motion.div>
-            <SlipCard
-              slip={dailySlip}
-              isAccepted={acceptedSlips.has(dailySlip.id)}
-              onAccept={() => handleAccept(dailySlip.id)}
-              index={0}
-            />
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.02 }}
+    >
+      <Card
+        className={`relative h-full transition-all duration-300 hover:-translate-y-0.5 ${
+          isAccepted ? "border-accent/30" : "border-border/50"
+        }`}
+        style={{
+          background: isAccepted
+            ? "linear-gradient(135deg, hsl(43 52% 54% / 0.08) 0%, hsl(43 52% 54% / 0.03) 100%)"
+            : undefined,
+          boxShadow: "0 4px 20px -4px hsl(43 52% 54% / 0.06)",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLElement).style.boxShadow =
+            "0 8px 30px -4px hsl(43 52% 54% / 0.15)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.boxShadow =
+            "0 4px 20px -4px hsl(43 52% 54% / 0.06)";
+        }}
+      >
+        {isAccepted && (
+          <div className="absolute top-3 right-3">
+            <Check className="w-4 h-4 text-accent" />
           </div>
-        </TabsContent>
-
-        <TabsContent value="collection">
-          {acceptedSlips.size === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground">You haven't accepted any slips yet. Start with today's daily slip!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {allSlips
-                .filter((s) => acceptedSlips.has(s.id))
-                .map((slip, i) => (
-                  <SlipCard key={slip.id} slip={slip} isAccepted={true} onAccept={() => {}} index={i} />
-                ))}
-            </div>
-          )}
-        </TabsContent>
-
-        {categories.map((cat) => (
-          <TabsContent key={cat} value={cat}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {allSlips
-                .filter((s) => s.category === cat)
-                .map((slip, i) => (
-                  <SlipCard
-                    key={slip.id}
-                    slip={slip}
-                    isAccepted={acceptedSlips.has(slip.id)}
-                    onAccept={() => handleAccept(slip.id)}
-                    index={i}
-                  />
-                ))}
-            </div>
-          </TabsContent>
-        ))}
-      </Tabs>
-    </AuthenticatedLayout>
+        )}
+        <CardContent className="p-5 flex flex-col h-full">
+          <p className="text-xs uppercase tracking-widest text-accent/70 mb-3">
+            {slip.category}
+          </p>
+          <p className="font-serif italic text-foreground text-base leading-relaxed mb-4 flex-1">
+            "{slip.text}"
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAccept}
+            disabled={isAccepted}
+            className={
+              isAccepted
+                ? "border-accent/30 text-accent bg-accent/10"
+                : "border-accent/30 text-accent hover:bg-accent/10"
+            }
+          >
+            {isAccepted ? (
+              <>
+                <Check className="w-4 h-4 mr-1" /> Accepted
+              </>
+            ) : (
+              "Accept This Slip"
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
