@@ -214,6 +214,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          body_type: string | null
+          body_type_completed_at: string | null
           created_at: string
           current_streak: number | null
           full_name: string | null
@@ -228,6 +230,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          body_type?: string | null
+          body_type_completed_at?: string | null
           created_at?: string
           current_streak?: number | null
           full_name?: string | null
@@ -242,6 +246,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          body_type?: string | null
+          body_type_completed_at?: string | null
           created_at?: string
           current_streak?: number | null
           full_name?: string | null
