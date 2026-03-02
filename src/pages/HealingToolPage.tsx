@@ -1,0 +1,81 @@
+import { useParams, useNavigate } from "react-router-dom";
+import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
+import { LockedContent } from "@/components/LockedContent";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { healingTools } from "@/data/healingToolsData";
+import LimitingBeliefRewriter from "@/components/healing-tools/LimitingBeliefRewriter";
+import EmotionalTriggerTracker from "@/components/healing-tools/EmotionalTriggerTracker";
+import InnerChildHealing from "@/components/healing-tools/InnerChildHealing";
+import ShadowWorkLibrary from "@/components/healing-tools/ShadowWorkLibrary";
+import MoneyStoryAudit from "@/components/healing-tools/MoneyStoryAudit";
+import AbundanceEvidenceLog from "@/components/healing-tools/AbundanceEvidenceLog";
+
+const toolComponents: Record<string, React.ComponentType> = {
+  "limiting-belief-rewriter": LimitingBeliefRewriter,
+  "emotional-trigger-tracker": EmotionalTriggerTracker,
+  "inner-child-healing": InnerChildHealing,
+  "shadow-work-library": ShadowWorkLibrary,
+  "money-story-audit": MoneyStoryAudit,
+  "abundance-evidence-log": AbundanceEvidenceLog,
+};
+
+export default function HealingToolPage() {
+  const { toolId } = useParams<{ toolId: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("subscription_tier")
+        .eq("user_id", user!.id)
+        .single();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const tier = profile?.subscription_tier || "free";
+  const tool = healingTools.find((t) => t.id === toolId);
+  const ToolComponent = toolId ? toolComponents[toolId] : null;
+
+  if (!tool) {
+    return (
+      <AuthenticatedLayout title="Tool Not Found">
+        <p className="text-muted-foreground">This tool doesn't exist or hasn't been built yet.</p>
+        <Button variant="outline" className="mt-4" onClick={() => navigate("/healing-tools")}>
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Tools
+        </Button>
+      </AuthenticatedLayout>
+    );
+  }
+
+  return (
+    <AuthenticatedLayout title={tool.name} subtitle={tool.description}>
+      <Button
+        variant="ghost"
+        className="mb-6 text-muted-foreground hover:text-foreground"
+        onClick={() => navigate("/healing-tools")}
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" /> Back to All Tools
+      </Button>
+      <LockedContent requiredTier="tier2" currentTier={tier}>
+        {ToolComponent ? (
+          <ToolComponent />
+        ) : (
+          <div className="glass-card p-12 text-center">
+            <span className="text-5xl mb-4 block">{tool.icon}</span>
+            <h3 className="font-serif text-xl text-foreground mb-2">Coming Soon</h3>
+            <p className="text-muted-foreground">This tool is being built and will be available shortly.</p>
+          </div>
+        )}
+      </LockedContent>
+    </AuthenticatedLayout>
+  );
+}

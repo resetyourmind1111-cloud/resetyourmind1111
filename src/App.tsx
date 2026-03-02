@@ -14,6 +14,7 @@ import CardGallery from "./pages/CardGallery";
 import MeditationLibrary from "./pages/MeditationLibrary";
 import PermissionSlips from "./pages/PermissionSlips";
 import HealingTools from "./pages/HealingTools";
+import HealingToolPage from "./pages/HealingToolPage";
 import HumanDesign from "./pages/HumanDesign";
 import Manifesto from "./pages/Manifesto";
 import MyProgress from "./pages/MyProgress";
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/meditations" element={<MeditationLibrary />} />
             <Route path="/permission-slips" element={<PermissionSlips />} />
             <Route path="/healing-tools" element={<HealingTools />} />
+            <Route path="/healing-tools/:toolId" element={<HealingToolPage />} />
             <Route path="/human-design" element={<HumanDesign />} />
             <Route path="/manifesto" element={<Manifesto />} />
             <Route path="/my-progress" element={<MyProgress />} />

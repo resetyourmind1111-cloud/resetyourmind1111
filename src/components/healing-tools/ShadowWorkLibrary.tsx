@@ -1,0 +1,144 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
+import { motion } from "framer-motion";
+import { Check, ChevronLeft } from "lucide-react";
+
+const PROMPTS: Record<string, string[]> = {
+  "Self-Worth": [
+    "What part of yourself do you judge most harshly in others?",
+    "What would you do differently if you truly believed you were enough?",
+    "What compliment do you find hardest to receive and why?",
+    "What are you most afraid people would think if they knew the real you?",
+    "Where in your life are you performing instead of being?",
+    "What version of yourself have you been hiding and why?",
+  ],
+  "Relationships": [
+    "What pattern keeps repeating in your relationships?",
+    "What did you learn about love from watching your parents?",
+    "Where do you abandon yourself to keep others comfortable?",
+    "What do you most need from others that you refuse to ask for?",
+    "Who in your life are you most resentful of and what does that resentment protect you from feeling?",
+    "What would your relationships look like if you stopped being afraid of being too much?",
+  ],
+  "Money": [
+    "What emotion comes up when you think about being wealthy?",
+    "What does your family believe about people with money?",
+    "Where are you self-sabotaging your financial growth?",
+    "What would change about how people see you if you were wealthy?",
+    "What do you believe you have to sacrifice to be rich?",
+    "What is the real reason you are not charging more?",
+  ],
+  "Anger": [
+    "What are you most angry about that you have never said out loud?",
+    "Who taught you that your anger was not allowed?",
+    "What injustice in your life have you minimized or explained away?",
+    "Where in your body do you hold unexpressed anger?",
+    "What would you say if you knew there were no consequences?",
+    "What does your anger most want to protect?",
+  ],
+  "Fear": [
+    "What is the thing you most want that you are most afraid to want?",
+    "What would you do if you knew you could not fail?",
+    "What fear has been running your decisions without your permission?",
+    "What are you avoiding by staying comfortable?",
+    "What is the worst thing that could happen if you fully showed up — and could you survive it?",
+    "What would your life look like if fear had no vote?",
+  ],
+};
+
+const allPrompts = Object.entries(PROMPTS).flatMap(([cat, prompts]) =>
+  prompts.map((p, i) => ({ category: cat, prompt: p, index: i }))
+);
+
+export default function ShadowWorkLibrary() {
+  const { entries, saveEntry } = useHealingToolEntries("shadow-work-library");
+  const [activePrompt, setActivePrompt] = useState<{ category: string; prompt: string; globalIndex: number } | null>(null);
+  const [response, setResponse] = useState("");
+
+  const completedPrompts = new Set(entries.map((e: any) => e.entry_data.prompt));
+  const completedCount = completedPrompts.size;
+
+  const handleSave = () => {
+    if (!response.trim() || !activePrompt) return;
+    saveEntry.mutate(
+      { category: activePrompt.category, prompt: activePrompt.prompt, response },
+      { onSuccess: () => { setResponse(""); setActivePrompt(null); } }
+    );
+  };
+
+  if (activePrompt) {
+    return (
+      <div className="space-y-6">
+        <Button variant="ghost" className="text-muted-foreground" onClick={() => setActivePrompt(null)}>
+          <ChevronLeft className="w-4 h-4 mr-1" /> Back to prompts
+        </Button>
+        <Card className="glass-card">
+          <CardContent className="p-6 space-y-5">
+            <p className="text-xs text-accent uppercase tracking-wider">{activePrompt.category}</p>
+            <h3 className="font-serif text-xl text-foreground">{activePrompt.prompt}</h3>
+            <Textarea
+              value={response}
+              onChange={(e) => setResponse(e.target.value)}
+              placeholder="Write freely. There is no wrong answer here..."
+              className="bg-input border-border min-h-[200px]"
+            />
+            <div className="glass-card p-4 text-sm text-muted-foreground italic">
+              <p>Reflection: What surprised you about what came up?</p>
+            </div>
+            <div className="glass-card p-4 text-sm text-accent italic text-center">
+              I integrate this part of myself with compassion. It is safe to see myself fully.
+            </div>
+            <Button onClick={handleSave} disabled={saveEntry.isPending} className="bg-accent text-accent-foreground">
+              {saveEntry.isPending ? "Saving..." : "Complete & Save"}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Progress value={(completedCount / 30) * 100} className="flex-1 h-3" />
+        <span className="text-sm text-muted-foreground font-medium">{completedCount}/30</span>
+      </div>
+
+      <Tabs defaultValue="Self-Worth">
+        <TabsList className="bg-muted flex-wrap h-auto gap-1 p-1">
+          {Object.keys(PROMPTS).map((cat) => (
+            <TabsTrigger key={cat} value={cat} className="text-xs">{cat}</TabsTrigger>
+          ))}
+        </TabsList>
+        {Object.entries(PROMPTS).map(([cat, prompts]) => (
+          <TabsContent key={cat} value={cat} className="space-y-3 mt-4">
+            {prompts.map((prompt, i) => {
+              const done = completedPrompts.has(prompt);
+              const globalIndex = allPrompts.findIndex((p) => p.prompt === prompt);
+              return (
+                <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}>
+                  <Card
+                    className={`glass-card cursor-pointer transition-all ${done ? "border-accent/40" : "hover:border-accent/20"}`}
+                    onClick={() => !done && setActivePrompt({ category: cat, prompt, globalIndex })}
+                  >
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${done ? "bg-accent text-accent-foreground" : "border border-border"}`}>
+                        {done && <Check className="w-3 h-3" />}
+                      </div>
+                      <p className={`text-sm ${done ? "text-muted-foreground" : "text-foreground"}`}>{prompt}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
+}

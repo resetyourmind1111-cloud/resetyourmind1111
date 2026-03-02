@@ -1,34 +1,18 @@
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { LockedContent } from "@/components/LockedContent";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-
-const healingTools = [
-  { name: "Emotional Release Technique", icon: "💧", description: "Let go of trapped emotions through guided release exercises." },
-  { name: "Inner Child Healing", icon: "🧸", description: "Reconnect with and heal your inner child wounds." },
-  { name: "Mirror Work", icon: "🪞", description: "Transform self-image through mirror affirmation practice." },
-  { name: "Shadow Work Journal", icon: "🌑", description: "Explore and integrate your shadow self with guided prompts." },
-  { name: "Cord Cutting Ceremony", icon: "✂️", description: "Release energetic attachments to people and situations." },
-  { name: "Forgiveness Protocol", icon: "🕊️", description: "A structured approach to deep forgiveness work." },
-  { name: "Grief Processing", icon: "🖤", description: "Honor and process grief in a safe, guided container." },
-  { name: "Boundary Builder", icon: "🛡️", description: "Strengthen your boundaries with practical exercises." },
-  { name: "Nervous System Reset", icon: "🧠", description: "Regulate your nervous system with somatic techniques." },
-  { name: "Trauma Timeline", icon: "📅", description: "Map and process your healing timeline." },
-  { name: "Body Scan Practice", icon: "🧘", description: "Release stored tension through guided body scanning." },
-  { name: "EFT Tapping Guide", icon: "👆", description: "Emotional freedom technique for anxiety and stress." },
-  { name: "Breathwork Sessions", icon: "🌬️", description: "Transformative breathing techniques for emotional release." },
-  { name: "Gratitude Alchemy", icon: "✨", description: "Transform pain into gratitude through structured practice." },
-  { name: "Self-Compassion Letters", icon: "💌", description: "Write healing letters to yourself through different life stages." },
-  { name: "Rage Release Ritual", icon: "🔥", description: "Safely express and channel anger for healing." },
-  { name: "Dream Analysis", icon: "🌙", description: "Decode your subconscious messages through dream journaling." },
-  { name: "Energy Clearing", icon: "🌊", description: "Cleanse your energetic field and restore balance." },
-];
+import { useNavigate } from "react-router-dom";
+import { healingTools } from "@/data/healingToolsData";
 
 export default function HealingTools() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
@@ -50,16 +34,28 @@ export default function HealingTools() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {healingTools.map((tool, index) => (
             <motion.div
-              key={tool.name}
+              key={tool.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
+              transition={{ delay: index * 0.04 }}
             >
-              <Card className="glass-card-hover cursor-pointer h-full">
-                <CardContent className="p-6">
-                  <div className="text-4xl mb-4">{tool.icon}</div>
+              <Card className="glass-card-hover h-full flex flex-col">
+                <CardContent className="p-6 flex flex-col flex-1">
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="text-3xl">{tool.icon}</span>
+                    <Badge variant="outline" className="text-xs border-accent/30 text-accent">
+                      {tool.category}
+                    </Badge>
+                  </div>
                   <h3 className="font-serif text-lg font-semibold text-foreground mb-2">{tool.name}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{tool.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">{tool.description}</p>
+                  <Button
+                    variant="outline"
+                    className="w-full border-accent/30 text-accent hover:bg-accent/10"
+                    onClick={() => navigate(`/healing-tools/${tool.id}`)}
+                  >
+                    Open Tool
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>

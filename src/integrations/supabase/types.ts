@@ -86,6 +86,33 @@ export type Database = {
         }
         Relationships: []
       }
+      healing_tool_entries: {
+        Row: {
+          created_at: string
+          entry_data: Json
+          id: string
+          tool_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_data?: Json
+          id?: string
+          tool_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_data?: Json
+          id?: string
+          tool_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
