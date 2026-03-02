@@ -31,7 +31,7 @@ export default function HealingTools() {
   const tier = profile?.subscription_tier || "free";
 
   return (
-    <AuthenticatedLayout title="Healing Tools" subtitle="18 powerful tools for deep emotional healing and transformation">
+    <AuthenticatedLayout title="Healing Tools" subtitle="20 powerful tools for deep emotional healing and transformation">
       <LockedContent requiredTier="tier2" currentTier={tier}>
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="mb-6 bg-muted/50">

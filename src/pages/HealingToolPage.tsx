@@ -25,6 +25,8 @@ import AffirmationBuilder from "@/components/healing-tools/AffirmationBuilder";
 import VisibilityChallengeTracker from "@/components/healing-tools/VisibilityChallengeTracker";
 import CEOSelfAssessment from "@/components/healing-tools/CEOSelfAssessment";
 import ValuesClarityTool from "@/components/healing-tools/ValuesClarityTool";
+import ChakraBalancingGuide from "@/components/healing-tools/ChakraBalancingGuide";
+import EnergyCordCutting from "@/components/healing-tools/EnergyCordCutting";
 
 const toolComponents: Record<string, React.ComponentType> = {
   "limiting-belief-rewriter": LimitingBeliefRewriter,
@@ -45,6 +47,8 @@ const toolComponents: Record<string, React.ComponentType> = {
   "visibility-challenge": VisibilityChallengeTracker,
   "ceo-self-assessment": CEOSelfAssessment,
   "values-clarity-tool": ValuesClarityTool,
+  "chakra-balancing": ChakraBalancingGuide,
+  "energy-cord-cutting": EnergyCordCutting,
 };
 
 export default function HealingToolPage() {
