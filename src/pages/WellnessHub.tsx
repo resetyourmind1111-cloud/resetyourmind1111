@@ -5,18 +5,9 @@ import { BodyTypeAssessment } from "@/components/wellness/BodyTypeAssessment";
 import { NutritionPlans } from "@/components/wellness/NutritionPlans";
 import { MovementPlans } from "@/components/wellness/MovementPlans";
 import { motion } from "framer-motion";
-import { Construction } from "lucide-react";
 import { AviniHealthProducts } from "@/components/wellness/AviniHealthProducts";
+import { DailyWellnessTips } from "@/components/wellness/DailyWellnessTips";
 
-function ComingSoon({ label }: { label: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <Construction className="w-12 h-12 text-muted-foreground mb-4" />
-      <h3 className="font-serif text-2xl text-foreground mb-2">{label}</h3>
-      <p className="text-muted-foreground">This section is coming soon.</p>
-    </div>
-  );
-}
 
 export default function WellnessHub() {
   const [activeTab, setActiveTab] = useState("body-type");
@@ -63,7 +54,7 @@ export default function WellnessHub() {
               <AviniHealthProducts />
             </TabsContent>
             <TabsContent value="tips">
-              <ComingSoon label="Daily Wellness Tips" />
+              <DailyWellnessTips />
             </TabsContent>
           </Tabs>
         </div>
