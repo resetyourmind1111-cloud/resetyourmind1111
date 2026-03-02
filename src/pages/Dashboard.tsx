@@ -15,6 +15,7 @@ import { thermostatTypes, ThermostatType } from "@/data/thermostatTypes";
 import { getDailySlip } from "@/data/permissionSlipsData";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { DailySlipModal } from "@/components/DailySlipModal";
 
 interface AssessmentResult {
   id: string;
@@ -109,6 +110,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <DailySlipModal />
       <Navigation />
       
       <main className="container mx-auto px-4 py-12">
