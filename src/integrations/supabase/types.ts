@@ -55,33 +55,45 @@ export type Database = {
       }
       card_pulls: {
         Row: {
+          action_items_completed: Json | null
           cards_pulled: Json
           created_at: string
+          deck_used: string | null
           id: string
           journal_entry: string | null
           points_awarded: number
           question_asked: string | null
           reading_type: string
+          revisited_count: number | null
+          spread_name: string | null
           user_id: string
         }
         Insert: {
+          action_items_completed?: Json | null
           cards_pulled: Json
           created_at?: string
+          deck_used?: string | null
           id?: string
           journal_entry?: string | null
           points_awarded?: number
           question_asked?: string | null
           reading_type: string
+          revisited_count?: number | null
+          spread_name?: string | null
           user_id: string
         }
         Update: {
+          action_items_completed?: Json | null
           cards_pulled?: Json
           created_at?: string
+          deck_used?: string | null
           id?: string
           journal_entry?: string | null
           points_awarded?: number
           question_asked?: string | null
           reading_type?: string
+          revisited_count?: number | null
+          spread_name?: string | null
           user_id?: string
         }
         Relationships: []
@@ -260,6 +272,51 @@ export type Database = {
           total_points?: number | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      spread_templates: {
+        Row: {
+          created_at: string
+          deck_name: string
+          description: string | null
+          icon: string | null
+          id: string
+          layout_type: string
+          number_of_cards: number
+          points: number
+          position_meanings: Json
+          question_prompt: string
+          spread_name: string
+          tier_required: number
+        }
+        Insert: {
+          created_at?: string
+          deck_name: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          layout_type?: string
+          number_of_cards: number
+          points?: number
+          position_meanings?: Json
+          question_prompt: string
+          spread_name: string
+          tier_required?: number
+        }
+        Update: {
+          created_at?: string
+          deck_name?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          layout_type?: string
+          number_of_cards?: number
+          points?: number
+          position_meanings?: Json
+          question_prompt?: string
+          spread_name?: string
+          tier_required?: number
         }
         Relationships: []
       }
