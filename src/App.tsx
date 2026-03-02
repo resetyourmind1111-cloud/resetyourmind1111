@@ -21,6 +21,8 @@ import MyProgress from "./pages/MyProgress";
 import MyAccount from "./pages/MyAccount";
 import WellnessHub from "./pages/WellnessHub";
 import SavedReadings from "./pages/SavedReadings";
+import ThirtyDayExperience from "./pages/ThirtyDayExperience";
+import EmotionalSurgery from "./pages/EmotionalSurgery";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +52,8 @@ const App = () => (
             <Route path="/my-account" element={<MyAccount />} />
             <Route path="/wellness" element={<WellnessHub />} />
             <Route path="/saved-readings" element={<SavedReadings />} />
+            <Route path="/30-day-experience" element={<ThirtyDayExperience />} />
+            <Route path="/emotional-surgery" element={<EmotionalSurgery />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
