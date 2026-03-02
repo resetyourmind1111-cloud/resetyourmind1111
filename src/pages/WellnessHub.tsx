@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BodyTypeAssessment } from "@/components/wellness/BodyTypeAssessment";
+import { NutritionPlans } from "@/components/wellness/NutritionPlans";
 import { motion } from "framer-motion";
 import { Construction } from "lucide-react";
 
@@ -51,7 +52,7 @@ export default function WellnessHub() {
               <BodyTypeAssessment onNavigateTab={setActiveTab} />
             </TabsContent>
             <TabsContent value="nutrition">
-              <ComingSoon label="Nutrition Plans & Recipes" />
+              <NutritionPlans />
             </TabsContent>
             <TabsContent value="movement">
               <ComingSoon label="Movement Medicine" />
