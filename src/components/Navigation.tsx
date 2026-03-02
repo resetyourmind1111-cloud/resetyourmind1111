@@ -15,6 +15,7 @@ const navLinks = [
   { name: "Permission Slips", href: "/permission-slips" },
   { name: "Healing Tools", href: "/healing-tools" },
   { name: "Human Design", href: "/human-design" },
+  { name: "Wellness Hub", href: "/wellness" },
   { name: "Manifesto", href: "/manifesto" },
   { name: "My Progress", href: "/my-progress" },
   { name: "My Account", href: "/my-account" },
