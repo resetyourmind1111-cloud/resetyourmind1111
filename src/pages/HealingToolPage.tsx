@@ -13,6 +13,12 @@ import InnerChildHealing from "@/components/healing-tools/InnerChildHealing";
 import ShadowWorkLibrary from "@/components/healing-tools/ShadowWorkLibrary";
 import MoneyStoryAudit from "@/components/healing-tools/MoneyStoryAudit";
 import AbundanceEvidenceLog from "@/components/healing-tools/AbundanceEvidenceLog";
+import IncomeFrequencyTracker from "@/components/healing-tools/IncomeFrequencyTracker";
+import ManifestationTracker from "@/components/healing-tools/ManifestationTracker";
+import BoundaryBuilder from "@/components/healing-tools/BoundaryBuilder";
+import AttachmentStyleAnalyzer from "@/components/healing-tools/AttachmentStyleAnalyzer";
+import MoonPhaseTracker from "@/components/healing-tools/MoonPhaseTracker";
+import AngelNumberJournal from "@/components/healing-tools/AngelNumberJournal";
 
 const toolComponents: Record<string, React.ComponentType> = {
   "limiting-belief-rewriter": LimitingBeliefRewriter,
@@ -21,6 +27,12 @@ const toolComponents: Record<string, React.ComponentType> = {
   "shadow-work-library": ShadowWorkLibrary,
   "money-story-audit": MoneyStoryAudit,
   "abundance-evidence-log": AbundanceEvidenceLog,
+  "income-frequency-tracker": IncomeFrequencyTracker,
+  "manifestation-tracker": ManifestationTracker,
+  "boundary-builder": BoundaryBuilder,
+  "attachment-style-analyzer": AttachmentStyleAnalyzer,
+  "moon-phase-tracker": MoonPhaseTracker,
+  "angel-number-journal": AngelNumberJournal,
 };
 
 export default function HealingToolPage() {
