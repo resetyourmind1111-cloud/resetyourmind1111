@@ -25,4 +25,6 @@ export const healingTools: HealingTool[] = [
   { id: "visibility-challenge", name: "Visibility Challenge Tracker", icon: "👁️", description: "Build your visibility muscle with 30 daily challenges", category: "Growth" },
   { id: "ceo-self-assessment", name: "CEO Self-Assessment", icon: "👑", description: "Evaluate how you are showing up as CEO of your life", category: "Leadership" },
   { id: "values-clarity-tool", name: "Values Clarity Tool", icon: "💎", description: "Identify your core values and align your life to them", category: "Purpose" },
+  { id: "chakra-balancing", name: "Chakra Balancing Guide", icon: "🔮", description: "Assess, balance, and track your seven energy centers", category: "Energy" },
+  { id: "energy-cord-cutting", name: "Energy Cord Cutting Ritual", icon: "✂️", description: "Release energetic ties that no longer serve your highest good", category: "Energy" },
 ];

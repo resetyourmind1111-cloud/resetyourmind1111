@@ -77,7 +77,7 @@ export default function HealingToolsDashboard() {
       {/* Overview Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Tools Started", value: `${toolsStarted}/18`, icon: Sparkles, detail: `${Math.round(overallProgress)}% explored` },
+          { label: "Tools Started", value: `${toolsStarted}/${healingTools.length}`, icon: Sparkles, detail: `${Math.round(overallProgress)}% explored` },
           { label: "Total Entries", value: totalEntries, icon: TrendingUp, detail: "across all tools" },
           { label: "Active Days", value: `${activeDays}/7`, icon: Calendar, detail: "this week" },
           { label: "Most Used", value: mostUsed?.entryCount || 0, icon: CheckCircle2, detail: mostUsed?.name || "—" },
@@ -109,13 +109,13 @@ export default function HealingToolsDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-serif text-lg font-semibold text-foreground">Overall Exploration</h3>
-              <span className="text-sm text-accent font-medium">{toolsStarted} of 18 tools</span>
+              <span className="text-sm text-accent font-medium">{toolsStarted} of {healingTools.length} tools</span>
             </div>
             <Progress value={overallProgress} className="h-3 bg-muted" />
             <p className="text-xs text-muted-foreground mt-2">
-              {toolsStarted === 18
+              {toolsStarted === healingTools.length
                 ? "🎉 You've explored every tool! Keep deepening your practice."
-                : `${18 - toolsStarted} tools waiting for you to discover`}
+                : `${healingTools.length - toolsStarted} tools waiting for you to discover`}
             </p>
           </CardContent>
         </Card>
