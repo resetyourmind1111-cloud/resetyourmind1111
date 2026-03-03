@@ -225,22 +225,18 @@ export default function ThirtyDayExperience() {
   const phaseNames = ["Recognition", "Recalibration", "Integration"];
 
   const content = (
-    <AuthenticatedLayout title="30-Day Experience">
-      <div className="min-h-screen pt-24 pb-16 px-4">
+    <AuthenticatedLayout title="30-Day Experience" subtitle="Your journey to reclaimed worth">
+      <div className="pb-16">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-2">30-Day Experience</h1>
-            <p className="text-muted-foreground text-sm mb-4">Your journey to reclaimed worth</p>
-            <motion.blockquote
-              key={currentDay}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-sm italic text-primary/80 max-w-md mx-auto leading-relaxed"
-            >
-              "{dailyAffirmations[(currentDay - 1) % dailyAffirmations.length]}"
-            </motion.blockquote>
-          </div>
+          {/* Daily Affirmation */}
+          <motion.blockquote
+            key={currentDay}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-sm italic text-primary/80 max-w-md mx-auto leading-relaxed text-center mb-8"
+          >
+            "{dailyAffirmations[(currentDay - 1) % dailyAffirmations.length]}"
+          </motion.blockquote>
 
           {/* Top Stats */}
           <div className="flex items-center justify-between mb-4">
