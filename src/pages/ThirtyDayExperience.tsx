@@ -12,6 +12,39 @@ import { LockedContent } from "@/components/LockedContent";
 import { thirtyDayContent, DayContent } from "@/data/thirtyDayExperienceData";
 import { useToast } from "@/hooks/use-toast";
 
+const dailyAffirmations = [
+  "You are the permission you've been waiting for.",
+  "Your worth is not up for negotiation.",
+  "You are allowed to take up space unapologetically.",
+  "Choosing yourself is not selfish — it's sacred.",
+  "You don't need anyone's approval to become who you're meant to be.",
+  "Rest is not a reward. It is a right.",
+  "Your boundaries are proof of your self-respect.",
+  "You are allowed to outgrow the version of you they were comfortable with.",
+  "Joy is your birthright. Stop apologizing for feeling it.",
+  "You are not too much. They were just not enough.",
+  "Forgiveness is a gift you give yourself.",
+  "You are allowed to want more — and to get it.",
+  "The old story ends when you decide it does.",
+  "You are building something no one else can build.",
+  "Your voice matters. Use it without shrinking.",
+  "Grief and growth can live in the same breath.",
+  "You are allowed to change your mind as many times as you need.",
+  "Abundance is not greed — it is alignment.",
+  "You don't owe anyone an explanation for your evolution.",
+  "Passion is not a luxury. It is a compass.",
+  "Your tears are not weakness. They are release.",
+  "You are allowed to fail publicly and rise loudly.",
+  "No one can pour from your cup without your permission.",
+  "You are the evidence that healing is possible.",
+  "Trust your knowing. It has never lied to you.",
+  "Love that requires you to shrink is not love.",
+  "Your ambition is beautiful. Never dim it.",
+  "Today, you choose yourself. Tomorrow, you choose yourself again.",
+  "The world needs exactly what you carry inside you.",
+  "You are the permission slip. You always were.",
+];
+
 interface DayProgress {
   day_number: number;
   phase: string;
@@ -198,7 +231,15 @@ export default function ThirtyDayExperience() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-2">30-Day Experience</h1>
-            <p className="text-muted-foreground text-sm">Your journey to reclaimed worth</p>
+            <p className="text-muted-foreground text-sm mb-4">Your journey to reclaimed worth</p>
+            <motion.blockquote
+              key={currentDay}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm italic text-primary/80 max-w-md mx-auto leading-relaxed"
+            >
+              "{dailyAffirmations[(currentDay - 1) % dailyAffirmations.length]}"
+            </motion.blockquote>
           </div>
 
           {/* Top Stats */}
