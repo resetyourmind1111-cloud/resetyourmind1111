@@ -138,7 +138,7 @@ export default function ThirtyDayExperience() {
   const [showCertificate, setShowCertificate] = useState(false);
   const [userTier, setUserTier] = useState("free");
   const [firstName, setFirstName] = useState("");
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Determine current day based on first entry or default to 1
   const completedDays = Object.values(progressMap).filter(p => p.marked_complete).length;

@@ -42,7 +42,7 @@ export default function EmotionalSurgery() {
   const [journalText, setJournalText] = useState("");
   const [actionComplete, setActionComplete] = useState(false);
   const [userTier, setUserTier] = useState("free");
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const completionKey = (track: string, num: number) => `${track}_${num}`;
 
