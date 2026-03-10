@@ -5,8 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function LimitingBeliefRewriter() {
   const { entries, saveEntry, deleteEntry } = useHealingToolEntries("limiting-belief-rewriter");
@@ -15,6 +17,7 @@ export default function LimitingBeliefRewriter() {
   const [origin, setOrigin] = useState("");
   const [newBelief, setNewBelief] = useState("");
   const [affirmation, setAffirmation] = useState("");
+  const [isReframing, setIsReframing] = useState(false);
 
   const handleSave = () => {
     if (!belief.trim() || !newBelief.trim()) return;
@@ -24,6 +27,31 @@ export default function LimitingBeliefRewriter() {
         setShowForm(false);
       },
     });
+  };
+
+  const handleAiReframe = async () => {
+    if (!belief.trim()) {
+      toast.error("Please enter your limiting belief first");
+      return;
+    }
+    setIsReframing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("reframe-belief", {
+        body: { belief: belief.trim() },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.origin) setOrigin(data.origin);
+      if (data.newBelief) setNewBelief(data.newBelief);
+      if (data.affirmation) setAffirmation(data.affirmation);
+      toast.success("AI reframe complete — review and personalize the suggestions");
+    } catch (err: any) {
+      console.error("Reframe error:", err);
+      toast.error(err.message || "Failed to generate reframe. Please try again.");
+    } finally {
+      setIsReframing(false);
+    }
   };
 
   return (
@@ -44,6 +72,21 @@ export default function LimitingBeliefRewriter() {
                   <p className="text-xs text-muted-foreground mb-2">Write it exactly as it sounds in your head</p>
                   <Textarea placeholder="e.g. I am not smart enough to be successful" value={belief} onChange={(e) => setBelief(e.target.value)} className="bg-input border-border" />
                 </div>
+
+                {/* AI Reframe Button */}
+                <Button
+                  onClick={handleAiReframe}
+                  disabled={isReframing || !belief.trim()}
+                  variant="outline"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                >
+                  {isReframing ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Reframing with AI...</>
+                  ) : (
+                    <><Sparkles className="w-4 h-4 mr-2" /> Help Me Reframe This (AI)</>
+                  )}
+                </Button>
+
                 <div className="glass-card p-4 text-sm text-muted-foreground italic space-y-1">
                   <p>Where do you think this belief came from?</p>
                   <p>What age were you when you first heard or felt this?</p>
