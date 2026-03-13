@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Loader2, Wand2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -17,14 +17,21 @@ const EMOTIONS = [
   "Rejection", "Overwhelm", "Jealousy", "Unworthiness", "Betrayal",
 ];
 
+type TriggerInsight = {
+  bodySensation: string;
+  rootReflection: string;
+  healingPrompt: string;
+};
+
 export default function EmotionalTriggerTracker() {
-  const { entries, saveEntry, deleteEntry } = useHealingToolEntries("emotional-trigger-tracker");
+  const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("emotional-trigger-tracker");
   const [showForm, setShowForm] = useState(false);
   const [trigger, setTrigger] = useState("");
   const [emotion, setEmotion] = useState("");
   const [bodySensation, setBodySensation] = useState("");
   const [rootResponse, setRootResponse] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [insightLoading, setInsightLoading] = useState<string | null>(null);
 
   const emotionCounts = entries.reduce((acc: Record<string, number>, e: any) => {
     const em = e.entry_data.emotion;
@@ -66,6 +73,26 @@ export default function EmotionalTriggerTracker() {
       toast.error(err.message || "Failed to analyze trigger. Please try again.");
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const fetchInsight = async (entryId: string, entryData: any) => {
+    setInsightLoading(entryId);
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-trigger", {
+        body: { trigger: entryData.trigger, emotion: entryData.emotion },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      updateEntry.mutate({
+        id: entryId,
+        entryData: { ...entryData, aiInsight: data },
+      });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to get insight");
+    } finally {
+      setInsightLoading(null);
     }
   };
 
@@ -155,7 +182,7 @@ export default function EmotionalTriggerTracker() {
           <TabsContent value="all">
             <div className="space-y-3">
               {entries.map((entry: any) => (
-                <TriggerCard key={entry.id} entry={entry} onDelete={() => deleteEntry.mutate(entry.id)} />
+                <TriggerCard key={entry.id} entry={entry} onDelete={() => deleteEntry.mutate(entry.id)} onDecode={fetchInsight} isDecoding={insightLoading === entry.id} />
               ))}
             </div>
           </TabsContent>
@@ -163,7 +190,7 @@ export default function EmotionalTriggerTracker() {
             <TabsContent key={em} value={em}>
               <div className="space-y-3">
                 {entries.filter((e: any) => e.entry_data.emotion === em).map((entry: any) => (
-                  <TriggerCard key={entry.id} entry={entry} onDelete={() => deleteEntry.mutate(entry.id)} />
+                  <TriggerCard key={entry.id} entry={entry} onDelete={() => deleteEntry.mutate(entry.id)} onDecode={fetchInsight} isDecoding={insightLoading === entry.id} />
                 ))}
               </div>
             </TabsContent>
@@ -174,8 +201,9 @@ export default function EmotionalTriggerTracker() {
   );
 }
 
-function TriggerCard({ entry, onDelete }: { entry: any; onDelete: () => void }) {
+function TriggerCard({ entry, onDelete, onDecode, isDecoding }: { entry: any; onDelete: () => void; onDecode: (id: string, data: any) => void; isDecoding: boolean }) {
   const d = entry.entry_data;
+  const insight: TriggerInsight | undefined = d.aiInsight;
   return (
     <Card className="glass-card">
       <CardContent className="p-4">
@@ -184,13 +212,49 @@ function TriggerCard({ entry, onDelete }: { entry: any; onDelete: () => void }) 
             <Badge className="bg-secondary text-secondary-foreground text-xs">{d.emotion}</Badge>
             <span className="text-xs text-muted-foreground">{format(new Date(entry.created_at), "MMM d, yyyy")}</span>
           </div>
-          <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0" onClick={onDelete}>
-            <Trash2 className="w-3 h-3" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-accent h-7 px-2 text-xs hover:bg-accent/10"
+              disabled={isDecoding}
+              onClick={() => onDecode(entry.id, d)}
+            >
+              {isDecoding ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Wand2 className="w-3 h-3 mr-1" />}
+              {insight ? "Refresh" : "Decode"}
+            </Button>
+            <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0" onClick={onDelete}>
+              <Trash2 className="w-3 h-3" />
+            </Button>
+          </div>
         </div>
         <p className="text-sm text-foreground mb-1">{d.trigger}</p>
         {d.bodySensation && <p className="text-xs text-muted-foreground">Body: {d.bodySensation}</p>}
         {d.rootResponse && <p className="text-xs text-muted-foreground mt-1 italic whitespace-pre-wrap">Reflection: {d.rootResponse}</p>}
+
+        <AnimatePresence>
+          {insight && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 space-y-3 border-t border-border pt-4"
+            >
+              <div>
+                <p className="text-xs font-semibold text-accent mb-1">🧠 Body-Mind Connection</p>
+                <p className="text-sm text-foreground/90">{insight.bodySensation}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-accent mb-1">🪞 Root Reflection</p>
+                <p className="text-sm text-foreground/90">{insight.rootReflection}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-accent mb-1">📝 Healing Prompt</p>
+                <p className="text-sm text-foreground/90">{insight.healingPrompt}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </CardContent>
     </Card>
   );
