@@ -32,7 +32,7 @@ export default function HealingTools() {
 
   return (
     <AuthenticatedLayout title="Healing Tools" subtitle="20 powerful tools for deep emotional healing and transformation">
-      <LockedContent requiredTier="tier2" currentTier={tier}>
+      <LockedContent requiredTier="expand" currentTier={tier}>
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="mb-6 bg-muted/50">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>

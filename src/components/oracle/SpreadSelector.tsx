@@ -25,7 +25,7 @@ export const SpreadSelector = ({ deckName, subscriptionTier, onSelectSpread, onB
   const [loading, setLoading] = useState(true);
   const theme = deckThemes[deckName] || deckThemes['Permission Granted'];
 
-  const tierNumber = subscriptionTier === 'tier3' ? 3 : subscriptionTier === 'tier2' ? 2 : 1;
+  const tierNumber = ['embody', 'founding_full_access'].includes(subscriptionTier) ? 3 : subscriptionTier === 'expand' ? 2 : 1;
 
   useEffect(() => {
     const fetchSpreads = async () => {
