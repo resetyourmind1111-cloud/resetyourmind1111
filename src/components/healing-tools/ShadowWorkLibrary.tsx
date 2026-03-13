@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
-import { motion } from "framer-motion";
-import { Check, ChevronLeft, Sparkles, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, ChevronLeft, Sparkles, Loader2, Wand2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 const PROMPTS: Record<string, string[]> = {
   "Self-Worth": [
@@ -57,14 +58,21 @@ const allPrompts = Object.entries(PROMPTS).flatMap(([cat, prompts]) =>
   prompts.map((p, i) => ({ category: cat, prompt: p, index: i }))
 );
 
+type ShadowInsight = {
+  insight: string;
+  deeperPrompt: string;
+  integration: string;
+};
+
 export default function ShadowWorkLibrary() {
-  const { entries, saveEntry } = useHealingToolEntries("shadow-work-library");
+  const { entries, saveEntry, updateEntry } = useHealingToolEntries("shadow-work-library");
   const [activePrompt, setActivePrompt] = useState<{ category: string; prompt: string; globalIndex: number } | null>(null);
   const [response, setResponse] = useState("");
   const [aiInsight, setAiInsight] = useState("");
   const [aiDeeperPrompt, setAiDeeperPrompt] = useState("");
   const [aiIntegration, setAiIntegration] = useState("");
   const [isGuiding, setIsGuiding] = useState(false);
+  const [insightLoading, setInsightLoading] = useState<string | null>(null);
 
   const completedPrompts = new Set(entries.map((e: any) => e.entry_data.prompt));
   const completedCount = completedPrompts.size;
@@ -100,6 +108,30 @@ export default function ShadowWorkLibrary() {
       toast.error(err.message || "Failed to generate guidance. Please try again.");
     } finally {
       setIsGuiding(false);
+    }
+  };
+
+  const fetchInsight = async (entryId: string, entryData: any) => {
+    setInsightLoading(entryId);
+    try {
+      const { data, error } = await supabase.functions.invoke("shadow-work-guide", {
+        body: {
+          category: entryData.category,
+          prompt: entryData.prompt,
+          response: entryData.response || undefined,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      updateEntry.mutate({
+        id: entryId,
+        entryData: { ...entryData, aiInsight: data },
+      });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to get insight");
+    } finally {
+      setInsightLoading(null);
     }
   };
 
@@ -176,6 +208,68 @@ export default function ShadowWorkLibrary() {
         <Progress value={(completedCount / 30) * 100} className="flex-1 h-3" />
         <span className="text-sm text-muted-foreground font-medium">{completedCount}/30</span>
       </div>
+
+      {/* Completed entries with Decode */}
+      {entries.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="font-serif text-lg text-foreground">Completed Shadow Work</h3>
+          {entries.map((entry: any) => {
+            const d = entry.entry_data;
+            const insight: ShadowInsight | undefined = d.aiInsight;
+            const isLoading = insightLoading === entry.id;
+            return (
+              <motion.div key={entry.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Card className="glass-card">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="text-xs text-accent uppercase tracking-wider">{d.category}</p>
+                        <p className="text-sm text-foreground font-medium mt-1">{d.prompt}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{format(new Date(entry.created_at), "MMM d, yyyy")}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-accent h-7 px-2 text-xs hover:bg-accent/10"
+                        disabled={isLoading}
+                        onClick={() => fetchInsight(entry.id, d)}
+                      >
+                        {isLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Wand2 className="w-3 h-3 mr-1" />}
+                        {insight ? "Refresh" : "Decode"}
+                      </Button>
+                    </div>
+                    <p className="text-sm text-foreground/70 italic mt-2">"{d.response}"</p>
+
+                    <AnimatePresence>
+                      {insight && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-4 space-y-3 border-t border-border pt-4"
+                        >
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">🔮 Shadow Insight</p>
+                            <p className="text-sm text-foreground/90">{insight.insight}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">🌊 Go Deeper</p>
+                            <p className="text-sm text-foreground/90">{insight.deeperPrompt}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">✨ Integration</p>
+                            <p className="text-sm text-foreground/90 italic">"{insight.integration}"</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
 
       <Tabs defaultValue="Self-Worth">
         <TabsList className="bg-muted flex-wrap h-auto gap-1 p-1">
