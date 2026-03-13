@@ -136,13 +136,13 @@ export default function EmotionalSurgery() {
     Visibility: "text-emerald-400",
   };
 
-  // Tier gating: Expand (tier2) and Embody (tier3)
-  if (!["tier2", "tier3", "expand", "embody"].includes(userTier)) {
+  // Tier gating: Expand and above
+  if (!["expand", "embody", "founding_full_access"].includes(userTier)) {
     return (
       <AuthenticatedLayout title="Emotional Surgery Lessons">
         <div className="min-h-screen pt-24 pb-16 px-4">
           <div className="max-w-4xl mx-auto">
-            <LockedContent requiredTier="tier2" currentTier={userTier}>
+            <LockedContent requiredTier="expand" currentTier={userTier}>
               <div className="h-[600px]" />
             </LockedContent>
           </div>

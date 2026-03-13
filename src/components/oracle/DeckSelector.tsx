@@ -21,7 +21,7 @@ interface DeckSelectorProps {
 }
 
 export const DeckSelector = ({ onSelectDeck, subscriptionTier }: DeckSelectorProps) => {
-  const canAccessTier2 = subscriptionTier === 'tier2' || subscriptionTier === 'tier3';
+  const canAccessTier2 = ['expand', 'embody', 'founding_full_access'].includes(subscriptionTier);
 
   const decks: DeckInfo[] = [
     {

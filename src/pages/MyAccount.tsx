@@ -32,9 +32,6 @@ const tierNames: Record<string, string> = {
   expand: "Expand",
   embody: "Embody",
   founding_full_access: "Founding 111",
-  tier1: "Reset",
-  tier2: "Expand",
-  tier3: "Embody",
 };
 
 export default function MyAccount() {

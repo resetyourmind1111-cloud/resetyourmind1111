@@ -361,13 +361,13 @@ export default function ThirtyDayExperience() {
     </AuthenticatedLayout>
   );
 
-  // Tier gating: Embody only (tier3)
-  if (userTier !== "tier3" && userTier !== "embody") {
+  // Tier gating: Embody only
+  if (!["embody", "founding_full_access"].includes(userTier)) {
     return (
       <AuthenticatedLayout title="30-Day Experience">
         <div className="min-h-screen pt-24 pb-16 px-4">
           <div className="max-w-4xl mx-auto">
-            <LockedContent requiredTier="tier3" currentTier={userTier}>
+            <LockedContent requiredTier="embody" currentTier={userTier}>
               <div className="h-[600px]" />
             </LockedContent>
           </div>

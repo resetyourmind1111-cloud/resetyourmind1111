@@ -3,38 +3,38 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
+type TierName = "reset" | "expand" | "embody" | "founding_full_access";
+
 interface LockedContentProps {
   children: ReactNode;
-  requiredTier: "tier1" | "tier2" | "tier3" | "reset" | "expand" | "embody";
+  requiredTier: TierName;
   currentTier: string;
 }
 
-const tierLabels: Record<string, string> = {
-  tier1: "Reset",
-  tier2: "Expand",
-  tier3: "Embody",
+const tierLabels: Record<TierName, string> = {
   reset: "Reset",
   expand: "Expand",
   embody: "Embody",
+  founding_full_access: "Founding 111",
 };
 
-const tierPrices: Record<string, string> = {
-  tier1: "$44",
-  tier2: "$88",
-  tier3: "$111",
+const tierPrices: Record<TierName, string> = {
   reset: "$44",
   expand: "$88",
   embody: "$111",
+  founding_full_access: "$44",
+};
+
+const TIER_LEVEL: Record<string, number> = {
+  free: 0,
+  reset: 1,
+  expand: 2,
+  embody: 3,
+  founding_full_access: 3,
 };
 
 export function LockedContent({ children, requiredTier, currentTier }: LockedContentProps) {
-  // Normalize tier names for comparison
-  const normalize = (t: string) => {
-    const map: Record<string, number> = {
-      free: 0, tier1: 1, reset: 1, tier2: 2, expand: 2, tier3: 3, embody: 3, founding_full_access: 3,
-    };
-    return map[t.toLowerCase()] ?? 0;
-  };
+  const normalize = (t: string) => TIER_LEVEL[t.toLowerCase()] ?? 0;
 
   if (normalize(currentTier) >= normalize(requiredTier)) {
     return <>{children}</>;
