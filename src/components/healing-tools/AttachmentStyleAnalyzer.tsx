@@ -80,6 +80,8 @@ export default function AttachmentStyleAnalyzer() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>(Array(20).fill(-1));
   const [started, setStarted] = useState(false);
+  const [isInsighting, setIsInsighting] = useState(false);
+  const [aiData, setAiData] = useState<{ personalInsight: string; coreWound: string; dailyPractice: string; affirmation: string } | null>(null);
 
   const existingResult = useMemo(() => entries.find((e: any) => e.entry_data.type === "result"), [entries]);
 
