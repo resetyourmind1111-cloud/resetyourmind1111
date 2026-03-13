@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { Play, Pause, RotateCcw, Trash2, Sparkles, Loader2, Wind, Flame, Moon, Sun, Heart, Zap, Shield, Leaf } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { playPhaseTone, playCompletionTone } from "@/lib/breathingAudio";
 
 const exercises = [
   { id: "box", name: "Box Breathing", inhale: 4, hold1: 4, exhale: 4, hold2: 4, icon: "box", category: "Calm", description: "Equal counts for calm focus. Navy SEALs use this to stay composed under pressure." },
