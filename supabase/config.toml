@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.reframe-belief]
 verify_jwt = false
+
+[functions.analyze-trigger]
+verify_jwt = false
+
+[functions.inner-child-guide]
+verify_jwt = false
