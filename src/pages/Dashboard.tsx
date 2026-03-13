@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
+import { PastDueBanner } from "@/components/PastDueBanner";
 import { Footer } from "@/components/landing/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -124,6 +125,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <DailySlipModal />
       <Navigation />
+      <PastDueBanner />
       
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">

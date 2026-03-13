@@ -2,6 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigation } from "@/components/Navigation";
+import { PastDueBanner } from "@/components/PastDueBanner";
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
@@ -32,6 +33,7 @@ export function AuthenticatedLayout({ children, title, subtitle }: Authenticated
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <PastDueBanner />
       <main className="pt-20 md:pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-10">
