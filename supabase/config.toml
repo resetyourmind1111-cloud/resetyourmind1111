@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.create-portal-session]
 verify_jwt = false
+
+[functions.body-map-insight]
+verify_jwt = false
