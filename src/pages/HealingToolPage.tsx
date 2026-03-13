@@ -50,6 +50,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   "values-clarity-tool": ValuesClarityTool,
   "chakra-balancing": ChakraBalancingGuide,
   "energy-cord-cutting": EnergyCordCutting,
+  "nervous-system-diagnostic": NervousSystemDiagnostic,
 };
 
 export default function HealingToolPage() {
