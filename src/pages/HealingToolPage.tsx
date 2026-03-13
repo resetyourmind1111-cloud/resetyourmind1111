@@ -95,17 +95,23 @@ export default function HealingToolPage() {
       >
         <ArrowLeft className="w-4 h-4 mr-2" /> Back to All Tools
       </Button>
-      <LockedContent requiredTier="tier2" currentTier={tier}>
-        {ToolComponent ? (
-          <ToolComponent />
-        ) : (
-          <div className="glass-card p-12 text-center">
-            <span className="text-5xl mb-4 block">{tool.icon}</span>
-            <h3 className="font-serif text-xl text-foreground mb-2">Coming Soon</h3>
-            <p className="text-muted-foreground">This tool is being built and will be available shortly.</p>
-          </div>
-        )}
-      </LockedContent>
+      {(() => {
+        const freeTierTools = ["nervous-system-diagnostic"];
+        const requiredTier = freeTierTools.includes(toolId || "") ? "tier1" as const : "tier2" as const;
+        return (
+          <LockedContent requiredTier={requiredTier} currentTier={tier}>
+            {ToolComponent ? (
+              <ToolComponent />
+            ) : (
+              <div className="glass-card p-12 text-center">
+                <span className="text-5xl mb-4 block">{tool.icon}</span>
+                <h3 className="font-serif text-xl text-foreground mb-2">Coming Soon</h3>
+                <p className="text-muted-foreground">This tool is being built and will be available shortly.</p>
+              </div>
+            )}
+          </LockedContent>
+        );
+      })()}
     </AuthenticatedLayout>
   );
 }

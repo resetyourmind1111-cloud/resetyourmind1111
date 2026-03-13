@@ -5,11 +5,12 @@ import { Link } from "react-router-dom";
 
 interface LockedContentProps {
   children: ReactNode;
-  requiredTier: "tier2" | "tier3";
+  requiredTier: "tier1" | "tier2" | "tier3";
   currentTier: string;
 }
 
 const tierLabels: Record<string, string> = {
+  tier1: "Reset",
   tier2: "Expand",
   tier3: "Embody",
 };
