@@ -335,6 +335,59 @@ export function AssessmentResults({
           </div>
         </div>
 
+        {/* Upgrade Section for Public Users */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.35 }}
+          className="glass-card p-8 mb-8 border border-primary/30"
+        >
+          <h3
+            className="font-serif text-2xl font-bold text-primary mb-4 text-center"
+            style={{ fontFamily: "'Playfair Display', serif" }}
+          >
+            Here's How to Raise Your Worth Thermostat
+          </h3>
+          <p className="text-foreground/80 text-center mb-6">
+            Your Reset Your Mind 1111™ membership gives you the exact tools to recalibrate your thermostat across health, wealth, love, and leadership — starting today.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+            {[
+              "Worth Thermostat tracking",
+              "Emotional Surgery™ Lessons",
+              "21 Healing Tools",
+              "Permission Slips (125)",
+              "3 Oracle Card Decks",
+              "Guided Meditations",
+              "Wellness Hub",
+              "Hormone Health",
+              "Sacred Circle Community",
+              "30-Day Experience",
+              "Daily Ritual Builder",
+            ].map((feature) => (
+              <div key={feature} className="flex items-center gap-2 text-sm text-foreground/70">
+                <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                <span>{feature}</span>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link to="/auth?redirect=checkout&priceId=price_1TAUgeC1ibVojXJKMY9OXfeh&tier=RESET">
+              <Button variant="hero" size="lg" className="w-full">
+                Start Your Reset — $44/month
+              </Button>
+            </Link>
+            <Link to="/#pricing">
+              <Button variant="hero-outline" size="lg" className="w-full">
+                See All Plans
+              </Button>
+            </Link>
+          </div>
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Cancel anytime. No contracts.
+          </p>
+        </motion.div>
+
         {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
