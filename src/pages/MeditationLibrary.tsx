@@ -101,7 +101,7 @@ export default function MeditationLibrary() {
         </TabsContent>
 
         <TabsContent value="body">
-          <LockedContent requiredTier="tier2" currentTier={tier}>
+          <LockedContent requiredTier="expand" currentTier={tier}>
             <div className="space-y-3">
               {bodyMeditations.map((m, i) => (
                 <MeditationCard key={m.id} meditation={m} index={i} />

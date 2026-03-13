@@ -97,7 +97,7 @@ export default function HealingToolPage() {
       </Button>
       {(() => {
         const freeTierTools = ["nervous-system-diagnostic"];
-        const requiredTier = freeTierTools.includes(toolId || "") ? "tier1" as const : "tier2" as const;
+        const requiredTier = freeTierTools.includes(toolId || "") ? "reset" as const : "expand" as const;
         return (
           <LockedContent requiredTier={requiredTier} currentTier={tier}>
             {ToolComponent ? (
