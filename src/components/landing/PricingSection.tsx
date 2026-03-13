@@ -269,7 +269,14 @@ export function PricingSection() {
 
       if (error) throw error;
       if (data?.url) {
-        window.location.href = data.url;
+        // Use _top to break out of iframe if in preview
+        const link = document.createElement('a');
+        link.href = data.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to start checkout. Please try again.");

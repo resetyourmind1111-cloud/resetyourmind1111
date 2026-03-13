@@ -78,7 +78,13 @@ export default function Auth() {
             body: { priceId, tierKey: tier },
           }).then(({ data, error }) => {
             if (data?.url) {
-              window.location.href = data.url;
+              const link = document.createElement('a');
+              link.href = data.url;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
               return;
             }
             navigate("/dashboard");
