@@ -23,13 +23,12 @@ type AbundanceInsight = {
 };
 
 export default function AbundanceEvidenceLog() {
-  const { entries, saveEntry, deleteEntry } = useHealingToolEntries("abundance-evidence-log");
+  const { entries, saveEntry, deleteEntry, updateEntry } = useHealingToolEntries("abundance-evidence-log");
   const [showForm, setShowForm] = useState(false);
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [gratitude, setGratitude] = useState("");
   const [insightLoading, setInsightLoading] = useState<string | null>(null);
-  const [insights, setInsights] = useState<Record<string, AbundanceInsight>>({});
 
   const handleSave = () => {
     if (!category || !description.trim()) return;
@@ -38,15 +37,20 @@ export default function AbundanceEvidenceLog() {
     });
   };
 
-  const fetchInsight = async (entryId: string, data: { category: string; description: string; gratitude?: string }) => {
+  const fetchInsight = async (entryId: string, entryData: any) => {
     setInsightLoading(entryId);
     try {
       const { data: result, error } = await supabase.functions.invoke("abundance-insight", {
-        body: data,
+        body: { category: entryData.category, description: entryData.description, gratitude: entryData.gratitude },
       });
       if (error) throw error;
       if (result?.error) throw new Error(result.error);
-      setInsights(prev => ({ ...prev, [entryId]: result }));
+      
+      // Persist insight into entry_data
+      updateEntry.mutate({
+        id: entryId,
+        entryData: { ...entryData, aiInsight: result },
+      });
     } catch (e: any) {
       toast.error(e.message || "Failed to get insight");
     } finally {
@@ -54,7 +58,6 @@ export default function AbundanceEvidenceLog() {
     }
   };
 
-  // Calculate streak
   const streak = useMemo(() => {
     if (!entries.length) return 0;
     const days = [...new Set(entries.map((e: any) => format(new Date(e.created_at), "yyyy-MM-dd")))].sort().reverse();
@@ -71,7 +74,6 @@ export default function AbundanceEvidenceLog() {
 
   return (
     <div className="space-y-6">
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         <Card className="glass-card">
           <CardContent className="p-4 text-center">
@@ -141,7 +143,7 @@ export default function AbundanceEvidenceLog() {
           <h3 className="font-serif text-xl text-foreground">Abundance Log</h3>
           {entries.map((entry: any) => {
             const d = entry.entry_data;
-            const insight = insights[entry.id];
+            const insight: AbundanceInsight | undefined = d.aiInsight;
             const isLoading = insightLoading === entry.id;
             return (
               <motion.div key={entry.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -158,7 +160,7 @@ export default function AbundanceEvidenceLog() {
                           size="sm"
                           className="text-accent h-7 px-2 text-xs hover:bg-accent/10"
                           disabled={isLoading}
-                          onClick={() => fetchInsight(entry.id, { category: d.category, description: d.description, gratitude: d.gratitude })}
+                          onClick={() => fetchInsight(entry.id, d)}
                         >
                           {isLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Wand2 className="w-3 h-3 mr-1" />}
                           {insight ? "Refresh" : "Decode"}
