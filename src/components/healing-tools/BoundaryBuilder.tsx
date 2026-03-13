@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Shield, ChevronRight, ChevronLeft } from "lucide-react";
+import { Plus, Trash2, Shield, ChevronRight, ChevronLeft, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const STEPS = [
   { title: "Identify", prompt: "Who or what needs a boundary right now?" },
@@ -30,6 +32,9 @@ export default function BoundaryBuilder() {
   const [deliveryDate, setDeliveryDate] = useState("");
   const [reflectingId, setReflectingId] = useState<string | null>(null);
   const [reflection, setReflection] = useState("");
+  const [isCoaching, setIsCoaching] = useState(false);
+  const [aiInsight, setAiInsight] = useState("");
+  const [aiScripts, setAiScripts] = useState<{ direct: string; gentle: string; practice: string } | null>(null);
 
   const handleSave = () => {
     if (!who.trim()) return;
@@ -38,10 +43,40 @@ export default function BoundaryBuilder() {
       {
         onSuccess: () => {
           setWho(""); setWhy(""); setBlock(""); setScript(""); setPractice("");
-          setDeliveryDate(""); setStep(0); setShowForm(false);
+          setDeliveryDate(""); setStep(0); setShowForm(false); setAiInsight(""); setAiScripts(null);
         },
       }
     );
+  };
+
+  const handleAiCoach = async () => {
+    if (!who.trim()) {
+      toast.error("Please identify who or what needs a boundary first");
+      return;
+    }
+    setIsCoaching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("boundary-coach", {
+        body: { who: who.trim(), why: why.trim() || undefined, block: block.trim() || undefined },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.whyItMatters) setWhy(data.whyItMatters);
+      if (data.blockInsight) setBlock(data.blockInsight);
+      setAiInsight(data.whyItMatters || "");
+      setAiScripts({
+        direct: data.directScript || "",
+        gentle: data.gentleScript || "",
+        practice: data.practiceWords || "",
+      });
+      toast.success("Boundary coaching ready — review and personalize");
+    } catch (err: any) {
+      console.error("Boundary coach error:", err);
+      toast.error(err.message || "Failed to generate coaching. Please try again.");
+    } finally {
+      setIsCoaching(false);
+    }
   };
 
   const handleReflection = (entry: any) => {
@@ -50,20 +85,39 @@ export default function BoundaryBuilder() {
     setReflection("");
   };
 
-  const scripts = who ? [
-    `I need you to ${who ? "respect this boundary" : "[boundary]"}. This is important to me.`,
-    `I care about our relationship and I also need ${who ? "this boundary honored" : "[boundary]"}.`,
-    `I have communicated this before. Going forward, ${who ? "this is non-negotiable" : "[boundary]"}.`,
-  ] : [];
+  const scripts = aiScripts
+    ? [aiScripts.direct, aiScripts.gentle, aiScripts.practice]
+    : who ? [
+        `I need you to respect this boundary. This is important to me.`,
+        `I care about our relationship and I also need this boundary honored.`,
+        `I have communicated this before. Going forward, this is non-negotiable.`,
+      ] : [];
 
   const renderStep = () => {
     switch (step) {
-      case 0: return <Textarea placeholder="Who or what..." value={who} onChange={(e) => setWho(e.target.value)} className="bg-input border-border" />;
+      case 0: return (
+        <div className="space-y-3">
+          <Textarea placeholder="Who or what..." value={who} onChange={(e) => setWho(e.target.value)} className="bg-input border-border" />
+          {/* AI Coach Button - available after step 0 */}
+          <Button
+            onClick={handleAiCoach}
+            disabled={isCoaching || !who.trim()}
+            variant="outline"
+            className="w-full border-primary/30 text-primary hover:bg-primary/10"
+          >
+            {isCoaching ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Coaching with AI...</>
+            ) : (
+              <><Sparkles className="w-4 h-4 mr-2" /> Help Me Build This Boundary (AI)</>
+            )}
+          </Button>
+        </div>
+      );
       case 1: return <Textarea placeholder="My peace, energy, time..." value={why} onChange={(e) => setWhy(e.target.value)} className="bg-input border-border" />;
       case 2: return <Textarea placeholder="Fear, guilt, obligation..." value={block} onChange={(e) => setBlock(e.target.value)} className="bg-input border-border" />;
       case 3: return (
         <div className="space-y-3">
-          {["Direct", "Gentle", "Final"].map((label, i) => (
+          {["Direct", "Gentle", aiScripts ? "Personalized" : "Final"].map((label, i) => (
             <button
               key={label}
               onClick={() => setScript(scripts[i])}
