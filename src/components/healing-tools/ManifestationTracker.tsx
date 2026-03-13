@@ -7,10 +7,18 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Star, Sparkles } from "lucide-react";
+import { Plus, Trash2, Star, Sparkles, Wand2, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const STATUSES = ["Calling In", "In Progress", "Manifested"] as const;
+
+type ManifestationInsight = {
+  energeticAlignment: string;
+  hiddenPattern: string;
+  nextStep: string;
+};
 
 export default function ManifestationTracker() {
   const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("manifestation-tracker");
@@ -19,6 +27,7 @@ export default function ManifestationTracker() {
   const [feeling, setFeeling] = useState("");
   const [addEvidenceId, setAddEvidenceId] = useState<string | null>(null);
   const [evidenceText, setEvidenceText] = useState("");
+  const [insightLoading, setInsightLoading] = useState<string | null>(null);
 
   const handleSave = () => {
     if (!intention.trim()) return;
@@ -40,6 +49,26 @@ export default function ManifestationTracker() {
     updateEntry.mutate({ id: entry.id, entryData: { ...entry.entry_data, evidence } });
     setEvidenceText("");
     setAddEvidenceId(null);
+  };
+
+  const fetchInsight = async (entryId: string, entryData: any) => {
+    setInsightLoading(entryId);
+    try {
+      const { data, error } = await supabase.functions.invoke("manifestation-insight", {
+        body: { intention: entryData.intention, feeling: entryData.feeling, status: entryData.status, evidence: entryData.evidence },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      updateEntry.mutate({
+        id: entryId,
+        entryData: { ...entryData, aiInsight: data },
+      });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to get insight");
+    } finally {
+      setInsightLoading(null);
+    }
   };
 
   const active = entries.filter((e: any) => e.entry_data.status !== "Manifested");
@@ -90,6 +119,8 @@ export default function ManifestationTracker() {
         <TabsContent value="active" className="space-y-4 mt-4">
           {active.map((entry: any) => {
             const d = entry.entry_data;
+            const insight: ManifestationInsight | undefined = d.aiInsight;
+            const isLoading = insightLoading === entry.id;
             return (
               <motion.div key={entry.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <Card className="glass-card">
@@ -99,9 +130,21 @@ export default function ManifestationTracker() {
                         <p className="text-foreground font-semibold">{d.intention}</p>
                         <p className="text-xs text-muted-foreground">{format(new Date(d.createdDate), "MMM d, yyyy")}</p>
                       </div>
-                      <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0" onClick={() => deleteEntry.mutate(entry.id)}>
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-accent h-7 px-2 text-xs hover:bg-accent/10"
+                          disabled={isLoading}
+                          onClick={() => fetchInsight(entry.id, d)}
+                        >
+                          {isLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Wand2 className="w-3 h-3 mr-1" />}
+                          {insight ? "Refresh" : "Decode"}
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0" onClick={() => deleteEntry.mutate(entry.id)}>
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                     {d.feeling && <p className="text-sm text-muted-foreground italic">"{d.feeling}"</p>}
 
@@ -140,6 +183,30 @@ export default function ManifestationTracker() {
                         + Add Evidence
                       </Button>
                     )}
+
+                    <AnimatePresence>
+                      {insight && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-2 space-y-3 border-t border-border pt-4"
+                        >
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">⚡ Energetic Alignment</p>
+                            <p className="text-sm text-foreground/90">{insight.energeticAlignment}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">🪞 Hidden Pattern</p>
+                            <p className="text-sm text-foreground/90">{insight.hiddenPattern}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">🎯 Next Step</p>
+                            <p className="text-sm text-foreground/90">{insight.nextStep}</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </CardContent>
                 </Card>
               </motion.div>
