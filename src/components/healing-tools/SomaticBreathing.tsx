@@ -254,6 +254,26 @@ export default function SomaticBreathing() {
                   </Button>
                   <Button onClick={reset} variant="outline" size="lg"><RotateCcw className="w-4 h-4" /></Button>
                 </div>
+                {/* Sound controls */}
+                <div className="flex items-center gap-3 w-full pt-1">
+                  <button
+                    onClick={() => setSoundEnabled(!soundEnabled)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    title={soundEnabled ? "Mute bowl tones" : "Enable bowl tones"}
+                  >
+                    {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  </button>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={soundEnabled ? soundVolume : 0}
+                    onChange={e => { setSoundVolume(Number(e.target.value)); setSoundEnabled(Number(e.target.value) > 0); }}
+                    className="flex-1 h-1.5 accent-accent cursor-pointer"
+                  />
+                  <span className="text-[10px] text-muted-foreground w-8">{soundEnabled ? `${Math.round(soundVolume * 100)}%` : "Off"}</span>
+                </div>
               </CardContent>
             </Card>
 
