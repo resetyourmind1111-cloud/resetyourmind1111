@@ -262,23 +262,23 @@ export function PricingSection() {
       return;
     }
 
+    const checkoutWindow = window.open("", "_blank", "noopener,noreferrer");
+    if (!checkoutWindow) {
+      toast.error("Please allow pop-ups to open secure checkout.");
+      return;
+    }
+
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: { priceId, tierKey },
       });
 
       if (error) throw error;
-      if (data?.url) {
-        // Use _top to break out of iframe if in preview
-        const link = document.createElement('a');
-        link.href = data.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      if (!data?.url) throw new Error("No checkout URL returned.");
+
+      checkoutWindow.location.href = data.url;
     } catch (err: any) {
+      checkoutWindow.close();
       toast.error(err.message || "Failed to start checkout. Please try again.");
     }
   };
