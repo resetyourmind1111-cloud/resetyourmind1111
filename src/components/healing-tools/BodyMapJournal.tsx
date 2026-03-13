@@ -6,8 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2 } from "lucide-react";
+import { Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const bodyAreas = ["Head", "Jaw/Throat", "Neck/Shoulders", "Chest/Heart", "Stomach/Solar Plexus", "Lower Belly/Sacral", "Hips/Pelvis", "Upper Back", "Lower Back", "Arms/Hands", "Legs/Feet", "Full Body"];
 const sensations = ["Tension", "Pain", "Tightness", "Heaviness", "Warmth", "Tingling", "Numbness", "Fluttering", "Pressure", "Buzzing", "Coldness", "Emptiness"];
@@ -22,11 +24,37 @@ export default function BodyMapJournal() {
   const [trigger, setTrigger] = useState("");
   const [message, setMessage] = useState("");
   const [release, setRelease] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleSave = () => {
     if (!area || !sensation) return;
     saveEntry.mutate({ body_area: area, sensation, emotion, intensity: Number(intensity), trigger, body_message: message, release_action: release });
     setArea(""); setSensation(""); setEmotion(""); setIntensity("5"); setTrigger(""); setMessage(""); setRelease("");
+  };
+
+  const handleAiInsight = async () => {
+    if (!area || !sensation) {
+      toast.error("Please select a body area and sensation first");
+      return;
+    }
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("body-map-insight", {
+        body: { bodyArea: area, sensation, emotion: emotion || undefined },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.bodyMessage) setMessage(data.bodyMessage);
+      if (data.triggerInsight) setTrigger(data.triggerInsight);
+      if (data.releaseAction) setRelease(data.releaseAction);
+      toast.success("AI insight complete — review and personalize");
+    } catch (err: any) {
+      console.error("Body map insight error:", err);
+      toast.error(err.message || "Failed to get insight. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -58,6 +86,18 @@ export default function BodyMapJournal() {
                   ))}
                 </div>
               </div>
+              <Button
+                onClick={handleAiInsight}
+                variant="outline"
+                className="w-full mt-2 border-accent/30 text-accent hover:bg-accent/10"
+                disabled={!area || !sensation || isAnalyzing}
+              >
+                {isAnalyzing ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Listening to your body...</>
+                ) : (
+                  <><Sparkles className="w-4 h-4 mr-2" /> AI: Decode This Sensation</>
+                )}
+              </Button>
             </CardContent>
           </Card>
           <Card className="glass-card">
@@ -70,7 +110,7 @@ export default function BodyMapJournal() {
                   <SelectContent>{Array.from({length:10},(_,i)=>i+1).map(n=><SelectItem key={n} value={String(n)}>{n}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div><label className="text-sm font-medium text-foreground">What triggered this?</label><Input value={trigger} onChange={e=>setTrigger(e.target.value)} placeholder="A conversation, memory, thought..." /></div>
+              <div><label className="text-sm font-medium text-foreground">What triggered this?</label><Textarea value={trigger} onChange={e=>setTrigger(e.target.value)} placeholder="A conversation, memory, thought..." rows={2} /></div>
               <div><label className="text-sm font-medium text-foreground">If this sensation could speak, what would it say?</label><Textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Listen to your body..." rows={3} /></div>
               <div><label className="text-sm font-medium text-foreground">What does this part of you need?</label><Textarea value={release} onChange={e=>setRelease(e.target.value)} placeholder="Rest, movement, tears, comfort..." rows={2} /></div>
               <Button onClick={handleSave} variant="gold" className="w-full" disabled={!area || !sensation}>Save Body Check-In</Button>
