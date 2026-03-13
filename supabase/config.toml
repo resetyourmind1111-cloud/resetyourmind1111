@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.shadow-work-guide]
 verify_jwt = false
+
+[functions.boundary-coach]
+verify_jwt = false
+
+[functions.attachment-insight]
+verify_jwt = false

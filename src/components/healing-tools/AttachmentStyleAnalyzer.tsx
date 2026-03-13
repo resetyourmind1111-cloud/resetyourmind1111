@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion } from "framer-motion";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const QUESTIONS = [
   { q: "When my partner is distant, I tend to:", o: ["Feel comfortable giving them space", "Feel anxious and seek reassurance", "Feel relieved and enjoy the freedom", "Feel confused — wanting closeness but also wanting to run"] },
@@ -78,6 +80,8 @@ export default function AttachmentStyleAnalyzer() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>(Array(20).fill(-1));
   const [started, setStarted] = useState(false);
+  const [isInsighting, setIsInsighting] = useState(false);
+  const [aiData, setAiData] = useState<{ personalInsight: string; coreWound: string; dailyPractice: string; affirmation: string } | null>(null);
 
   const existingResult = useMemo(() => entries.find((e: any) => e.entry_data.type === "result"), [entries]);
 
@@ -103,12 +107,30 @@ export default function AttachmentStyleAnalyzer() {
     });
   };
 
+  const handleAiInsight = async (d: any) => {
+    setIsInsighting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("attachment-insight", {
+        body: { primary: d.primary, secondary: d.secondary, scores: d.scores },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiData(data);
+      toast.success("Personalized insight ready — sit with this");
+    } catch (err: any) {
+      console.error("Attachment insight error:", err);
+      toast.error(err.message || "Failed to generate insight. Please try again.");
+    } finally {
+      setIsInsighting(false);
+    }
+  };
+
   if (existingResult && !started) {
     const d = existingResult.entry_data as any;
     const info = STYLE_INFO[d.primary];
     return (
       <div className="space-y-6 max-w-2xl mx-auto">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className={`bg-accent/20 ${info.color} px-3 py-1 rounded-full text-sm font-semibold`}>
             Primary: {d.primary}
           </div>
@@ -117,7 +139,7 @@ export default function AttachmentStyleAnalyzer() {
               Secondary: {d.secondary}
             </div>
           )}
-          <Button variant="outline" size="sm" onClick={() => { setStarted(true); setStep(0); setAnswers(Array(20).fill(-1)); }}>
+          <Button variant="outline" size="sm" onClick={() => { setStarted(true); setStep(0); setAnswers(Array(20).fill(-1)); setAiData(null); }}>
             <RotateCcw className="w-3 h-3 mr-1" /> Retake
           </Button>
         </div>
@@ -130,6 +152,42 @@ export default function AttachmentStyleAnalyzer() {
             </Card>
           ))}
         </div>
+
+        {/* AI Insight Button */}
+        <Button
+          onClick={() => handleAiInsight(d)}
+          disabled={isInsighting}
+          variant="outline"
+          className="w-full border-primary/30 text-primary hover:bg-primary/10"
+        >
+          {isInsighting ? (
+            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating Personalized Insight...</>
+          ) : (
+            <><Sparkles className="w-4 h-4 mr-2" /> Get My Personalized AI Insight</>
+          )}
+        </Button>
+
+        {aiData && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="glass-card border-accent/30">
+              <CardContent className="p-6 space-y-4">
+                <h3 className="font-serif text-lg text-accent">✨ Your Personalized Insight</h3>
+                <p className="text-foreground/80 italic">{aiData.personalInsight}</p>
+                <div>
+                  <h4 className="font-semibold text-foreground text-sm mb-1">Core Wound</h4>
+                  <p className="text-sm text-muted-foreground">{aiData.coreWound}</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-foreground text-sm mb-1">Daily Healing Practice</h4>
+                  <p className="text-sm text-muted-foreground">{aiData.dailyPractice}</p>
+                </div>
+                <div className="glass-card p-4 text-center">
+                  <p className="text-accent italic font-semibold">"{aiData.affirmation}"</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         <Card className="glass-card">
           <CardContent className="p-6 space-y-4">
