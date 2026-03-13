@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { Play, Pause, RotateCcw, Trash2, Sparkles, Loader2, Wind, Flame, Moon, Sun, Heart, Zap, Shield, Leaf, Volume2, VolumeX } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { playPhaseTone, playCompletionTone } from "@/lib/breathingAudio";
