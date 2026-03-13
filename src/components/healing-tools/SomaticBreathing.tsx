@@ -157,13 +157,37 @@ export default function SomaticBreathing() {
     }
   };
 
-  // Breathing animation scale
-  const getBreathScale = () => {
-    if (phase === "inhale") return "scale-110";
-    if (phase === "exhale") return "scale-90";
-    return "scale-100";
+  // Framer-motion breathing animation config
+  const getBreathAnimation = () => {
+    if (phase === "idle") return { scale: 1, opacity: 0.6 };
+    if (phase === "inhale") return { scale: 1.35, opacity: 1 };
+    if (phase === "exhale") return { scale: 0.75, opacity: 0.85 };
+    return { scale: 1, opacity: 0.95 }; // hold phases
   };
 
+  const getPhaseDuration = () => {
+    if (phase === "inhale") return selected.inhale;
+    if (phase === "exhale") return selected.exhale;
+    if (phase === "hold1") return selected.hold1;
+    if (phase === "hold2") return selected.hold2;
+    return 0.5;
+  };
+
+  const phaseGlow: Record<Phase, string> = {
+    inhale: "0 0 40px 10px hsla(145, 60%, 50%, 0.3), 0 0 80px 20px hsla(145, 60%, 50%, 0.1)",
+    hold1: "0 0 30px 8px hsla(45, 80%, 55%, 0.25), 0 0 60px 15px hsla(45, 80%, 55%, 0.08)",
+    exhale: "0 0 40px 10px hsla(200, 70%, 55%, 0.3), 0 0 80px 20px hsla(200, 70%, 55%, 0.1)",
+    hold2: "0 0 30px 8px hsla(45, 80%, 55%, 0.25), 0 0 60px 15px hsla(45, 80%, 55%, 0.08)",
+    idle: "0 0 0px 0px transparent",
+  };
+
+  const phaseBorder: Record<Phase, string> = {
+    inhale: "hsla(145, 60%, 50%, 0.8)",
+    hold1: "hsla(45, 80%, 55%, 0.8)",
+    exhale: "hsla(200, 70%, 55%, 0.8)",
+    hold2: "hsla(45, 80%, 55%, 0.8)",
+    idle: "hsl(var(--border))",
+  };
   return (
     <Tabs defaultValue="practice">
       <TabsList className="mb-6">
