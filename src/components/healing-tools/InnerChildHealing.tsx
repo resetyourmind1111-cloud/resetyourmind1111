@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function InnerChildHealing() {
   const { entries, saveEntry, deleteEntry } = useHealingToolEntries("inner-child-healing");
@@ -17,6 +19,7 @@ export default function InnerChildHealing() {
   const [prompt2, setPrompt2] = useState("");
   const [prompt3, setPrompt3] = useState("");
   const [letter, setLetter] = useState("");
+  const [isGuiding, setIsGuiding] = useState(false);
 
   const handleSave = () => {
     if (!letter.trim()) return;
@@ -26,6 +29,27 @@ export default function InnerChildHealing() {
         setShowForm(false);
       },
     });
+  };
+
+  const handleAiGuide = async () => {
+    setIsGuiding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("inner-child-guide", {
+        body: { age: age[0], prompt1: prompt1.trim() || undefined },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.whatSheNeeded) setPrompt2(data.whatSheNeeded);
+      if (data.whatToSayNow) setPrompt3(data.whatToSayNow);
+      if (data.letterStarter) setLetter(data.letterStarter);
+      toast.success("AI guidance ready — personalize the prompts to make them yours");
+    } catch (err: any) {
+      console.error("Inner child guide error:", err);
+      toast.error(err.message || "Failed to generate guidance. Please try again.");
+    } finally {
+      setIsGuiding(false);
+    }
   };
 
   return (
@@ -57,6 +81,21 @@ export default function InnerChildHealing() {
                   <Label className="text-foreground font-semibold">What does she look like right now? What is she feeling?</Label>
                   <Textarea value={prompt1} onChange={(e) => setPrompt1(e.target.value)} className="bg-input border-border mt-1" />
                 </div>
+
+                {/* AI Guide Button */}
+                <Button
+                  onClick={handleAiGuide}
+                  disabled={isGuiding}
+                  variant="outline"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                >
+                  {isGuiding ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating Guidance...</>
+                  ) : (
+                    <><Sparkles className="w-4 h-4 mr-2" /> Help Me Connect With Her (AI)</>
+                  )}
+                </Button>
+
                 <div>
                   <Label className="text-foreground font-semibold">What did she need to hear that she never heard?</Label>
                   <Textarea value={prompt2} onChange={(e) => setPrompt2(e.target.value)} className="bg-input border-border mt-1" />

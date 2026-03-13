@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const EMOTIONS = [
   "Anger", "Shame", "Fear", "Sadness", "Abandonment",
@@ -22,6 +24,7 @@ export default function EmotionalTriggerTracker() {
   const [emotion, setEmotion] = useState("");
   const [bodySensation, setBodySensation] = useState("");
   const [rootResponse, setRootResponse] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const emotionCounts = entries.reduce((acc: Record<string, number>, e: any) => {
     const em = e.entry_data.emotion;
@@ -37,6 +40,33 @@ export default function EmotionalTriggerTracker() {
         setShowForm(false);
       },
     });
+  };
+
+  const handleAiAnalyze = async () => {
+    if (!trigger.trim() || !emotion) {
+      toast.error("Please describe the trigger and select an emotion first");
+      return;
+    }
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-trigger", {
+        body: { trigger: trigger.trim(), emotion },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.bodySensation) setBodySensation(data.bodySensation);
+      if (data.rootReflection) setRootResponse(data.rootReflection);
+      if (data.healingPrompt) {
+        setRootResponse((prev) => prev ? `${prev}\n\n💡 Journaling prompt: ${data.healingPrompt}` : `💡 Journaling prompt: ${data.healingPrompt}`);
+      }
+      toast.success("AI analysis complete — review and personalize the insights");
+    } catch (err: any) {
+      console.error("Analyze trigger error:", err);
+      toast.error(err.message || "Failed to analyze trigger. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const patternNote = emotion && emotionCounts[emotion] ? (
@@ -75,6 +105,21 @@ export default function EmotionalTriggerTracker() {
                   </div>
                   {patternNote}
                 </div>
+
+                {/* AI Analyze Button */}
+                <Button
+                  onClick={handleAiAnalyze}
+                  disabled={isAnalyzing || !trigger.trim() || !emotion}
+                  variant="outline"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                >
+                  {isAnalyzing ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing with AI...</>
+                  ) : (
+                    <><Sparkles className="w-4 h-4 mr-2" /> Help Me Understand This (AI)</>
+                  )}
+                </Button>
+
                 <div>
                   <Label className="text-foreground font-semibold">Where do you feel it physically?</Label>
                   <Textarea placeholder="e.g. tightness in my chest, knot in my stomach..." value={bodySensation} onChange={(e) => setBodySensation(e.target.value)} className="bg-input border-border mt-1" />
@@ -145,7 +190,7 @@ function TriggerCard({ entry, onDelete }: { entry: any; onDelete: () => void }) 
         </div>
         <p className="text-sm text-foreground mb-1">{d.trigger}</p>
         {d.bodySensation && <p className="text-xs text-muted-foreground">Body: {d.bodySensation}</p>}
-        {d.rootResponse && <p className="text-xs text-muted-foreground mt-1 italic">Reflection: {d.rootResponse}</p>}
+        {d.rootResponse && <p className="text-xs text-muted-foreground mt-1 italic whitespace-pre-wrap">Reflection: {d.rootResponse}</p>}
       </CardContent>
     </Card>
   );
