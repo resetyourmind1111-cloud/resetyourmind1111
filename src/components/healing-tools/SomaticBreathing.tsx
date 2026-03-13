@@ -260,15 +260,46 @@ export default function SomaticBreathing() {
             {/* Breathing Timer */}
             <Card className="glass-card">
               <CardContent className="pt-6 flex flex-col items-center gap-4">
-                <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center transition-all duration-1000 ${
-                  phase === "inhale" ? "border-emerald-400 scale-110" :
-                  phase === "exhale" ? "border-sky-400 scale-90" :
-                  phase === "hold1" || phase === "hold2" ? "border-amber-400 scale-100" :
-                  "border-border scale-100"
-                }`}>
-                  <div className={`text-5xl font-bold transition-all duration-500 ${phaseColors[phase]}`}>
-                    {phase === "idle" ? "●" : counter}
-                  </div>
+                <div className="relative w-40 h-40 flex items-center justify-center">
+                  {/* Outer glow ring */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    animate={{
+                      ...getBreathAnimation(),
+                      boxShadow: phaseGlow[phase],
+                    }}
+                    transition={{
+                      duration: getPhaseDuration(),
+                      ease: phase === "inhale" ? "easeOut" : phase === "exhale" ? "easeIn" : "easeInOut",
+                    }}
+                    style={{ border: "2px solid transparent", borderColor: phaseBorder[phase] }}
+                  />
+                  {/* Inner breathing circle */}
+                  <motion.div
+                    className="absolute inset-3 rounded-full flex items-center justify-center"
+                    animate={{
+                      ...getBreathAnimation(),
+                      borderColor: phaseBorder[phase],
+                    }}
+                    transition={{
+                      duration: getPhaseDuration(),
+                      ease: phase === "inhale" ? "easeOut" : phase === "exhale" ? "easeIn" : "easeInOut",
+                    }}
+                    style={{
+                      border: "3px solid",
+                      background: `radial-gradient(circle, ${phaseBorder[phase]}15 0%, transparent 70%)`,
+                    }}
+                  >
+                    <motion.span
+                      key={phase === "idle" ? "idle" : counter}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className={`text-5xl font-bold ${phaseColors[phase]}`}
+                    >
+                      {phase === "idle" ? "●" : counter}
+                    </motion.span>
+                  </motion.div>
                 </div>
                 <p className={`text-lg font-semibold ${phaseColors[phase]}`}>{phaseLabels[phase]}</p>
                 <Progress value={(cycles / targetCycles) * 100} className="h-2" />
