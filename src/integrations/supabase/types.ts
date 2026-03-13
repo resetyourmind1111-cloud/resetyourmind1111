@@ -98,6 +98,24 @@ export type Database = {
         }
         Relationships: []
       }
+      founding_member_spots: {
+        Row: {
+          id: string
+          spots_remaining: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          spots_remaining?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          spots_remaining?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       healing_tool_entries: {
         Row: {
           created_at: string
@@ -311,6 +329,7 @@ export type Database = {
           last_login: string | null
           phone: string | null
           profile_photo_url: string | null
+          stripe_customer_id: string | null
           subscription_tier: string | null
           total_points: number | null
           updated_at: string
@@ -327,6 +346,7 @@ export type Database = {
           last_login?: string | null
           phone?: string | null
           profile_photo_url?: string | null
+          stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
           updated_at?: string
@@ -343,6 +363,7 @@ export type Database = {
           last_login?: string | null
           phone?: string | null
           profile_photo_url?: string | null
+          stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
           updated_at?: string
@@ -392,6 +413,63 @@ export type Database = {
           question_prompt?: string
           spread_name?: string
           tier_required?: number
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          billing_interval: string | null
+          cancel_at_period_end: boolean | null
+          created_at: string
+          current_period_end: string | null
+          founding_member: boolean | null
+          id: string
+          lifetime_locked_price: boolean | null
+          plan_name: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          stripe_subscription_id: string | null
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_interval?: string | null
+          cancel_at_period_end?: boolean | null
+          created_at?: string
+          current_period_end?: string | null
+          founding_member?: boolean | null
+          id?: string
+          lifetime_locked_price?: boolean | null
+          plan_name?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_interval?: string | null
+          cancel_at_period_end?: boolean | null
+          created_at?: string
+          current_period_end?: string | null
+          founding_member?: boolean | null
+          id?: string
+          lifetime_locked_price?: boolean | null
+          plan_name?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

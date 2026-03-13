@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 interface LockedContentProps {
   children: ReactNode;
-  requiredTier: "tier1" | "tier2" | "tier3";
+  requiredTier: "tier1" | "tier2" | "tier3" | "reset" | "expand" | "embody";
   currentTier: string;
 }
 
@@ -13,14 +13,30 @@ const tierLabels: Record<string, string> = {
   tier1: "Reset",
   tier2: "Expand",
   tier3: "Embody",
+  reset: "Reset",
+  expand: "Expand",
+  embody: "Embody",
+};
+
+const tierPrices: Record<string, string> = {
+  tier1: "$44",
+  tier2: "$88",
+  tier3: "$111",
+  reset: "$44",
+  expand: "$88",
+  embody: "$111",
 };
 
 export function LockedContent({ children, requiredTier, currentTier }: LockedContentProps) {
-  const tierOrder = ["free", "tier1", "tier2", "tier3"];
-  const currentIndex = tierOrder.indexOf(currentTier);
-  const requiredIndex = tierOrder.indexOf(requiredTier);
+  // Normalize tier names for comparison
+  const normalize = (t: string) => {
+    const map: Record<string, number> = {
+      free: 0, tier1: 1, reset: 1, tier2: 2, expand: 2, tier3: 3, embody: 3, founding_full_access: 3,
+    };
+    return map[t.toLowerCase()] ?? 0;
+  };
 
-  if (currentIndex >= requiredIndex) {
+  if (normalize(currentTier) >= normalize(requiredTier)) {
     return <>{children}</>;
   }
 
@@ -35,7 +51,7 @@ export function LockedContent({ children, requiredTier, currentTier }: LockedCon
             <Lock className="w-8 h-8 text-accent" />
           </div>
           <h3 className="font-serif text-xl font-bold text-foreground">
-            Upgrade to {tierLabels[requiredTier]}
+            Unlock with {tierLabels[requiredTier]} — {tierPrices[requiredTier]}/month
           </h3>
           <p className="text-muted-foreground text-sm max-w-xs">
             This content is available with the {tierLabels[requiredTier]} plan and above.

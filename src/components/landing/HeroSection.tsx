@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Star, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export function HeroSection() {
   return (
@@ -43,7 +44,7 @@ export function HeroSection() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8"
           >
             <Sparkles className="w-4 h-4" />
-            <span>The Emotional Surgeon Presents</span>
+            <span>The Emotional Surgeon™ Presents Reset Your Mind 1111™</span>
           </motion.div>
 
           {/* Main Headline */}
@@ -65,27 +66,56 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 text-balance leading-relaxed"
+            className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-4 text-balance leading-relaxed"
           >
-            Discover your Worth Thermostat and recalibrate your life. 
-            Transform your relationship with love, money, and self-worth.
+            Discover your Worth Thermostat and recalibrate your life across the four areas that matter most:
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.25 }}
+            className="text-lg md:text-xl lg:text-2xl font-serif text-primary max-w-2xl mx-auto mb-4 text-balance"
+          >
+            Health. Wealth. Love. Leadership.
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-10 text-balance leading-relaxed"
+          >
+            Transform the patterns that keep you settling for less and step into the life you were meant to live.
           </motion.p>
 
           {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            transition={{ duration: 0.8, delay: 0.35 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Button variant="hero" size="xl" className="group">
-              Take Free Assessment
-              <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-            </Button>
-            <Button variant="hero-outline" size="xl">
-              View Pricing
-            </Button>
+            <Link to="/assessment" className="w-full sm:w-auto">
+              <Button variant="hero" size="xl" className="group w-full">
+                Take the Free Worth Thermostat Assessment
+                <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+              </Button>
+            </Link>
+            <a href="#pricing" className="w-full sm:w-auto">
+              <Button variant="hero-outline" size="xl" className="w-full">
+                See All Plans
+              </Button>
+            </a>
           </motion.div>
+
+          {/* Sub-CTA info */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.45 }}
+            className="text-sm text-muted-foreground mt-4"
+          >
+            25 questions • 3 minutes
+          </motion.p>
 
           {/* Trust Indicators */}
           <motion.div
@@ -100,7 +130,7 @@ export function HeroSection() {
               ))}
             </div>
             <p className="text-sm text-muted-foreground">
-              Trusted by <span className="font-semibold text-foreground">2,500+</span> women on their transformation journey
+              Helping people recalibrate their worth across health, wealth, love, and leadership.
             </p>
           </motion.div>
         </div>

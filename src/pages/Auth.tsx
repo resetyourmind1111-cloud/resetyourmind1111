@@ -68,9 +68,26 @@ export default function Auth() {
 
   useEffect(() => {
     if (!isLoading && user && view !== "updatePassword") {
-      navigate("/");
+      const redirect = searchParams.get("redirect");
+      if (redirect === "checkout") {
+        const priceId = searchParams.get("priceId");
+        const tier = searchParams.get("tier");
+        if (priceId) {
+          // Trigger checkout after login/signup
+          supabase.functions.invoke("create-checkout", {
+            body: { priceId, tierKey: tier },
+          }).then(({ data, error }) => {
+            if (data?.url) {
+              window.open(data.url, "_blank");
+            }
+            navigate("/dashboard");
+          });
+          return;
+        }
+      }
+      navigate("/dashboard");
     }
-  }, [user, isLoading, navigate, view]);
+  }, [user, isLoading, navigate, view, searchParams]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,7 +222,7 @@ export default function Auth() {
             toast.error(error.message);
           }
         } else {
-          toast.success("Account created successfully! You can now sign in.");
+          toast.success("Account created! Please check your email to verify your account.");
           setView("signIn");
         }
       } else {

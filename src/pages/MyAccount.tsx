@@ -8,15 +8,30 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { User, CreditCard, Bell, Shield, Upload } from "lucide-react";
+import { User, CreditCard, Bell, Shield, Upload, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useSubscription } from "@/hooks/useSubscription";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const tierNames: Record<string, string> = {
   free: "Free",
+  reset: "Reset",
+  expand: "Expand",
+  embody: "Embody",
+  founding_full_access: "Founding 111",
   tier1: "Reset",
   tier2: "Expand",
   tier3: "Embody",
@@ -80,9 +95,41 @@ export default function MyAccount() {
     }
   };
 
+  const { subscription, effectiveTier } = useSubscription();
+  const [showFoundingWarning, setShowFoundingWarning] = useState(false);
+
+  const handleManageSubscription = async () => {
+    if (subscription?.founding_member) {
+      setShowFoundingWarning(true);
+      return;
+    }
+    openPortal();
+  };
+
+  const openPortal = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("create-portal-session");
+      if (error) throw error;
+      if (data?.url) window.open(data.url, "_blank");
+    } catch {
+      toast.error("Failed to open subscription management.");
+    }
+  };
+
+  const displayTier = effectiveTier || tier;
+
   return (
     <AuthenticatedLayout title="My Account" subtitle="Manage your profile, plan, and preferences">
       <div className="max-w-2xl mx-auto space-y-8">
+        {/* Payment Failed Banner */}
+        {subscription?.status === "past_due" && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 rounded-lg bg-primary/10 border border-primary/30 flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-primary flex-shrink-0" />
+            <p className="text-sm text-foreground">Your payment needs attention — update your card to keep your access.</p>
+            <Button variant="gold" size="sm" onClick={openPortal} className="ml-auto flex-shrink-0">Update Card</Button>
+          </motion.div>
+        )}
+
         {/* Plan Card */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="glass-card overflow-hidden">
@@ -94,19 +141,48 @@ export default function MyAccount() {
                   <h2 className="font-serif text-xl font-bold text-foreground">Current Plan</h2>
                 </div>
                 <Badge variant="outline" className="border-accent text-accent text-sm px-3">
-                  {tierNames[tier]}
+                  {tierNames[displayTier] || displayTier}
                 </Badge>
               </div>
-              {tier !== "tier3" && (
+              {subscription && subscription.status !== "canceled" ? (
+                <div className="space-y-3">
+                  {subscription.cancel_at_period_end && (
+                    <p className="text-sm text-muted-foreground">
+                      Access until {new Date(subscription.current_period_end!).toLocaleDateString()}
+                    </p>
+                  )}
+                  <Button variant="outline" className="w-full" onClick={handleManageSubscription}>
+                    Manage Subscription
+                  </Button>
+                </div>
+              ) : (
                 <Link to="/#pricing">
                   <Button variant="gold" className="w-full">
-                    Upgrade to {tier === "free" || tier === "tier1" ? "Expand" : "Embody"}
+                    {subscription?.status === "canceled" ? "Resubscribe" : "Choose a Plan"}
                   </Button>
                 </Link>
               )}
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Founding Warning Dialog */}
+        <AlertDialog open={showFoundingWarning} onOpenChange={setShowFoundingWarning}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-foreground">Warning: Founding 111 Membership</AlertDialogTitle>
+              <AlertDialogDescription>
+                If you leave your Founding 111 membership, your locked-in rate of $44/month for full access cannot be reinstated. This cannot be undone. Are you sure?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Keep My Founding Rate</AlertDialogCancel>
+              <AlertDialogAction onClick={openPortal} className="bg-destructive text-destructive-foreground">
+                I Understand, Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Profile */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
