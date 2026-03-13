@@ -8,15 +8,30 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { User, CreditCard, Bell, Shield, Upload } from "lucide-react";
+import { User, CreditCard, Bell, Shield, Upload, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useSubscription } from "@/hooks/useSubscription";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const tierNames: Record<string, string> = {
   free: "Free",
+  reset: "Reset",
+  expand: "Expand",
+  embody: "Embody",
+  founding_full_access: "Founding 111",
   tier1: "Reset",
   tier2: "Expand",
   tier3: "Embody",
