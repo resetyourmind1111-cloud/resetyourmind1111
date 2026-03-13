@@ -6,7 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion } from "framer-motion";
-import { Check, ChevronLeft } from "lucide-react";
+import { Check, ChevronLeft, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const PROMPTS: Record<string, string[]> = {
   "Self-Worth": [
@@ -59,6 +61,10 @@ export default function ShadowWorkLibrary() {
   const { entries, saveEntry } = useHealingToolEntries("shadow-work-library");
   const [activePrompt, setActivePrompt] = useState<{ category: string; prompt: string; globalIndex: number } | null>(null);
   const [response, setResponse] = useState("");
+  const [aiInsight, setAiInsight] = useState("");
+  const [aiDeeperPrompt, setAiDeeperPrompt] = useState("");
+  const [aiIntegration, setAiIntegration] = useState("");
+  const [isGuiding, setIsGuiding] = useState(false);
 
   const completedPrompts = new Set(entries.map((e: any) => e.entry_data.prompt));
   const completedCount = completedPrompts.size;
@@ -67,14 +73,40 @@ export default function ShadowWorkLibrary() {
     if (!response.trim() || !activePrompt) return;
     saveEntry.mutate(
       { category: activePrompt.category, prompt: activePrompt.prompt, response },
-      { onSuccess: () => { setResponse(""); setActivePrompt(null); } }
+      { onSuccess: () => { setResponse(""); setActivePrompt(null); setAiInsight(""); setAiDeeperPrompt(""); setAiIntegration(""); } }
     );
+  };
+
+  const handleAiGuide = async () => {
+    if (!activePrompt) return;
+    setIsGuiding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("shadow-work-guide", {
+        body: {
+          category: activePrompt.category,
+          prompt: activePrompt.prompt,
+          response: response.trim() || undefined,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.insight) setAiInsight(data.insight);
+      if (data.deeperPrompt) setAiDeeperPrompt(data.deeperPrompt);
+      if (data.integration) setAiIntegration(data.integration);
+      toast.success("Shadow work guidance ready — sit with these insights");
+    } catch (err: any) {
+      console.error("Shadow work guide error:", err);
+      toast.error(err.message || "Failed to generate guidance. Please try again.");
+    } finally {
+      setIsGuiding(false);
+    }
   };
 
   if (activePrompt) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" className="text-muted-foreground" onClick={() => setActivePrompt(null)}>
+        <Button variant="ghost" className="text-muted-foreground" onClick={() => { setActivePrompt(null); setAiInsight(""); setAiDeeperPrompt(""); setAiIntegration(""); }}>
           <ChevronLeft className="w-4 h-4 mr-1" /> Back to prompts
         </Button>
         <Card className="glass-card">
@@ -87,6 +119,42 @@ export default function ShadowWorkLibrary() {
               placeholder="Write freely. There is no wrong answer here..."
               className="bg-input border-border min-h-[200px]"
             />
+
+            {/* AI Guide Button */}
+            <Button
+              onClick={handleAiGuide}
+              disabled={isGuiding}
+              variant="outline"
+              className="w-full border-primary/30 text-primary hover:bg-primary/10"
+            >
+              {isGuiding ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Exploring with AI...</>
+              ) : (
+                <><Sparkles className="w-4 h-4 mr-2" /> Help Me Go Deeper (AI)</>
+              )}
+            </Button>
+
+            {aiInsight && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4 text-sm space-y-3">
+                <div>
+                  <p className="text-xs text-accent uppercase tracking-wider mb-1">Shadow Insight</p>
+                  <p className="text-foreground/80 italic">{aiInsight}</p>
+                </div>
+                {aiDeeperPrompt && (
+                  <div>
+                    <p className="text-xs text-accent uppercase tracking-wider mb-1">Go Deeper</p>
+                    <p className="text-foreground/80">{aiDeeperPrompt}</p>
+                  </div>
+                )}
+                {aiIntegration && (
+                  <div>
+                    <p className="text-xs text-accent uppercase tracking-wider mb-1">Integration Statement</p>
+                    <p className="text-accent italic font-semibold">"{aiIntegration}"</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
             <div className="glass-card p-4 text-sm text-muted-foreground italic">
               <p>Reflection: What surprised you about what came up?</p>
             </div>

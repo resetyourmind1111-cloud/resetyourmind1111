@@ -5,7 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, RotateCcw } from "lucide-react";
+import { ChevronRight, RotateCcw, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const QUESTIONS = [
   "What was the money situation in your home growing up?",
@@ -26,6 +28,8 @@ export default function MoneyStoryAudit() {
   const [answers, setAnswers] = useState<string[]>(Array(10).fill(""));
   const [newStory, setNewStory] = useState("");
   const [showAudit, setShowAudit] = useState(false);
+  const [patternInsight, setPatternInsight] = useState("");
+  const [isRewriting, setIsRewriting] = useState(false);
 
   const existingAudit = useMemo(() => entries.find((e: any) => e.entry_data.type === "audit"), [entries]);
 
@@ -39,6 +43,31 @@ export default function MoneyStoryAudit() {
       { type: "audit", answers, newStory },
       { onSuccess: () => setShowAudit(false) }
     );
+  };
+
+  const handleAiRewrite = async () => {
+    const answeredCount = answers.filter((a) => a.trim()).length;
+    if (answeredCount < 3) {
+      toast.error("Please answer at least 3 questions before using AI rewrite");
+      return;
+    }
+    setIsRewriting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("rewrite-money-story", {
+        body: { answers, questions: QUESTIONS },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.pattern) setPatternInsight(data.pattern);
+      if (data.newStory) setNewStory(data.newStory);
+      toast.success("AI money story rewrite complete — personalize it to make it yours");
+    } catch (err: any) {
+      console.error("Money story rewrite error:", err);
+      toast.error(err.message || "Failed to rewrite. Please try again.");
+    } finally {
+      setIsRewriting(false);
+    }
   };
 
   if (!showAudit && existingAudit) {
@@ -125,6 +154,28 @@ export default function MoneyStoryAudit() {
         <CardContent className="p-6 space-y-4">
           <h3 className="font-serif text-lg text-foreground">Rewrite Your Money Story</h3>
           <p className="text-xs text-muted-foreground">Write your new money story in first person, present tense.</p>
+
+          {/* AI Rewrite Button */}
+          <Button
+            onClick={handleAiRewrite}
+            disabled={isRewriting}
+            variant="outline"
+            className="w-full border-primary/30 text-primary hover:bg-primary/10"
+          >
+            {isRewriting ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Rewriting with AI...</>
+            ) : (
+              <><Sparkles className="w-4 h-4 mr-2" /> Help Me Rewrite My Money Story (AI)</>
+            )}
+          </Button>
+
+          {patternInsight && (
+            <div className="glass-card p-4 text-sm text-muted-foreground italic">
+              <p className="text-xs text-accent uppercase tracking-wider mb-2 not-italic">Your Old Pattern</p>
+              {patternInsight}
+            </div>
+          )}
+
           <Textarea
             value={newStory}
             onChange={(e) => setNewStory(e.target.value)}
