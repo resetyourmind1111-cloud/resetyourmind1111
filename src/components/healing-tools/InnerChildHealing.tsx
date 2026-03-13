@@ -6,13 +6,19 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Loader2, Wand2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type InnerChildInsight = {
+  whatSheNeeded: string;
+  whatToSayNow: string;
+  letterStarter: string;
+};
+
 export default function InnerChildHealing() {
-  const { entries, saveEntry, deleteEntry } = useHealingToolEntries("inner-child-healing");
+  const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("inner-child-healing");
   const [showForm, setShowForm] = useState(false);
   const [age, setAge] = useState([7]);
   const [prompt1, setPrompt1] = useState("");
@@ -20,6 +26,7 @@ export default function InnerChildHealing() {
   const [prompt3, setPrompt3] = useState("");
   const [letter, setLetter] = useState("");
   const [isGuiding, setIsGuiding] = useState(false);
+  const [insightLoading, setInsightLoading] = useState<string | null>(null);
 
   const handleSave = () => {
     if (!letter.trim()) return;
@@ -49,6 +56,26 @@ export default function InnerChildHealing() {
       toast.error(err.message || "Failed to generate guidance. Please try again.");
     } finally {
       setIsGuiding(false);
+    }
+  };
+
+  const fetchInsight = async (entryId: string, entryData: any) => {
+    setInsightLoading(entryId);
+    try {
+      const { data, error } = await supabase.functions.invoke("inner-child-guide", {
+        body: { age: entryData.age, prompt1: entryData.prompt1 || undefined },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      updateEntry.mutate({
+        id: entryId,
+        entryData: { ...entryData, aiInsight: data },
+      });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to get insight");
+    } finally {
+      setInsightLoading(null);
     }
   };
 
@@ -131,6 +158,8 @@ export default function InnerChildHealing() {
           <h3 className="font-serif text-xl text-foreground">Inner Child Library</h3>
           {entries.map((entry: any) => {
             const d = entry.entry_data;
+            const insight: InnerChildInsight | undefined = d.aiInsight;
+            const isLoading = insightLoading === entry.id;
             return (
               <motion.div key={entry.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <Card className="glass-card">
@@ -140,11 +169,47 @@ export default function InnerChildHealing() {
                         <span className="text-accent font-serif text-lg">Age {d.age}</span>
                         <span className="text-xs text-muted-foreground ml-3">{format(new Date(entry.created_at), "MMM d, yyyy")}</span>
                       </div>
-                      <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0" onClick={() => deleteEntry.mutate(entry.id)}>
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-accent h-7 px-2 text-xs hover:bg-accent/10"
+                          disabled={isLoading}
+                          onClick={() => fetchInsight(entry.id, d)}
+                        >
+                          {isLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Wand2 className="w-3 h-3 mr-1" />}
+                          {insight ? "Refresh" : "Decode"}
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0" onClick={() => deleteEntry.mutate(entry.id)}>
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                     <p className="text-sm text-foreground/80 whitespace-pre-wrap">{d.letter}</p>
+
+                    <AnimatePresence>
+                      {insight && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-4 space-y-3 border-t border-border pt-4"
+                        >
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">💛 What She Needed</p>
+                            <p className="text-sm text-foreground/90">{insight.whatSheNeeded}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">🫂 What To Say Now</p>
+                            <p className="text-sm text-foreground/90">{insight.whatToSayNow}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">💌 Letter From Your Heart</p>
+                            <p className="text-sm text-foreground/90 italic">{insight.letterStarter}</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </CardContent>
                 </Card>
               </motion.div>

@@ -5,8 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Wand2, Loader2 } from "lucide-react";
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const REFERENCE_NEW_MOON = new Date("2024-01-11T11:57:00Z");
 const LUNAR_CYCLE = 29.53;
@@ -54,10 +56,17 @@ const RITUALS: Record<string, { guide: string; prompt: string }> = {
   "Waning Crescent": { guide: "Rest. Restore. Integrate. Prepare. This is sacred rest time. Honor the pause.", prompt: "What do you need to release before the new cycle?" },
 };
 
+type MoonInsight = {
+  lunarMessage: string;
+  soulPattern: string;
+  ritualSuggestion: string;
+};
+
 export default function MoonPhaseTracker() {
-  const { entries, saveEntry, deleteEntry } = useHealingToolEntries("moon-phase-tracker");
+  const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("moon-phase-tracker");
   const [showJournal, setShowJournal] = useState(false);
   const [journalText, setJournalText] = useState("");
+  const [insightLoading, setInsightLoading] = useState<string | null>(null);
 
   const today = new Date();
   const phase = getMoonPhase(today);
@@ -79,6 +88,26 @@ export default function MoonPhaseTracker() {
       { phase: phase.name, journal: journalText, date: today.toISOString() },
       { onSuccess: () => { setJournalText(""); setShowJournal(false); } }
     );
+  };
+
+  const fetchInsight = async (entryId: string, entryData: any) => {
+    setInsightLoading(entryId);
+    try {
+      const { data, error } = await supabase.functions.invoke("moon-insight", {
+        body: { phase: entryData.phase, journal: entryData.journal },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      updateEntry.mutate({
+        id: entryId,
+        entryData: { ...entryData, aiInsight: data },
+      });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to get insight");
+    } finally {
+      setInsightLoading(null);
+    }
   };
 
   return (
@@ -153,6 +182,8 @@ export default function MoonPhaseTracker() {
           <h3 className="font-serif text-xl text-foreground">Moon Journal</h3>
           {entries.map((entry: any) => {
             const d = entry.entry_data;
+            const insight: MoonInsight | undefined = d.aiInsight;
+            const isLoading = insightLoading === entry.id;
             return (
               <motion.div key={entry.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <Card className="glass-card">
@@ -162,11 +193,47 @@ export default function MoonPhaseTracker() {
                         <span className="text-accent text-sm font-semibold">{d.phase}</span>
                         <span className="text-xs text-muted-foreground">{format(new Date(d.date), "MMM d, yyyy")}</span>
                       </div>
-                      <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0" onClick={() => deleteEntry.mutate(entry.id)}>
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-accent h-7 px-2 text-xs hover:bg-accent/10"
+                          disabled={isLoading}
+                          onClick={() => fetchInsight(entry.id, d)}
+                        >
+                          {isLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Wand2 className="w-3 h-3 mr-1" />}
+                          {insight ? "Refresh" : "Decode"}
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0" onClick={() => deleteEntry.mutate(entry.id)}>
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                     <p className="text-sm text-foreground/80 whitespace-pre-wrap">{d.journal}</p>
+
+                    <AnimatePresence>
+                      {insight && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-4 space-y-3 border-t border-border pt-4"
+                        >
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">🌙 Lunar Message</p>
+                            <p className="text-sm text-foreground/90">{insight.lunarMessage}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">🔮 Soul Pattern</p>
+                            <p className="text-sm text-foreground/90">{insight.soulPattern}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-accent mb-1">🕯️ Ritual Suggestion</p>
+                            <p className="text-sm text-foreground/90">{insight.ritualSuggestion}</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </CardContent>
                 </Card>
               </motion.div>
