@@ -80,22 +80,41 @@ export default function SomaticBreathing() {
   useEffect(() => {
     if (!running) { if (intervalRef.current) clearInterval(intervalRef.current); return; }
     let elapsed = 0;
+    let lastPhase: Phase = "idle";
+    // Play initial inhale tone
+    if (soundEnabled) playPhaseTone("inhale", soundVolume);
     const tick = () => {
       elapsed++;
       const pos = elapsed % totalCycleTime;
       const completedCycles = Math.floor(elapsed / totalCycleTime);
-      if (completedCycles >= targetCycles) { stop(); setCycles(targetCycles); return; }
+      if (completedCycles >= targetCycles) {
+        stop();
+        setCycles(targetCycles);
+        if (soundEnabled) playCompletionTone(soundVolume);
+        return;
+      }
       setCycles(completedCycles);
       let p: Phase; let c: number;
       if (pos < selected.inhale) { p = "inhale"; c = selected.inhale - pos; }
       else if (pos < selected.inhale + selected.hold1) { p = "hold1"; c = selected.inhale + selected.hold1 - pos; }
       else if (pos < selected.inhale + selected.hold1 + selected.exhale) { p = "exhale"; c = selected.inhale + selected.hold1 + selected.exhale - pos; }
       else { p = "hold2"; c = totalCycleTime - pos; }
+
+      // Play tone on phase transition
+      if (p !== lastPhase && soundEnabled) {
+        // Skip hold phases with 0 duration
+        const shouldPlay = (p === "hold1" && selected.hold1 > 0) ||
+                           (p === "hold2" && selected.hold2 > 0) ||
+                           p === "inhale" || p === "exhale";
+        if (shouldPlay) playPhaseTone(p, soundVolume);
+      }
+      lastPhase = p;
+
       setPhase(p); setCounter(c);
     };
     intervalRef.current = setInterval(tick, 1000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [running, selected, targetCycles, totalCycleTime]);
+  }, [running, selected, targetCycles, totalCycleTime, soundEnabled, soundVolume]);
 
   const stop = () => { setRunning(false); if (intervalRef.current) clearInterval(intervalRef.current); };
   const reset = () => { stop(); setPhase("idle"); setCounter(0); setCycles(0); setAiData(null); };
