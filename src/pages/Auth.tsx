@@ -77,16 +77,17 @@ export default function Auth() {
           supabase.functions.invoke("create-checkout", {
             body: { priceId, tierKey: tier },
           }).then(({ data, error }) => {
-            if (data?.url) {
-              const link = document.createElement('a');
-              link.href = data.url;
-              link.target = '_blank';
-              link.rel = 'noopener noreferrer';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
+            if (error) {
+              toast.error(error.message || "Failed to start checkout. Please try again.");
+              navigate("/dashboard");
               return;
             }
+
+            if (data?.url) {
+              window.location.assign(data.url);
+              return;
+            }
+
             navigate("/dashboard");
           });
           return;
