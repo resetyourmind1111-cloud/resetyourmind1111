@@ -127,6 +127,27 @@ export default function Dashboard() {
       
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
+          {/* Welcome banner after successful checkout */}
+          {showWelcome && (
+            <div className="mb-6 p-6 rounded-2xl bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 border border-primary/30 relative">
+              <button
+                onClick={() => setShowWelcome(false)}
+                className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors text-lg"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+              <div className="flex items-center gap-3 mb-2">
+                <Sparkles className="w-6 h-6 text-primary" />
+                <h2 className="font-serif text-xl font-bold text-foreground">Welcome to your transformation! 🎉</h2>
+              </div>
+              <p className="text-muted-foreground">
+                Your subscription is being activated. It may take a moment to unlock all your features. 
+                Explore your dashboard while we set everything up — permission granted to begin.
+              </p>
+            </div>
+          )}
+
           <div className="flex items-start justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">Your Dashboard</h1>
