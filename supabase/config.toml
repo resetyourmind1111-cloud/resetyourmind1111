@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.attachment-insight]
 verify_jwt = false
+
+[functions.somatic-coach]
+verify_jwt = false
