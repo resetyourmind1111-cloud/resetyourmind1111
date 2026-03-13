@@ -98,13 +98,20 @@ export default function AttachmentStyleAnalyzer() {
     const sortedScores = [...scores].sort((a, b) => b - a);
     const secondaryIdx = sortedScores[1] >= 4 ? scores.indexOf(sortedScores[1], sortedScores[1] === sortedScores[0] ? primaryIdx + 1 : 0) : -1;
 
-    saveEntry.mutate({
-      type: "result",
-      scores,
-      primary: STYLES[primaryIdx],
-      secondary: secondaryIdx >= 0 && secondaryIdx !== primaryIdx ? STYLES[secondaryIdx] : null,
-      completedAt: new Date().toISOString(),
-    });
+    saveEntry.mutate(
+      {
+        type: "result",
+        scores,
+        primary: STYLES[primaryIdx],
+        secondary: secondaryIdx >= 0 && secondaryIdx !== primaryIdx ? STYLES[secondaryIdx] : null,
+        completedAt: new Date().toISOString(),
+      },
+      {
+        onSuccess: () => {
+          setStarted(false);
+        },
+      }
+    );
   };
 
   const handleAiInsight = async (d: any) => {
