@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.inner-child-guide]
 verify_jwt = false
+
+[functions.rewrite-money-story]
+verify_jwt = false
+
+[functions.shadow-work-guide]
+verify_jwt = false
