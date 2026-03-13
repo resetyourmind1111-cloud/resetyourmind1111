@@ -27,6 +27,7 @@ import CEOSelfAssessment from "@/components/healing-tools/CEOSelfAssessment";
 import ValuesClarityTool from "@/components/healing-tools/ValuesClarityTool";
 import ChakraBalancingGuide from "@/components/healing-tools/ChakraBalancingGuide";
 import EnergyCordCutting from "@/components/healing-tools/EnergyCordCutting";
+import NervousSystemDiagnostic from "@/components/healing-tools/NervousSystemDiagnostic";
 
 const toolComponents: Record<string, React.ComponentType> = {
   "limiting-belief-rewriter": LimitingBeliefRewriter,
