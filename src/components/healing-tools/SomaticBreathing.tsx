@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { Play, Pause, RotateCcw, Trash2, Sparkles, Loader2, Wind, Flame, Moon, Sun, Heart, Zap, Shield, Leaf, Volume2, VolumeX } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { playPhaseTone, playCompletionTone } from "@/lib/breathingAudio";
@@ -156,13 +157,37 @@ export default function SomaticBreathing() {
     }
   };
 
-  // Breathing animation scale
-  const getBreathScale = () => {
-    if (phase === "inhale") return "scale-110";
-    if (phase === "exhale") return "scale-90";
-    return "scale-100";
+  // Framer-motion breathing animation config
+  const getBreathAnimation = () => {
+    if (phase === "idle") return { scale: 1, opacity: 0.6 };
+    if (phase === "inhale") return { scale: 1.35, opacity: 1 };
+    if (phase === "exhale") return { scale: 0.75, opacity: 0.85 };
+    return { scale: 1, opacity: 0.95 }; // hold phases
   };
 
+  const getPhaseDuration = () => {
+    if (phase === "inhale") return selected.inhale;
+    if (phase === "exhale") return selected.exhale;
+    if (phase === "hold1") return selected.hold1;
+    if (phase === "hold2") return selected.hold2;
+    return 0.5;
+  };
+
+  const phaseGlow: Record<Phase, string> = {
+    inhale: "0 0 40px 10px hsla(145, 60%, 50%, 0.3), 0 0 80px 20px hsla(145, 60%, 50%, 0.1)",
+    hold1: "0 0 30px 8px hsla(45, 80%, 55%, 0.25), 0 0 60px 15px hsla(45, 80%, 55%, 0.08)",
+    exhale: "0 0 40px 10px hsla(200, 70%, 55%, 0.3), 0 0 80px 20px hsla(200, 70%, 55%, 0.1)",
+    hold2: "0 0 30px 8px hsla(45, 80%, 55%, 0.25), 0 0 60px 15px hsla(45, 80%, 55%, 0.08)",
+    idle: "0 0 0px 0px transparent",
+  };
+
+  const phaseBorder: Record<Phase, string> = {
+    inhale: "hsla(145, 60%, 50%, 0.8)",
+    hold1: "hsla(45, 80%, 55%, 0.8)",
+    exhale: "hsla(200, 70%, 55%, 0.8)",
+    hold2: "hsla(45, 80%, 55%, 0.8)",
+    idle: "hsl(var(--border))",
+  };
   return (
     <Tabs defaultValue="practice">
       <TabsList className="mb-6">
@@ -235,15 +260,46 @@ export default function SomaticBreathing() {
             {/* Breathing Timer */}
             <Card className="glass-card">
               <CardContent className="pt-6 flex flex-col items-center gap-4">
-                <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center transition-all duration-1000 ${
-                  phase === "inhale" ? "border-emerald-400 scale-110" :
-                  phase === "exhale" ? "border-sky-400 scale-90" :
-                  phase === "hold1" || phase === "hold2" ? "border-amber-400 scale-100" :
-                  "border-border scale-100"
-                }`}>
-                  <div className={`text-5xl font-bold transition-all duration-500 ${phaseColors[phase]}`}>
-                    {phase === "idle" ? "●" : counter}
-                  </div>
+                <div className="relative w-40 h-40 flex items-center justify-center">
+                  {/* Outer glow ring */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    animate={{
+                      ...getBreathAnimation(),
+                      boxShadow: phaseGlow[phase],
+                    }}
+                    transition={{
+                      duration: getPhaseDuration(),
+                      ease: phase === "inhale" ? "easeOut" : phase === "exhale" ? "easeIn" : "easeInOut",
+                    }}
+                    style={{ border: "2px solid transparent", borderColor: phaseBorder[phase] }}
+                  />
+                  {/* Inner breathing circle */}
+                  <motion.div
+                    className="absolute inset-3 rounded-full flex items-center justify-center"
+                    animate={{
+                      ...getBreathAnimation(),
+                      borderColor: phaseBorder[phase],
+                    }}
+                    transition={{
+                      duration: getPhaseDuration(),
+                      ease: phase === "inhale" ? "easeOut" : phase === "exhale" ? "easeIn" : "easeInOut",
+                    }}
+                    style={{
+                      border: "3px solid",
+                      background: `radial-gradient(circle, ${phaseBorder[phase]}15 0%, transparent 70%)`,
+                    }}
+                  >
+                    <motion.span
+                      key={phase === "idle" ? "idle" : counter}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className={`text-5xl font-bold ${phaseColors[phase]}`}
+                    >
+                      {phase === "idle" ? "●" : counter}
+                    </motion.span>
+                  </motion.div>
                 </div>
                 <p className={`text-lg font-semibold ${phaseColors[phase]}`}>{phaseLabels[phase]}</p>
                 <Progress value={(cycles / targetCycles) * 100} className="h-2" />
