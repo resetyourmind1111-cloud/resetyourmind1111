@@ -29,11 +29,23 @@ interface AssessmentResult {
 export default function Dashboard() {
   const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const [results, setResults] = useState<AssessmentResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   const dailySlip = useMemo(() => getDailySlip(), []);
+
+  // Show welcome message after successful checkout
+  useEffect(() => {
+    if (searchParams.get("checkout") === "success") {
+      setShowWelcome(true);
+      // Clean URL
+      searchParams.delete("checkout");
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!authLoading && !user) {
