@@ -188,6 +188,42 @@ export type Database = {
         }
         Relationships: []
       }
+      nervous_system_checkins: {
+        Row: {
+          created_at: string
+          id: string
+          journal_entry: string | null
+          primary_state: string
+          reset_completed: boolean
+          scores_json: Json
+          secondary_state: string | null
+          triggered_by: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          journal_entry?: string | null
+          primary_state: string
+          reset_completed?: boolean
+          scores_json?: Json
+          secondary_state?: string | null
+          triggered_by?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          journal_entry?: string | null
+          primary_state?: string
+          reset_completed?: boolean
+          scores_json?: Json
+          secondary_state?: string | null
+          triggered_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       oracle_cards: {
         Row: {
           affirmation: string
