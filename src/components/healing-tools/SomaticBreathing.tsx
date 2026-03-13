@@ -64,7 +64,10 @@ export default function SomaticBreathing() {
   const [isCoaching, setIsCoaching] = useState(false);
   const [aiData, setAiData] = useState<AiData | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundVolume, setSoundVolume] = useState(0.7);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevPhaseRef = useRef<Phase>("idle");
 
   const totalCycleTime = selected.inhale + selected.hold1 + selected.exhale + selected.hold2;
 
