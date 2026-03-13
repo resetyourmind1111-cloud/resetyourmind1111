@@ -1,0 +1,1 @@
+UPDATE profiles SET subscription_tier = 'embody' WHERE user_id = 'e47a8591-1f40-4878-8f9c-69a08ce5abd7';
