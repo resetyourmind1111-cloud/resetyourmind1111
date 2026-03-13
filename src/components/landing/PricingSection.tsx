@@ -262,11 +262,7 @@ export function PricingSection() {
       return;
     }
 
-    const checkoutWindow = window.open("", "_blank", "noopener,noreferrer");
-    if (!checkoutWindow) {
-      toast.error("Please allow pop-ups to open secure checkout.");
-      return;
-    }
+    const checkoutWindow = window.open("about:blank", "_blank");
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
@@ -276,9 +272,17 @@ export function PricingSection() {
       if (error) throw error;
       if (!data?.url) throw new Error("No checkout URL returned.");
 
-      checkoutWindow.location.href = data.url;
+      if (checkoutWindow) {
+        checkoutWindow.location.replace(data.url);
+        checkoutWindow.focus();
+      } else {
+        // Popup blocked: fallback to same-tab redirect
+        window.location.assign(data.url);
+      }
     } catch (err: any) {
-      checkoutWindow.close();
+      if (checkoutWindow && !checkoutWindow.closed) {
+        checkoutWindow.close();
+      }
       toast.error(err.message || "Failed to start checkout. Please try again.");
     }
   };
