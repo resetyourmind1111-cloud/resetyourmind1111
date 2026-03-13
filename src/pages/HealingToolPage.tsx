@@ -27,6 +27,7 @@ import CEOSelfAssessment from "@/components/healing-tools/CEOSelfAssessment";
 import ValuesClarityTool from "@/components/healing-tools/ValuesClarityTool";
 import ChakraBalancingGuide from "@/components/healing-tools/ChakraBalancingGuide";
 import EnergyCordCutting from "@/components/healing-tools/EnergyCordCutting";
+import NervousSystemDiagnostic from "@/components/healing-tools/NervousSystemDiagnostic";
 
 const toolComponents: Record<string, React.ComponentType> = {
   "limiting-belief-rewriter": LimitingBeliefRewriter,
@@ -49,6 +50,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   "values-clarity-tool": ValuesClarityTool,
   "chakra-balancing": ChakraBalancingGuide,
   "energy-cord-cutting": EnergyCordCutting,
+  "nervous-system-diagnostic": NervousSystemDiagnostic,
 };
 
 export default function HealingToolPage() {
@@ -93,17 +95,23 @@ export default function HealingToolPage() {
       >
         <ArrowLeft className="w-4 h-4 mr-2" /> Back to All Tools
       </Button>
-      <LockedContent requiredTier="tier2" currentTier={tier}>
-        {ToolComponent ? (
-          <ToolComponent />
-        ) : (
-          <div className="glass-card p-12 text-center">
-            <span className="text-5xl mb-4 block">{tool.icon}</span>
-            <h3 className="font-serif text-xl text-foreground mb-2">Coming Soon</h3>
-            <p className="text-muted-foreground">This tool is being built and will be available shortly.</p>
-          </div>
-        )}
-      </LockedContent>
+      {(() => {
+        const freeTierTools = ["nervous-system-diagnostic"];
+        const requiredTier = freeTierTools.includes(toolId || "") ? "tier1" as const : "tier2" as const;
+        return (
+          <LockedContent requiredTier={requiredTier} currentTier={tier}>
+            {ToolComponent ? (
+              <ToolComponent />
+            ) : (
+              <div className="glass-card p-12 text-center">
+                <span className="text-5xl mb-4 block">{tool.icon}</span>
+                <h3 className="font-serif text-xl text-foreground mb-2">Coming Soon</h3>
+                <p className="text-muted-foreground">This tool is being built and will be available shortly.</p>
+              </div>
+            )}
+          </LockedContent>
+        );
+      })()}
     </AuthenticatedLayout>
   );
 }

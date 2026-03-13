@@ -27,4 +27,5 @@ export const healingTools: HealingTool[] = [
   { id: "values-clarity-tool", name: "Values Clarity Tool", icon: "💎", description: "Identify your core values and align your life to them", category: "Purpose" },
   { id: "chakra-balancing", name: "Chakra Balancing Guide", icon: "🔮", description: "Assess, balance, and track your seven energy centers", category: "Energy" },
   { id: "energy-cord-cutting", name: "Energy Cord Cutting Ritual", icon: "✂️", description: "Release energetic ties that no longer serve your highest good", category: "Energy" },
+  { id: "nervous-system-diagnostic", name: "Nervous System Diagnostic", icon: "🧠", description: "Find out which state your nervous system is in right now — and get your personalized reset plan", category: "Somatic" },
 ];
