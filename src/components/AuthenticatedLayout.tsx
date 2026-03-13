@@ -2,6 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigation } from "@/components/Navigation";
+import { PastDueBanner } from "@/components/PastDueBanner";
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
