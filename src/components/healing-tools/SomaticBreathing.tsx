@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
-import { Play, Pause, RotateCcw, Trash2, Sparkles, Loader2, Wind, Flame, Moon, Sun, Heart, Zap, Shield, Leaf } from "lucide-react";
+import { Play, Pause, RotateCcw, Trash2, Sparkles, Loader2, Wind, Flame, Moon, Sun, Heart, Zap, Shield, Leaf, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { playPhaseTone, playCompletionTone } from "@/lib/breathingAudio";
 
 const exercises = [
   { id: "box", name: "Box Breathing", inhale: 4, hold1: 4, exhale: 4, hold2: 4, icon: "box", category: "Calm", description: "Equal counts for calm focus. Navy SEALs use this to stay composed under pressure." },
@@ -63,7 +64,10 @@ export default function SomaticBreathing() {
   const [isCoaching, setIsCoaching] = useState(false);
   const [aiData, setAiData] = useState<AiData | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundVolume, setSoundVolume] = useState(0.7);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevPhaseRef = useRef<Phase>("idle");
 
   const totalCycleTime = selected.inhale + selected.hold1 + selected.exhale + selected.hold2;
 
@@ -76,22 +80,41 @@ export default function SomaticBreathing() {
   useEffect(() => {
     if (!running) { if (intervalRef.current) clearInterval(intervalRef.current); return; }
     let elapsed = 0;
+    let lastPhase: Phase = "idle";
+    // Play initial inhale tone
+    if (soundEnabled) playPhaseTone("inhale", soundVolume);
     const tick = () => {
       elapsed++;
       const pos = elapsed % totalCycleTime;
       const completedCycles = Math.floor(elapsed / totalCycleTime);
-      if (completedCycles >= targetCycles) { stop(); setCycles(targetCycles); return; }
+      if (completedCycles >= targetCycles) {
+        stop();
+        setCycles(targetCycles);
+        if (soundEnabled) playCompletionTone(soundVolume);
+        return;
+      }
       setCycles(completedCycles);
       let p: Phase; let c: number;
       if (pos < selected.inhale) { p = "inhale"; c = selected.inhale - pos; }
       else if (pos < selected.inhale + selected.hold1) { p = "hold1"; c = selected.inhale + selected.hold1 - pos; }
       else if (pos < selected.inhale + selected.hold1 + selected.exhale) { p = "exhale"; c = selected.inhale + selected.hold1 + selected.exhale - pos; }
       else { p = "hold2"; c = totalCycleTime - pos; }
+
+      // Play tone on phase transition
+      if (p !== lastPhase && soundEnabled) {
+        // Skip hold phases with 0 duration
+        const shouldPlay = (p === "hold1" && selected.hold1 > 0) ||
+                           (p === "hold2" && selected.hold2 > 0) ||
+                           p === "inhale" || p === "exhale";
+        if (shouldPlay) playPhaseTone(p, soundVolume);
+      }
+      lastPhase = p;
+
       setPhase(p); setCounter(c);
     };
     intervalRef.current = setInterval(tick, 1000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [running, selected, targetCycles, totalCycleTime]);
+  }, [running, selected, targetCycles, totalCycleTime, soundEnabled, soundVolume]);
 
   const stop = () => { setRunning(false); if (intervalRef.current) clearInterval(intervalRef.current); };
   const reset = () => { stop(); setPhase("idle"); setCounter(0); setCycles(0); setAiData(null); };
@@ -230,6 +253,26 @@ export default function SomaticBreathing() {
                     {running ? <><Pause className="w-4 h-4 mr-2" /> Pause</> : <><Play className="w-4 h-4 mr-2" /> Start</>}
                   </Button>
                   <Button onClick={reset} variant="outline" size="lg"><RotateCcw className="w-4 h-4" /></Button>
+                </div>
+                {/* Sound controls */}
+                <div className="flex items-center gap-3 w-full pt-1">
+                  <button
+                    onClick={() => setSoundEnabled(!soundEnabled)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    title={soundEnabled ? "Mute bowl tones" : "Enable bowl tones"}
+                  >
+                    {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  </button>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={soundEnabled ? soundVolume : 0}
+                    onChange={e => { setSoundVolume(Number(e.target.value)); setSoundEnabled(Number(e.target.value) > 0); }}
+                    className="flex-1 h-1.5 accent-accent cursor-pointer"
+                  />
+                  <span className="text-[10px] text-muted-foreground w-8">{soundEnabled ? `${Math.round(soundVolume * 100)}%` : "Off"}</span>
                 </div>
               </CardContent>
             </Card>
