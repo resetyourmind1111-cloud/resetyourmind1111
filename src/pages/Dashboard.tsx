@@ -39,15 +39,32 @@ export default function Dashboard() {
 
   const dailySlip = useMemo(() => getDailySlip(), []);
 
-  // Show welcome message after successful checkout
+  // Show welcome message after successful checkout and poll for subscription activation
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
       setShowWelcome(true);
-      // Clean URL
       searchParams.delete("checkout");
       setSearchParams(searchParams, { replace: true });
+
+      // Poll for subscription to be written by webhook (up to 30s)
+      if (user) {
+        let attempts = 0;
+        const poll = setInterval(async () => {
+          attempts++;
+          const { data } = await supabase
+            .from("subscriptions")
+            .select("status, tier")
+            .eq("user_id", user.id)
+            .eq("status", "active")
+            .maybeSingle();
+          if (data || attempts >= 10) {
+            clearInterval(poll);
+          }
+        }, 3000);
+        return () => clearInterval(poll);
+      }
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, user]);
 
   useEffect(() => {
     if (!authLoading && !user) {
