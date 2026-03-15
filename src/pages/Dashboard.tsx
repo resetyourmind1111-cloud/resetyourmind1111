@@ -132,7 +132,7 @@ export default function Dashboard() {
           {/* Welcome banner after successful checkout */}
           {showWelcome && (
             <div className="mb-6 p-6 rounded-2xl bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 border border-primary/30 relative">
-              <button
+           <button
                 onClick={() => setShowWelcome(false)}
                 className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors text-lg"
                 aria-label="Dismiss"
@@ -141,11 +141,15 @@ export default function Dashboard() {
               </button>
               <div className="flex items-center gap-3 mb-2">
                 <Sparkles className="w-6 h-6 text-primary" />
-                <h2 className="font-serif text-xl font-bold text-foreground">Welcome to your transformation! 🎉</h2>
+                <h2 className="font-serif text-xl font-bold text-foreground">
+                  Welcome to Reset Your Mind 1111™
+                </h2>
               </div>
-              <p className="text-muted-foreground">
-                Your subscription is being activated. It may take a moment to unlock all your features. 
-                Explore your dashboard while we set everything up — permission granted to begin.
+              <p className="font-serif text-lg text-foreground/90 italic mb-1">
+                Permission granted. Let's begin.
+              </p>
+              <p className="text-muted-foreground text-sm">
+                Your membership is activating now — features will unlock momentarily.
               </p>
             </div>
           )}
