@@ -178,6 +178,9 @@ export function AviniHealthProducts() {
           </a>
         </Button>
         <p className="text-xs text-muted-foreground mt-3">AVINIHEALTH.COM/LORIE — Affiliate Partner</p>
+        <p className="text-[10px] text-muted-foreground/70 mt-4 max-w-xl mx-auto leading-relaxed">
+          These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease.
+        </p>
       </motion.div>
 
       {/* Product Detail Modal */}

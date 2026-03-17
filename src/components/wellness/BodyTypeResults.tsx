@@ -119,6 +119,11 @@ export function BodyTypeResults({ profile, onRetake, onNavigateTab }: BodyTypeRe
             </div>
           </motion.div>
 
+          {/* FDA Disclaimer */}
+          <p className="text-[10px] text-muted-foreground/70 text-center max-w-xl mx-auto leading-relaxed">
+            These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease.
+          </p>
+
           {/* Retake */}
           <motion.div
             initial={{ opacity: 0 }}
