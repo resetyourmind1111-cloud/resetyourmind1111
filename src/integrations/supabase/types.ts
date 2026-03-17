@@ -242,6 +242,57 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_responses: {
+        Row: {
+          abundance_evidence: string | null
+          blocked_area: string | null
+          completed_at: string | null
+          created_at: string
+          emotional_state: string[] | null
+          future_self_answer: string | null
+          id: string
+          limiting_belief: string | null
+          new_belief: string | null
+          primary_focus: string | null
+          recommended_tools: string[] | null
+          secondary_focus: string | null
+          user_id: string
+          worth_score: number | null
+        }
+        Insert: {
+          abundance_evidence?: string | null
+          blocked_area?: string | null
+          completed_at?: string | null
+          created_at?: string
+          emotional_state?: string[] | null
+          future_self_answer?: string | null
+          id?: string
+          limiting_belief?: string | null
+          new_belief?: string | null
+          primary_focus?: string | null
+          recommended_tools?: string[] | null
+          secondary_focus?: string | null
+          user_id: string
+          worth_score?: number | null
+        }
+        Update: {
+          abundance_evidence?: string | null
+          blocked_area?: string | null
+          completed_at?: string | null
+          created_at?: string
+          emotional_state?: string[] | null
+          future_self_answer?: string | null
+          id?: string
+          limiting_belief?: string | null
+          new_belief?: string | null
+          primary_focus?: string | null
+          recommended_tools?: string[] | null
+          secondary_focus?: string | null
+          user_id?: string
+          worth_score?: number | null
+        }
+        Relationships: []
+      }
       oracle_cards: {
         Row: {
           affirmation: string
@@ -327,6 +378,7 @@ export type Database = {
           human_design_type: string | null
           id: string
           last_login: string | null
+          onboarding_complete: boolean | null
           phone: string | null
           profile_photo_url: string | null
           stripe_customer_id: string | null
@@ -344,6 +396,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           last_login?: string | null
+          onboarding_complete?: boolean | null
           phone?: string | null
           profile_photo_url?: string | null
           stripe_customer_id?: string | null
@@ -361,6 +414,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           last_login?: string | null
+          onboarding_complete?: boolean | null
           phone?: string | null
           profile_photo_url?: string | null
           stripe_customer_id?: string | null
