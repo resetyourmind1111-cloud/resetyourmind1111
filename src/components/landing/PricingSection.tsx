@@ -281,7 +281,8 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
                         className="h-full rounded-full"
                         style={{ background: "linear-gradient(90deg, hsl(43 52% 54%), hsl(43 52% 65%))" }}
                         initial={{ width: 0 }}
-                        animate={isInView ? { width: `${percentUsed}%` } : {}}
+                        whileInView={{ width: `${percentUsed}%` }}
+                        viewport={{ once: true }}
                         transition={{ duration: 1.2, delay: 0.6, ease: "easeOut" }}
                       />
                     </div>
