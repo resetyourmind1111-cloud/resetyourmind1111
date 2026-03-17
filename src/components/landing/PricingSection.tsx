@@ -91,7 +91,6 @@ const tiers = [
 
 function PricingCard({ tier, index, isAnnual, onCheckout }: { tier: typeof tiers[0]; index: number; isAnnual: boolean; onCheckout: (priceId: string, tierKey: string) => void }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const Icon = tier.icon;
 
   const displayPrice = isAnnual ? tier.annualMonthlyPrice : tier.monthlyPrice;
