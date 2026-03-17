@@ -171,6 +171,8 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const isSoldOut = spotsRemaining <= 0;
+  const spotsUsed = 111 - spotsRemaining;
+  const percentUsed = Math.round((spotsUsed / 111) * 100);
 
   return (
     <motion.div
@@ -178,59 +180,121 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: 0.5 }}
-      className="relative glass-card p-6 md:p-8 border-2 border-primary/50 max-w-lg mx-auto mt-12"
-      style={{ boxShadow: "0 0 30px hsl(43 52% 54% / 0.15)" }}
+      className="relative max-w-2xl mx-auto mt-16"
     >
-      <motion.div
-        className="absolute inset-0 rounded-[inherit] border-2 border-primary/30"
-        animate={{ opacity: [0.3, 0.8, 0.3] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {/* Section label */}
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <div className="h-px flex-1 max-w-[80px] bg-gradient-to-r from-transparent to-primary/40" />
+        <span className="text-xs font-semibold text-primary uppercase tracking-widest">Limited Offer</span>
+        <div className="h-px flex-1 max-w-[80px] bg-gradient-to-l from-transparent to-primary/40" />
+      </div>
 
-      <div className="relative text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 bg-primary/10 text-primary">
-          <Flame className="w-8 h-8" />
+      {/* Card with animated gold border */}
+      <div className="relative rounded-2xl p-[2px] overflow-hidden">
+        {/* Animated gold pulse border */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl"
+          style={{
+            background: "linear-gradient(135deg, hsl(43 52% 54% / 0.6), hsl(43 52% 70% / 0.3), hsl(43 52% 54% / 0.6))",
+          }}
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {/* Outer glow */}
+        <motion.div
+          className="absolute -inset-1 rounded-2xl blur-md"
+          style={{ background: "hsl(43 52% 54% / 0.12)" }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <div className="relative rounded-2xl bg-card p-8 md:p-10">
+          <div className="flex flex-col md:flex-row md:items-start gap-8">
+            {/* Left: Info */}
+            <div className="flex-1 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-4">
+                <Flame className="w-3.5 h-3.5" />
+                Never offered again
+              </div>
+              <h3 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">
+                Founding <span className="text-primary">111</span>
+              </h3>
+              <p className="text-muted-foreground text-sm mb-5 max-w-sm">
+                Full Embody-tier access — every tool, every future feature — locked in at the Reset price. Forever.
+              </p>
+
+              <div className="flex items-baseline justify-center md:justify-start gap-1 mb-1">
+                <span className="text-4xl md:text-5xl font-bold text-foreground">$44</span>
+                <span className="text-muted-foreground">/month</span>
+              </div>
+              <p className="text-xs text-primary font-medium mb-6">
+                Instead of $111/mo — locked in for life
+              </p>
+
+              <ul className="space-y-2.5 mb-6 text-left">
+                {[
+                  "Everything in the Embody tier",
+                  "$44/month locked in forever",
+                  "All current + future features included",
+                  "Founding member badge on your profile",
+                  "Listed on the Founding Wall",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary" />
+                    <span className="text-foreground text-sm">{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                className="w-full md:w-auto min-w-[220px]"
+                variant="hero"
+                size="lg"
+                disabled={isSoldOut}
+                onClick={() => onCheckout("price_1TAUzKC1ibVojXJKoehSnlnq", "FOUNDING")}
+              >
+                {isSoldOut ? "Sold Out" : "Claim Your Founding Spot"}
+              </Button>
+            </div>
+
+            {/* Right: Live counter */}
+            <div className="flex-shrink-0 w-full md:w-52">
+              <div className="rounded-xl bg-muted/50 border border-border p-5 text-center">
+                {isSoldOut ? (
+                  <p className="font-serif text-lg font-bold text-primary">SOLD OUT</p>
+                ) : (
+                  <>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Spots remaining</p>
+                    <motion.p
+                      key={spotsRemaining}
+                      initial={{ scale: 1.2, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="font-serif text-5xl font-bold text-primary mb-1"
+                    >
+                      {spotsRemaining}
+                    </motion.p>
+                    <p className="text-xs text-muted-foreground mb-4">of 111</p>
+
+                    {/* Progress bar */}
+                    <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: "linear-gradient(90deg, hsl(43 52% 54%), hsl(43 52% 65%))" }}
+                        initial={{ width: 0 }}
+                        animate={isInView ? { width: `${percentUsed}%` } : {}}
+                        transition={{ duration: 1.2, delay: 0.6, ease: "easeOut" }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">{percentUsed}% claimed</p>
+                  </>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground text-center mt-3 italic">
+                Cancel anytime — but the rate is gone forever
+              </p>
+            </div>
+          </div>
         </div>
-        <h3 className="font-serif text-2xl font-bold text-primary mb-1">
-          Founding 111 — Full Access
-        </h3>
-        <div className="flex items-baseline justify-center gap-1 mb-2">
-          <span className="text-4xl md:text-5xl font-bold text-foreground">$44</span>
-          <span className="text-muted-foreground">/month</span>
-        </div>
-        <p className="text-sm text-primary mb-1">Locked in for life</p>
-        <p className="text-sm text-muted-foreground mb-4">
-          Full Embody access at the Reset price. Only 111 spots. Never offered again.
-        </p>
-
-        <div className="mb-6 py-3 px-4 rounded-lg bg-primary/10 border border-primary/20">
-          {isSoldOut ? (
-            <p className="text-primary font-semibold">Founding 111 — SOLD OUT</p>
-          ) : (
-            <p className="text-primary font-semibold">
-              Only <span className="text-2xl">{spotsRemaining}</span> of 111 founding spots remaining
-            </p>
-          )}
-        </div>
-
-        <ul className="space-y-3 mb-8 text-left">
-          {["Everything in Embody tier", "$44/month locked in forever", "Full access to all current and future features", "Founding member badge and priority support"].map((f) => (
-            <li key={f} className="flex items-start gap-3">
-              <Check className="w-5 h-5 mt-0.5 flex-shrink-0 text-primary" />
-              <span className="text-foreground text-sm">{f}</span>
-            </li>
-          ))}
-        </ul>
-
-        <Button
-          className="w-full"
-          variant="hero"
-          size="lg"
-          disabled={isSoldOut}
-          onClick={() => onCheckout("price_1TAUzKC1ibVojXJKoehSnlnq", "FOUNDING")}
-        >
-          {isSoldOut ? "Sold Out" : "Claim Your Founding Spot"}
-        </Button>
       </div>
     </motion.div>
   );
