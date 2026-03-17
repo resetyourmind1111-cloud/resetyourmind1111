@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ThermostatType, calculateCategoryScores } from "@/data/thermostatTypes";
 import { 
   Thermometer, 
@@ -14,12 +16,21 @@ import {
   RefreshCw,
   Sparkles,
   Star,
+  Mail,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useState } from "react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const emailSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required").max(50),
+  email: z.string().trim().email("Please enter a valid email address").max(100),
+});
 
 interface AssessmentResultsProps {
   firstName: string;
