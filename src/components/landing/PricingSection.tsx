@@ -302,7 +302,6 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
 
 export function PricingSection() {
   const headerRef = useRef(null);
-  const isHeaderInView = useInView(headerRef, { once: true, margin: "-100px" });
   const [isAnnual, setIsAnnual] = useState(false);
   const [spotsRemaining, setSpotsRemaining] = useState(111);
   const { user } = useAuth();
