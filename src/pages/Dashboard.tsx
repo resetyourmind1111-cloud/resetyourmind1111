@@ -75,6 +75,25 @@ export default function Dashboard() {
     }
   }, [user, authLoading, navigate]);
 
+  // Check if user needs onboarding
+  useEffect(() => {
+    async function checkOnboarding() {
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("onboarding_complete")
+        .eq("user_id", user.id)
+        .single();
+      if (data && !(data as any).onboarding_complete) {
+        setShowOnboarding(true);
+      }
+      setOnboardingChecked(true);
+    }
+    if (user && !authLoading) {
+      checkOnboarding();
+    }
+  }, [user, authLoading]);
+
   useEffect(() => {
     async function fetchResults() {
       if (!user) return;
