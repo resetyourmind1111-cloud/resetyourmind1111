@@ -63,7 +63,7 @@ const tiers = [
   },
   {
     name: "Embody",
-    subtitle: "Premium Experience",
+    subtitle: "The Complete Reset",
     monthlyPrice: 111,
     annualMonthlyPrice: 83.25,
     annualTotal: 999,
