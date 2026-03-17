@@ -114,7 +114,7 @@ export function HeroSection() {
             transition={{ duration: 0.8, delay: 0.45 }}
             className="text-sm text-muted-foreground mt-4"
           >
-            25 questions • 3 minutes
+            25 questions • 3 minutes • Completely free — no credit card required
           </motion.p>
 
           {/* Trust Indicators */}
