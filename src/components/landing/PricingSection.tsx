@@ -227,7 +227,7 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
                 <span className="text-muted-foreground">/month</span>
               </div>
               <p className="text-xs text-primary font-medium mb-6">
-                Instead of $111/mo — locked in for life
+                Instead of $111/mo — yours as long as you stay
               </p>
 
               <ul className="space-y-2.5 mb-6 text-left">
