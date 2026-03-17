@@ -169,7 +169,6 @@ function PricingCard({ tier, index, isAnnual, onCheckout }: { tier: typeof tiers
 
 function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; onCheckout: (priceId: string, tierKey: string) => void }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const isSoldOut = spotsRemaining <= 0;
   const spotsUsed = 111 - spotsRemaining;
   const percentUsed = Math.round((spotsUsed / 111) * 100);
