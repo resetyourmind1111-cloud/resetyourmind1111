@@ -117,7 +117,7 @@ export const thermostatTypes: ThermostatType[] = [
     color: "from-emerald-400 to-emerald-600",
   },
   {
-    name: "The Rising Queen",
+    name: "The Rising Queen / King",
     scoreMin: 86,
     scoreMax: 105,
     percentageMin: 69,
