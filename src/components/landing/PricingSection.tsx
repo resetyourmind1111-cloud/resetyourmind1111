@@ -321,26 +321,36 @@ export function PricingSection() {
         </motion.div>
 
         {/* Billing Toggle */}
-        <div className="flex items-center justify-center gap-4 mb-12">
-          <span className={`text-sm font-medium transition-colors ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
-            Monthly
-          </span>
-          <button
-            onClick={() => setIsAnnual(!isAnnual)}
-            className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
-              isAnnual ? "bg-primary" : "bg-muted"
-            }`}
-          >
-            <div
-              className={`absolute top-0.5 w-6 h-6 rounded-full bg-foreground transition-transform duration-300 ${
-                isAnnual ? "translate-x-7" : "translate-x-0.5"
+        <div className="flex flex-col items-center gap-3 mb-12">
+          <div className="flex items-center gap-4">
+            <span className={`text-sm font-medium transition-colors ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
+              Monthly
+            </span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
+                isAnnual ? "bg-primary" : "bg-muted"
               }`}
-            />
-          </button>
-          <span className={`text-sm font-medium transition-colors ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
-            Annual
-            <span className="ml-1 text-xs text-primary">(Save up to 25%)</span>
-          </span>
+            >
+              <div
+                className={`absolute top-0.5 w-6 h-6 rounded-full bg-foreground transition-transform duration-300 ${
+                  isAnnual ? "translate-x-7" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+            <span className={`text-sm font-medium transition-colors ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
+              Annual
+            </span>
+          </div>
+          <motion.div
+            initial={false}
+            animate={{ opacity: isAnnual ? 1 : 0, y: isAnnual ? 0 : -4 }}
+            transition={{ duration: 0.3 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/15 border border-primary/25 text-primary text-xs font-semibold"
+          >
+            <Sparkles className="w-3 h-3" />
+            Save up to 25% — that's up to $333/year
+          </motion.div>
         </div>
 
         {/* Pricing Grid */}
