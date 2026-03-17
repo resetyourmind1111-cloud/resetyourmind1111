@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { Check, Star, Crown, Sparkles, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
