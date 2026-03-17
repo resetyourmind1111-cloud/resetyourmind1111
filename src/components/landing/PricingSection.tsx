@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { Check, Star, Crown, Sparkles, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -91,7 +90,6 @@ const tiers = [
 
 function PricingCard({ tier, index, isAnnual, onCheckout }: { tier: typeof tiers[0]; index: number; isAnnual: boolean; onCheckout: (priceId: string, tierKey: string) => void }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const Icon = tier.icon;
 
   const displayPrice = isAnnual ? tier.annualMonthlyPrice : tier.monthlyPrice;
@@ -101,7 +99,8 @@ function PricingCard({ tier, index, isAnnual, onCheckout }: { tier: typeof tiers
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: index * 0.15 }}
       className={`relative glass-card p-6 md:p-8 ${
         tier.popular 
@@ -169,7 +168,6 @@ function PricingCard({ tier, index, isAnnual, onCheckout }: { tier: typeof tiers
 
 function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; onCheckout: (priceId: string, tierKey: string) => void }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const isSoldOut = spotsRemaining <= 0;
   const spotsUsed = 111 - spotsRemaining;
   const percentUsed = Math.round((spotsUsed / 111) * 100);
@@ -178,7 +176,8 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: 0.5 }}
       className="relative max-w-2xl mx-auto mt-16"
     >
@@ -281,7 +280,8 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
                         className="h-full rounded-full"
                         style={{ background: "linear-gradient(90deg, hsl(43 52% 54%), hsl(43 52% 65%))" }}
                         initial={{ width: 0 }}
-                        animate={isInView ? { width: `${percentUsed}%` } : {}}
+                        whileInView={{ width: `${percentUsed}%` }}
+                        viewport={{ once: true }}
                         transition={{ duration: 1.2, delay: 0.6, ease: "easeOut" }}
                       />
                     </div>
@@ -302,7 +302,6 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
 
 export function PricingSection() {
   const headerRef = useRef(null);
-  const isHeaderInView = useInView(headerRef, { once: true, margin: "-100px" });
   const [isAnnual, setIsAnnual] = useState(false);
   const [spotsRemaining, setSpotsRemaining] = useState(111);
   const { user } = useAuth();
@@ -361,7 +360,8 @@ export function PricingSection() {
         <motion.div
           ref={headerRef}
           initial={{ opacity: 0, y: 30 }}
-          animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8 }}
           className="text-center max-w-3xl mx-auto mb-16"
         >
