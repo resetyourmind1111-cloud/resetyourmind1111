@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -36,6 +37,8 @@ export default function Dashboard() {
   const [results, setResults] = useState<AssessmentResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
 
   const dailySlip = useMemo(() => getDailySlip(), []);
 
@@ -71,6 +74,25 @@ export default function Dashboard() {
       navigate("/auth");
     }
   }, [user, authLoading, navigate]);
+
+  // Check if user needs onboarding
+  useEffect(() => {
+    async function checkOnboarding() {
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("onboarding_complete")
+        .eq("user_id", user.id)
+        .single();
+      if (data && !(data as any).onboarding_complete) {
+        setShowOnboarding(true);
+      }
+      setOnboardingChecked(true);
+    }
+    if (user && !authLoading) {
+      checkOnboarding();
+    }
+  }, [user, authLoading]);
 
   useEffect(() => {
     async function fetchResults() {
@@ -128,6 +150,18 @@ export default function Dashboard() {
   });
 
   if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={() => setShowOnboarding(false)} />;
+  }
+
+  if (!onboardingChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
