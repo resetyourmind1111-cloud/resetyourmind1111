@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ThermostatType, calculateCategoryScores } from "@/data/thermostatTypes";
 import { 
   Thermometer, 
@@ -14,12 +16,21 @@ import {
   RefreshCw,
   Sparkles,
   Star,
+  Mail,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useState } from "react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const emailSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required").max(50),
+  email: z.string().trim().email("Please enter a valid email address").max(100),
+});
 
 interface AssessmentResultsProps {
   firstName: string;
@@ -54,8 +65,52 @@ export function AssessmentResults({
   answers,
   onRetake,
 }: AssessmentResultsProps) {
+  const [emailFormName, setEmailFormName] = useState("");
+  const [emailFormEmail, setEmailFormEmail] = useState("");
+  const [emailErrors, setEmailErrors] = useState<{ firstName?: string; email?: string }>({});
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+
   const categoryScores = calculateCategoryScores(answers);
   const shareCardRef = useRef<HTMLDivElement>(null);
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailErrors({});
+    
+    const result = emailSchema.safeParse({ firstName: emailFormName, email: emailFormEmail });
+    if (!result.success) {
+      const fieldErrors: { firstName?: string; email?: string } = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0] === "firstName") fieldErrors.firstName = err.message;
+        if (err.path[0] === "email") fieldErrors.email = err.message;
+      });
+      setEmailErrors(fieldErrors);
+      return;
+    }
+
+    setEmailSending(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-assessment-email", {
+        body: {
+          firstName: result.data.firstName,
+          email: result.data.email,
+          thermostatType: thermostatType.name,
+          totalScore,
+          percentage,
+          categoryScores,
+        },
+      });
+      if (error) throw error;
+      setEmailSent(true);
+      toast.success("Your results have been sent to your inbox!");
+    } catch (err) {
+      console.error("Email send error:", err);
+      toast.error("Failed to send email. Please try again.");
+    } finally {
+      setEmailSending(false);
+    }
+  };
 
   const handleShareImage = useCallback(async () => {
     if (!shareCardRef.current) return;
@@ -334,6 +389,74 @@ export function AssessmentResults({
             <p className="text-center mt-6 text-sm opacity-40">resetyourmind1111.com</p>
           </div>
         </div>
+
+        {/* Email Capture — Get Your Full Reset Plan */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.3 }}
+          className="glass-card p-8 mb-8 border border-accent/30"
+        >
+          <div className="text-center mb-6">
+            <h3
+              className="font-serif text-2xl font-bold text-accent mb-3"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Get Your Full Reset Plan
+            </h3>
+            <p className="text-muted-foreground">
+              Enter your name and email to receive your complete Worth Thermostat results and personalized recalibration plan delivered straight to your inbox.
+            </p>
+          </div>
+
+          {emailSent ? (
+            <div className="text-center py-6">
+              <CheckCircle className="w-12 h-12 text-primary mx-auto mb-3" />
+              <p className="text-lg font-semibold text-foreground mb-1">Check your inbox!</p>
+              <p className="text-muted-foreground text-sm">Your personalized results email is on its way.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleEmailSubmit} className="space-y-4 max-w-sm mx-auto">
+              <div className="space-y-2">
+                <Label htmlFor="resetFirstName" className="text-foreground">First Name</Label>
+                <Input
+                  id="resetFirstName"
+                  type="text"
+                  placeholder="Your first name"
+                  value={emailFormName}
+                  onChange={(e) => setEmailFormName(e.target.value)}
+                  className={emailErrors.firstName ? "border-destructive" : ""}
+                />
+                {emailErrors.firstName && <p className="text-sm text-destructive">{emailErrors.firstName}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="resetEmail" className="text-foreground">Email Address</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    id="resetEmail"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={emailFormEmail}
+                    onChange={(e) => setEmailFormEmail(e.target.value)}
+                    className={`pl-10 ${emailErrors.email ? "border-destructive" : ""}`}
+                  />
+                </div>
+                {emailErrors.email && <p className="text-sm text-destructive">{emailErrors.email}</p>}
+              </div>
+              <Button
+                type="submit"
+                disabled={emailSending}
+                className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground py-6 text-lg font-semibold rounded-xl"
+              >
+                {emailSending ? "Sending..." : "Send My Reset Plan →"}
+              </Button>
+              <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+                <Lock className="w-3 h-3" /> No spam. Unsubscribe anytime.
+              </p>
+            </form>
+          )}
+        </motion.div>
 
         {/* Upgrade Section for Public Users */}
         <motion.div
