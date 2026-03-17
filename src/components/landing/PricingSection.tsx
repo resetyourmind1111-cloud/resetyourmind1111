@@ -308,14 +308,9 @@ export function PricingSection() {
             Choose Your{" "}
             <span className="gradient-text-gold">Transformation</span>
           </h2>
-          <p className="text-lg text-muted-foreground mb-2">
-            Discover your Worth Thermostat and recalibrate your life across the four areas that matter most:
-          </p>
-          <p className="font-serif text-xl text-primary mb-4">
-            Health. Wealth. Love. Leadership.
-          </p>
-          <p className="text-lg text-muted-foreground mb-2">
-            Transform the patterns that keep you settling for less and step into the life you were meant to live.
+          <p className="text-lg text-muted-foreground mb-4">
+            Every tier includes the Worth Thermostat Assessment, Permission Slips, and Human Design Analysis.
+            Pick the depth that matches where you are right now.
           </p>
           <p className="font-serif text-primary italic">Permission granted.</p>
         </motion.div>
