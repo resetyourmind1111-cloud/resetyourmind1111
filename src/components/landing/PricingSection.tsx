@@ -179,7 +179,8 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: 0.5 }}
       className="relative max-w-2xl mx-auto mt-16"
     >
