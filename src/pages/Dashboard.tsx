@@ -37,6 +37,8 @@ export default function Dashboard() {
   const [results, setResults] = useState<AssessmentResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
 
   const dailySlip = useMemo(() => getDailySlip(), []);
 
