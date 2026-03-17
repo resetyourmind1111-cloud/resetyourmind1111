@@ -219,7 +219,7 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
                 Founding <span className="text-primary">111</span>
               </h3>
               <p className="text-muted-foreground text-sm mb-5 max-w-sm">
-                Full Embody-tier access — every tool, every future feature — locked in at the Reset price. Forever.
+                Full Embody-tier access — every tool, every future feature — at the Reset price, as long as you stay.
               </p>
 
               <div className="flex items-baseline justify-center md:justify-start gap-1 mb-1">
