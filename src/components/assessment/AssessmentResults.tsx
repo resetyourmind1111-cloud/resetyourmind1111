@@ -65,8 +65,52 @@ export function AssessmentResults({
   answers,
   onRetake,
 }: AssessmentResultsProps) {
+  const [emailFormName, setEmailFormName] = useState("");
+  const [emailFormEmail, setEmailFormEmail] = useState("");
+  const [emailErrors, setEmailErrors] = useState<{ firstName?: string; email?: string }>({});
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+
   const categoryScores = calculateCategoryScores(answers);
   const shareCardRef = useRef<HTMLDivElement>(null);
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailErrors({});
+    
+    const result = emailSchema.safeParse({ firstName: emailFormName, email: emailFormEmail });
+    if (!result.success) {
+      const fieldErrors: { firstName?: string; email?: string } = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0] === "firstName") fieldErrors.firstName = err.message;
+        if (err.path[0] === "email") fieldErrors.email = err.message;
+      });
+      setEmailErrors(fieldErrors);
+      return;
+    }
+
+    setEmailSending(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-assessment-email", {
+        body: {
+          firstName: result.data.firstName,
+          email: result.data.email,
+          thermostatType: thermostatType.name,
+          totalScore,
+          percentage,
+          categoryScores,
+        },
+      });
+      if (error) throw error;
+      setEmailSent(true);
+      toast.success("Your results have been sent to your inbox!");
+    } catch (err) {
+      console.error("Email send error:", err);
+      toast.error("Failed to send email. Please try again.");
+    } finally {
+      setEmailSending(false);
+    }
+  };
 
   const handleShareImage = useCallback(async () => {
     if (!shareCardRef.current) return;
