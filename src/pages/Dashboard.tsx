@@ -157,6 +157,18 @@ export default function Dashboard() {
     );
   }
 
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={() => setShowOnboarding(false)} />;
+  }
+
+  if (!onboardingChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   const getTypeInfo = (typeKey: string): ThermostatType | undefined => {
     return thermostatTypes.find(t => t.name === typeKey);
   };
