@@ -233,7 +233,7 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
               <ul className="space-y-2.5 mb-6 text-left">
                 {[
                   "Everything in the Embody tier",
-                  "$44/month locked in forever",
+                  "$44/month rate kept while subscribed",
                   "All current + future features included",
                   "Founding member badge on your profile",
                   "Listed on the Founding Wall",
