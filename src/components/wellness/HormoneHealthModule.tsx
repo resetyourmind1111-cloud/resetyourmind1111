@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, Moon, Zap, Brain, Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { ArrowLeft, Heart, Moon, Zap, Brain, Sparkles, CheckCircle2 } from "lucide-react";
+import { useWellnessSectionProgress } from "@/hooks/useWellnessSectionProgress";
 import { MedicalDisclaimer } from "./MedicalDisclaimer";
 import { CredentialsBadge } from "./CredentialsBadge";
 import { AviniProductLink } from "./AviniProductLink";
