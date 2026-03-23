@@ -20,6 +20,13 @@ const sections = [
 
 export function HormoneHealthModule() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const { markRead, isSectionRead, progress, readCount } = useWellnessSectionProgress("hormone-health", sections.length);
+
+  useEffect(() => {
+    if (activeSection) {
+      markRead(activeSection);
+    }
+  }, [activeSection, markRead]);
 
   if (activeSection) {
     return (
