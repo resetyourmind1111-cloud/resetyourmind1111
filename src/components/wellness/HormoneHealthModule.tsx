@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, Moon, Zap, Brain, Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { ArrowLeft, Heart, Moon, Zap, Brain, Sparkles, CheckCircle2 } from "lucide-react";
+import { useWellnessSectionProgress } from "@/hooks/useWellnessSectionProgress";
 import { MedicalDisclaimer } from "./MedicalDisclaimer";
 import { CredentialsBadge } from "./CredentialsBadge";
 import { AviniProductLink } from "./AviniProductLink";
@@ -18,6 +20,13 @@ const sections = [
 
 export function HormoneHealthModule() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const { markRead, isSectionRead, progress, readCount } = useWellnessSectionProgress("hormone-health", sections.length);
+
+  useEffect(() => {
+    if (activeSection) {
+      markRead(activeSection);
+    }
+  }, [activeSection, markRead]);
 
   if (activeSection) {
     return (
@@ -64,9 +73,20 @@ export function HormoneHealthModule() {
 
       <CredentialsBadge />
 
+      <Card className="border-accent/20 bg-accent/5">
+        <CardContent className="pt-4 pb-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-medium text-foreground">Your Progress</p>
+            <p className="text-xs text-muted-foreground">{readCount} of {sections.length} sections read</p>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4">
         {sections.map((section, i) => {
           const Icon = section.icon;
+          const isRead = isSectionRead(section.id);
           return (
             <motion.div
               key={section.id}
@@ -75,12 +95,12 @@ export function HormoneHealthModule() {
               transition={{ delay: i * 0.08 }}
             >
               <Card
-                className="cursor-pointer hover:border-accent/30 transition-all duration-300 hover:shadow-md"
+                className={`cursor-pointer hover:border-accent/30 transition-all duration-300 hover:shadow-md ${isRead ? 'border-accent/20' : ''}`}
                 onClick={() => setActiveSection(section.id)}
               >
                 <CardHeader className="flex flex-row items-center gap-4 py-4">
-                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                    <Icon className="w-5 h-5 text-accent" />
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isRead ? 'bg-accent/20' : 'bg-accent/10'}`}>
+                    <Icon className={`w-5 h-5 ${isRead ? 'text-accent' : 'text-accent'}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-base font-semibold">{section.title}</CardTitle>
@@ -88,6 +108,9 @@ export function HormoneHealthModule() {
                       <Badge variant="secondary" className="mt-1 text-xs">{section.label}</Badge>
                     )}
                   </div>
+                  {isRead && (
+                    <CheckCircle2 className="w-5 h-5 text-accent shrink-0" />
+                  )}
                 </CardHeader>
               </Card>
             </motion.div>
