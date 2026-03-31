@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Lock, ChevronLeft, Play, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
