@@ -88,7 +88,7 @@ export default function EmotionalSurgery() {
     }
   }, [searchParams, selectedTrack]);
 
-
+  useEffect(() => {
     if (selectedLesson && selectedTrack) {
       const key = completionKey(selectedTrack.name, selectedLesson.number);
       const c = completions[key];
