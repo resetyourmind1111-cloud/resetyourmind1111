@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigation } from "@/components/Navigation";
 import { PastDueBanner } from "@/components/PastDueBanner";
+import { BottomNav } from "@/components/BottomNav";
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
