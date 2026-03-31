@@ -77,7 +77,18 @@ export default function EmotionalSurgery() {
       });
   }, [user]);
 
+  // Auto-select track from query param (from Home screen routing)
   useEffect(() => {
+    const moduleParam = searchParams.get("module");
+    if (moduleParam !== null && !selectedTrack) {
+      const idx = parseInt(moduleParam, 10);
+      if (!isNaN(idx) && idx >= 0 && idx < emotionalSurgeryTracks.length) {
+        setSelectedTrack(emotionalSurgeryTracks[idx]);
+      }
+    }
+  }, [searchParams, selectedTrack]);
+
+
     if (selectedLesson && selectedTrack) {
       const key = completionKey(selectedTrack.name, selectedLesson.number);
       const c = completions[key];
