@@ -36,6 +36,7 @@ function VideoPlaceholder({ label }: { label: string }) {
 
 export default function EmotionalSurgery() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [completions, setCompletions] = useState<Record<string, LessonCompletion>>({});
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
