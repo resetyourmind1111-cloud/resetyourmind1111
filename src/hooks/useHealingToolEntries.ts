@@ -35,7 +35,7 @@ export function useHealingToolEntries(toolId: string) {
       queryClient.invalidateQueries({ queryKey: ["healing-tool-entries", toolId] });
       toast.success("Entry saved");
     },
-    onError: () => toast.error("Failed to save entry"),
+    onError: (err) => { console.error("Failed to save healing entry:", err); toast.error("Failed to save entry"); },
   });
 
   const updateEntry = useMutation({
