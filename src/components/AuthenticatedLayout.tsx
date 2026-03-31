@@ -49,6 +49,7 @@ export function AuthenticatedLayout({ children, title, subtitle }: Authenticated
           {children}
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 }
