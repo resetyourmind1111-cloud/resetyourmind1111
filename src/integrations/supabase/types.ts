@@ -566,6 +566,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_checkins: {
+        Row: {
+          created_at: string
+          daily_state: string
+          id: string
+          routed_to_module: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_state: string
+          id?: string
+          routed_to_module: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_state?: string
+          id?: string
+          routed_to_module?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
