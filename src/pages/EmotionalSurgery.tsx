@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Lock, ChevronLeft, Play, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ function VideoPlaceholder({ label }: { label: string }) {
 
 export default function EmotionalSurgery() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [completions, setCompletions] = useState<Record<string, LessonCompletion>>({});
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
@@ -74,6 +76,17 @@ export default function EmotionalSurgery() {
         }
       });
   }, [user]);
+
+  // Auto-select track from query param (from Home screen routing)
+  useEffect(() => {
+    const moduleParam = searchParams.get("module");
+    if (moduleParam !== null && !selectedTrack) {
+      const idx = parseInt(moduleParam, 10);
+      if (!isNaN(idx) && idx >= 0 && idx < emotionalSurgeryTracks.length) {
+        setSelectedTrack(emotionalSurgeryTracks[idx]);
+      }
+    }
+  }, [searchParams, selectedTrack]);
 
   useEffect(() => {
     if (selectedLesson && selectedTrack) {
