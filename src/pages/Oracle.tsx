@@ -108,6 +108,7 @@ const Oracle = () => {
     });
 
     if (error) {
+      console.error('Failed to save reading:', error);
       toast.error('Failed to save reading.');
       return;
     }
