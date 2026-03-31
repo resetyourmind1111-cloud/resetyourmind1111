@@ -1,0 +1,1 @@
+ALTER TABLE public.card_pulls DROP CONSTRAINT card_pulls_reading_type_check;
