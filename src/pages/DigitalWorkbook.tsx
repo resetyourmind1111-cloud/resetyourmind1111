@@ -623,5 +623,3 @@ export default function DigitalWorkbook() {
   );
 }
 
-// Need to import useTrialStatus at usage point
-import { useTrialStatus } from "@/hooks/useTrialStatus";
