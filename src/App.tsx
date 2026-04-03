@@ -28,6 +28,9 @@ import EmotionalSurgery from "./pages/EmotionalSurgery";
 import EmotionalSurgeryModule from "./pages/EmotionalSurgeryModule";
 import Tools from "./pages/Tools";
 import Upgrade from "./pages/Upgrade";
+import SupportFlow from "./pages/SupportFlow";
+import SupportFlowCategory from "./pages/SupportFlowCategory";
+import SupportFlowComplete from "./pages/SupportFlowComplete";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
