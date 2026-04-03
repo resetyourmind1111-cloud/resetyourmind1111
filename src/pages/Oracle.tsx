@@ -279,6 +279,7 @@ const Oracle = () => {
             </motion.div>
           )}
         </AnimatePresence>
+        </TrialLockedContent>
       </main>
 
       <Footer />

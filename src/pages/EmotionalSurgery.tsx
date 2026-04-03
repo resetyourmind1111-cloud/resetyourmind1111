@@ -257,6 +257,7 @@ export default function EmotionalSurgery() {
           </motion.div>
         </div>
       </div>
+      </TrialLockedContent>
     </AuthenticatedLayout>
   );
 }

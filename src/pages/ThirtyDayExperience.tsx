@@ -342,16 +342,20 @@ export default function ThirtyDayExperience() {
                       {thirtyDayContent[(phase - 1) * 10].phaseSubtitle}
                     </p>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                      {thirtyDayContent.slice((phase - 1) * 10, phase * 10).map(day => (
-                        <DayCard
-                          key={day.day}
-                          day={day}
-                          progress={progressMap[day.day]}
-                          isToday={day.day === currentDay}
-                          isFuture={day.day > currentDay}
-                          onSelect={() => setSelectedDay(day.day)}
-                        />
-                      ))}
+                      {thirtyDayContent.slice((phase - 1) * 10, phase * 10).map(day => {
+                        const trialLocked = isTrialUser && day.day > 3;
+                        return (
+                          <TrialLockedContent key={day.day} isLocked={trialLocked}>
+                            <DayCard
+                              day={day}
+                              progress={progressMap[day.day]}
+                              isToday={!trialLocked && day.day === currentDay}
+                              isFuture={!trialLocked && day.day > currentDay}
+                              onSelect={() => !trialLocked && setSelectedDay(day.day)}
+                            />
+                          </TrialLockedContent>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
