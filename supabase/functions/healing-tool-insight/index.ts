@@ -49,6 +49,30 @@ const toolPrompts: Record<string, { system: string; buildUserPrompt: (data: any)
 {"validation": "a compassionate message validating what they're experiencing in this state", "bodyWisdom": "what their nervous system is trying to protect them from", "gentleAction": "one very gentle, body-based thing they can do right now (not advice to 'just relax')", "longerTerm": "one pattern to watch for that would indicate this state is becoming chronic"}`,
     buildUserPrompt: (d) => `Primary nervous system state: ${d.primaryState}. Secondary state: ${d.secondaryState || 'none'}. What they wrote about what triggered this: "${d.journalEntry || 'not specified'}". Score breakdown: Fight ${d.scores?.fight || 0}, Flight ${d.scores?.flight || 0}, Freeze ${d.scores?.freeze || 0}, Fawn ${d.scores?.fawn || 0}.`,
   },
+  "workbook-recognition": {
+    system: `You are a trauma-informed self-worth coach for women. Analyze their Recognition Deficit checklist to reveal deeper patterns, root wounds, and a compassionate path forward. Return ONLY JSON:
+{"dominantPattern": "the overarching pattern revealed by what they checked — name it clearly", "rootWound": "the deeper wound or belief driving most of these patterns", "blindSpot": "one pattern they may not realize connects to the others", "compassionateReframe": "a loving but honest reframe of what their checklist reveals", "nextStep": "one specific, gentle action they can take this week to begin shifting"}`,
+    buildUserPrompt: (d) => {
+      const checkedItems = d.checkedItems || [];
+      const total = d.totalItems || 22;
+      const notes = d.notes || "none";
+      return `Recognition Deficit checklist: ${checkedItems.length} of ${total} items flagged.\nFlagged items: ${checkedItems.join("; ")}.\nTheir written reflection: "${notes}".`;
+    },
+  },
+  "workbook-before-after": {
+    system: `You are a transformation coach who helps women see and celebrate their growth. Analyze their Before & After reflections to reveal the depth of their transformation. Return ONLY JSON:
+{"transformationTheme": "the central theme of their transformation in one powerful sentence", "biggestShift": "the single biggest mindset shift visible in their responses", "hiddenGrowth": "growth they may not fully recognize yet based on their language", "worthEvidence": "specific evidence from their words that proves their worth thermostat has risen", "celebrationMessage": "a deeply personal celebration message honoring their journey"}`,
+    buildUserPrompt: (d) => {
+      const pairs = d.pairs || [];
+      const pairText = pairs.map((p: any, i: number) => `Before: "${p.before}" → After: "${p.after}"`).join("\n");
+      return `Worth score change: ${d.scoreBefore || '?'} → ${d.scoreAfter || '?'}.\nBefore & After reflections:\n${pairText}`;
+    },
+  },
+  "workbook-love-response": {
+    system: `You are a compassionate self-love coach who helps women shift from fear-based to love-based responses. Analyze their scenario and coach them deeper. Return ONLY JSON:
+{"fearDecode": "what the fear response reveals about the wound or belief driving it", "loveValidation": "why their love response shows real growth and what it says about who they're becoming", "deeperLoveResponse": "an even more expanded version of their love response they might try", "bodyCheck": "where they might feel this shift in their body and what to do with that sensation", "affirmation": "a personalized affirmation for this specific situation"}`,
+    buildUserPrompt: (d) => `Situation: "${d.scenario}".\nFear-based response: "${d.fearResponse || 'not specified'}".\nLove-based response: "${d.loveResponse || 'not specified'}".`,
+  },
 };
 
 serve(async (req) => {
