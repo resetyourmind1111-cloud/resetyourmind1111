@@ -12,12 +12,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { healingTools } from "@/data/healingToolsData";
 import HealingToolsDashboard from "@/components/healing-tools/HealingToolsDashboard";
-import { useTrialStatus, TRIAL_ALLOWED_TOOLS } from "@/hooks/useTrialStatus";
+import { useTrialStatus, getTrialAllowedTools } from "@/hooks/useTrialStatus";
 
 export default function HealingTools() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { isTrialActive } = useTrialStatus();
+  const { isTrialActive, onboardingReason, trialTool1, trialTool2 } = useTrialStatus();
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
@@ -32,10 +32,10 @@ export default function HealingTools() {
   });
 
   const tier = profile?.subscription_tier || "free";
+  const allowedTools = getTrialAllowedTools(onboardingReason, trialTool1, trialTool2);
 
-  // During trial, show tools but gate non-trial ones
   const renderToolCard = (tool: typeof healingTools[0], index: number) => {
-    const isTrialTool = TRIAL_ALLOWED_TOOLS.includes(tool.id);
+    const isTrialTool = allowedTools.includes(tool.id);
     const isLockedDuringTrial = isTrialActive && tier === "free" && !isTrialTool;
 
     return (
@@ -46,7 +46,7 @@ export default function HealingTools() {
         transition={{ delay: index * 0.04 }}
       >
         <TrialLockedContent isLocked={isLockedDuringTrial}>
-          <Card className="glass-card-hover h-full flex flex-col">
+          <Card className={`glass-card-hover h-full flex flex-col ${isTrialTool && isTrialActive && tier === "free" ? "border-[#C9A84C]/40" : ""}`}>
             <CardContent className="p-6 flex flex-col flex-1">
               <div className="flex items-start justify-between mb-3">
                 <span className="text-3xl">{tool.icon}</span>
@@ -70,26 +70,45 @@ export default function HealingTools() {
     );
   };
 
-  // If trial is active and user is free, bypass the tier lock for the page itself
+  // Sort: unlocked tools first during trial
+  const sortedTools = isTrialActive && tier === "free"
+    ? [...healingTools].sort((a, b) => {
+        const aAllowed = allowedTools.includes(a.id) ? 0 : 1;
+        const bAllowed = allowedTools.includes(b.id) ? 0 : 1;
+        return aAllowed - bAllowed;
+      })
+    : healingTools;
+
   const shouldShowContent = isTrialActive && tier === "free";
 
   return (
     <AuthenticatedLayout title="Healing Tools" subtitle="20 powerful tools for deep emotional healing and transformation">
       {shouldShowContent ? (
-        <Tabs defaultValue="tools" className="w-full">
-          <TabsList className="mb-6 bg-muted/50">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="tools">All Tools</TabsTrigger>
-          </TabsList>
-          <TabsContent value="dashboard">
-            <HealingToolsDashboard />
-          </TabsContent>
-          <TabsContent value="tools">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {healingTools.map((tool, index) => renderToolCard(tool, index))}
-            </div>
-          </TabsContent>
-        </Tabs>
+        <>
+          {/* Trial banner */}
+          <div className="mb-6 p-4 rounded-xl bg-[#3D1A6E]/20 border border-[#3D1A6E]/30">
+            <p className="text-[#F9F6F0]/80 text-sm italic">
+              Your 2 preview tools are selected based on where you are right now.
+            </p>
+            <p className="text-muted-foreground text-xs mt-1">
+              Upgrade to unlock the full toolkit.
+            </p>
+          </div>
+          <Tabs defaultValue="tools" className="w-full">
+            <TabsList className="mb-6 bg-muted/50">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="tools">All Tools</TabsTrigger>
+            </TabsList>
+            <TabsContent value="dashboard">
+              <HealingToolsDashboard />
+            </TabsContent>
+            <TabsContent value="tools">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sortedTools.map((tool, index) => renderToolCard(tool, index))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </>
       ) : (
         <LockedContent requiredTier="expand" currentTier={tier}>
           <Tabs defaultValue="dashboard" className="w-full">

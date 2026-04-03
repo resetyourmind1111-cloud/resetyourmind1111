@@ -9,6 +9,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { BottomNav } from "@/components/BottomNav";
 import { PastDueBanner } from "@/components/PastDueBanner";
+import { TrialWelcomeFlow } from "@/components/trial/TrialWelcomeFlow";
+import { TrialWelcomeBanner } from "@/components/trial/TrialWelcomeBanner";
+import { DailyFeaturedCard } from "@/components/trial/DailyFeaturedCard";
+import { DailyPermissionSlipCard } from "@/components/trial/DailyPermissionSlipCard";
+import { Day7BottomBanner } from "@/components/trial/Day7BottomBanner";
+import { TrialDayBanner } from "@/components/TrialDayBanner";
+import { TrialExpiredOverlay } from "@/components/TrialExpiredOverlay";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
@@ -31,10 +39,12 @@ const dailyAffirmations = [
 export default function Home() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { isTrialActive, trialDay, onboardingReason, isLoading: trialLoading } = useTrialStatus();
   const [firstName, setFirstName] = useState<string | null>(null);
   const [streak, setStreak] = useState(0);
   const [lastModule, setLastModule] = useState<string | null>(null);
   const [tapping, setTapping] = useState<number | null>(null);
+  const [showWelcomeFlow, setShowWelcomeFlow] = useState(false);
 
   const dayOfWeek = new Date().getDay();
   const affirmation = dailyAffirmations[dayOfWeek];
@@ -46,28 +56,30 @@ export default function Home() {
     }
     if (!user) return;
 
-    // Fetch profile
     supabase
       .from("profiles")
-      .select("full_name, current_streak")
+      .select("full_name, current_streak, onboarding_reason")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
         if (data) {
-          setFirstName(data.full_name?.split(" ")[0] || null);
-          setStreak(data.current_streak || 0);
+          setFirstName((data as any).full_name?.split(" ")[0] || null);
+          setStreak((data as any).current_streak || 0);
+          // Show welcome flow if no onboarding_reason set yet (new user)
+          if (!(data as any).onboarding_reason) {
+            setShowWelcomeFlow(true);
+          }
         }
       });
 
-    // Fetch last check-in module
     supabase
-      .from("user_checkins" as any)
+      .from("user_checkins")
       .select("routed_to_module")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .then(({ data }: any) => {
-        if (data?.[0]) setLastModule(data[0].routed_to_module);
+      .then(({ data }) => {
+        if (data?.[0]) setLastModule((data[0] as any).routed_to_module);
       });
   }, [user, isLoading, navigate]);
 
@@ -76,19 +88,16 @@ export default function Home() {
     setTapping(index);
     const option = stateOptions[index];
 
-    // Save to Supabase
-    await supabase.from("user_checkins" as any).insert({
+    await supabase.from("user_checkins").insert({
       user_id: user.id,
       daily_state: option.label,
       routed_to_module: option.module,
-    } as any);
+    });
 
-    // Navigate to Emotional Surgery with the track index
-    // Map modules to track indices: the ES page uses track index from the emotionalSurgeryTracks array
     navigate(`/emotional-surgery?module=${index}`);
   };
 
-  if (isLoading) {
+  if (isLoading || trialLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
@@ -98,10 +107,19 @@ export default function Home() {
 
   if (!user) return null;
 
+  if (showWelcomeFlow) {
+    return (
+      <TrialWelcomeFlow onComplete={() => setShowWelcomeFlow(false)} />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <PastDueBanner />
+      <TrialWelcomeBanner />
+      <TrialDayBanner />
+      <TrialExpiredOverlay />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
           {/* Header */}
@@ -119,6 +137,14 @@ export default function Home() {
               Your transformation is not linear. Let's meet you where you are.
             </p>
           </motion.div>
+
+          {/* Daily Featured Card (trial) */}
+          {isTrialActive && (
+            <div className="mb-6 space-y-4">
+              <DailyFeaturedCard />
+              <DailyPermissionSlipCard />
+            </div>
+          )}
 
           {/* State Selector */}
           <div className="grid gap-3 mb-8">
@@ -188,8 +214,24 @@ export default function Home() {
               </div>
             </Card>
           </motion.div>
+
+          {/* Upgrade seed (subtle, during trial) */}
+          {isTrialActive && trialDay >= 1 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="mt-6 text-center"
+            >
+              <p className="text-muted-foreground text-xs">
+                Want to take this further? Your full reset is one step away.{" "}
+                <Link to="/upgrade" className="text-[#C9A84C] underline">See options</Link>
+              </p>
+            </motion.div>
+          )}
         </div>
       </main>
+      <Day7BottomBanner />
       <BottomNav />
     </div>
   );
