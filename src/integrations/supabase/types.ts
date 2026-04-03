@@ -416,57 +416,75 @@ export type Database = {
           body_type_completed_at: string | null
           created_at: string
           current_streak: number | null
+          founder_banner_dismissed_count: number
           full_name: string | null
           human_design_type: string | null
           id: string
           last_login: string | null
           onboarding_complete: boolean | null
+          onboarding_reason: string | null
           phone: string | null
           profile_photo_url: string | null
           stripe_customer_id: string | null
           subscription_tier: string | null
           total_points: number | null
+          trial_reflection_saved: boolean
           trial_start_date: string | null
+          trial_tool_1: string | null
+          trial_tool_2: string | null
           updated_at: string
           user_id: string
+          welcome_banner_dismissed: boolean
         }
         Insert: {
           body_type?: string | null
           body_type_completed_at?: string | null
           created_at?: string
           current_streak?: number | null
+          founder_banner_dismissed_count?: number
           full_name?: string | null
           human_design_type?: string | null
           id?: string
           last_login?: string | null
           onboarding_complete?: boolean | null
+          onboarding_reason?: string | null
           phone?: string | null
           profile_photo_url?: string | null
           stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
+          trial_reflection_saved?: boolean
           trial_start_date?: string | null
+          trial_tool_1?: string | null
+          trial_tool_2?: string | null
           updated_at?: string
           user_id: string
+          welcome_banner_dismissed?: boolean
         }
         Update: {
           body_type?: string | null
           body_type_completed_at?: string | null
           created_at?: string
           current_streak?: number | null
+          founder_banner_dismissed_count?: number
           full_name?: string | null
           human_design_type?: string | null
           id?: string
           last_login?: string | null
           onboarding_complete?: boolean | null
+          onboarding_reason?: string | null
           phone?: string | null
           profile_photo_url?: string | null
           stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
+          trial_reflection_saved?: boolean
           trial_start_date?: string | null
+          trial_tool_1?: string | null
+          trial_tool_2?: string | null
           updated_at?: string
           user_id?: string
+          welcome_banner_dismissed?: boolean
         }
         Relationships: []
       }
