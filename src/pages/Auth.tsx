@@ -93,7 +93,7 @@ export default function Auth() {
           return;
         }
       }
-      navigate("/dashboard");
+      navigate("/home");
     }
   }, [user, isLoading, navigate, view, searchParams]);
 
