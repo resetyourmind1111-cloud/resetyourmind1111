@@ -28,6 +28,7 @@ import EmotionalSurgery from "./pages/EmotionalSurgery";
 import EmotionalSurgeryModule from "./pages/EmotionalSurgeryModule";
 import Tools from "./pages/Tools";
 import Upgrade from "./pages/Upgrade";
+import DigitalWorkbook from "./pages/DigitalWorkbook";
 import SupportFlow from "./pages/SupportFlow";
 import SupportFlowCategory from "./pages/SupportFlowCategory";
 import SupportFlowComplete from "./pages/SupportFlowComplete";
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/30-day-experience" element={<ThirtyDayExperience />} />
             <Route path="/emotional-surgery" element={<EmotionalSurgery />} />
             <Route path="/tools" element={<Tools />} />
+            <Route path="/workbook" element={<DigitalWorkbook />} />
             <Route path="/upgrade" element={<Upgrade />} />
             <Route path="/support-flow" element={<SupportFlow />} />
             <Route path="/support-flow/complete" element={<SupportFlowComplete />} />

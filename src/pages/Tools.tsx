@@ -82,6 +82,14 @@ const tools: ToolDef[] = [
     category: "Abundance",
     route: "/healing-tools/abundance-evidence-log",
   },
+  {
+    id: "digital-workbook",
+    name: "Digital Workbook",
+    icon: "📖",
+    description: "Your transformation in writing. Four exercises that anchor your reset.",
+    category: "Mindset",
+    route: "/workbook",
+  },
 ];
 
 const shadowTools = [
