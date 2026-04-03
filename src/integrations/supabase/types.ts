@@ -572,6 +572,33 @@ export type Database = {
         }
         Relationships: []
       }
+      support_flow_outcomes: {
+        Row: {
+          created_at: string
+          entry_state: string
+          id: string
+          outcome: string | null
+          tool_used: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_state: string
+          id?: string
+          outcome?: string | null
+          tool_used: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_state?: string
+          id?: string
+          outcome?: string | null
+          tool_used?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       thirty_day_progress: {
         Row: {
           completed_at: string | null
