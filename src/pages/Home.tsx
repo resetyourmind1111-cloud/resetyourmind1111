@@ -17,6 +17,7 @@ import { Day7BottomBanner } from "@/components/trial/Day7BottomBanner";
 import { TrialDayBanner } from "@/components/TrialDayBanner";
 import { TrialExpiredOverlay } from "@/components/TrialExpiredOverlay";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { JourneyCheckinCard } from "@/components/journey/JourneyCheckinCard";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
