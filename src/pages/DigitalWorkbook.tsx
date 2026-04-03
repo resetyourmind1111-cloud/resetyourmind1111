@@ -735,6 +735,7 @@ function TransformationReportScreen() {
   const { user } = useAuth();
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Load saved report
