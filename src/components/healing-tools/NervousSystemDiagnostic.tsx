@@ -217,6 +217,8 @@ export default function NervousSystemDiagnostic() {
   const [journalText, setJournalText] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiGuide, setAiGuide] = useState<any>(null);
 
   const { data: history = [] } = useQuery({
     queryKey: ["nervous-system-checkins", user?.id],
