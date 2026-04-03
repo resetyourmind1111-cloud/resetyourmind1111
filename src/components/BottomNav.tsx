@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const tabs = [
   { label: "Home", icon: Home, href: "/home" },
   { label: "Emotional Surgery™", icon: Brain, href: "/emotional-surgery" },
-  { label: "Tools", icon: LayoutGrid, href: "/healing-tools" },
+  { label: "Tools", icon: LayoutGrid, href: "/tools" },
   { label: "Progress", icon: TrendingUp, href: "/my-progress" },
   { label: "Profile", icon: User, href: "/my-account" },
 ];
