@@ -25,6 +25,7 @@ import SavedReadings from "./pages/SavedReadings";
 import ThirtyDayExperience from "./pages/ThirtyDayExperience";
 import EmotionalSurgery from "./pages/EmotionalSurgery";
 import EmotionalSurgeryModule from "./pages/EmotionalSurgeryModule";
+import Tools from "./pages/Tools";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
