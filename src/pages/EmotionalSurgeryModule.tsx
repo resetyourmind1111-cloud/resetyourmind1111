@@ -13,6 +13,8 @@ import { LockedContent } from "@/components/LockedContent";
 import { useSubscription } from "@/hooks/useSubscription";
 import { emotionalSurgeryTracks, Lesson } from "@/data/emotionalSurgeryData";
 import { useToast } from "@/hooks/use-toast";
+import { moduleScreens } from "@/data/emotionalSurgeryModules";
+import ModuleScreen from "@/components/emotional-surgery/ModuleScreen";
 
 const MODULE_SLUG_MAP: Record<string, { lessonNumber: number; title: string }> = {
   recognition: { lessonNumber: 1, title: "Recognition" },
