@@ -47,6 +47,27 @@ export default function EnergyCordCutting() {
   const [preIntensity, setPreIntensity] = useState([5]);
   const [postIntensity, setPostIntensity] = useState([5]);
   const [journalReflection, setJournalReflection] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiGuide, setAiGuide] = useState<any>(null);
+
+  const handleAiGuide = async () => {
+    if (!person.trim()) return;
+    setIsAnalyzing(true);
+    setAiGuide(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "cord-cutting-guide", person, relationship, cordLocation, preFeelings, preIntensity: preIntensity[0] },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiGuide(data);
+      toast.success("Cord insight revealed ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get guidance");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const resetForm = () => {
     setPerson(""); setRelationship(""); setCordLocation(""); setLesson("");
