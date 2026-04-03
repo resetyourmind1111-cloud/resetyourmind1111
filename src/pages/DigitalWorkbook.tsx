@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, Lock } from "lucide-react";
+import { Check, Sparkles, Lock, Brain, Eye, Heart, Shield, AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { journeyWeeks } from "@/data/journeyData";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { toast as sonnerToast } from "sonner";
 
 // ─── Tier access logic ───
 const TIER_LEVEL: Record<string, number> = { free: 0, trial: 0.5, reset: 1, expand: 2, embody: 3, founding_full_access: 3 };
@@ -200,6 +201,8 @@ function RecognitionScreen() {
   const { toast } = useToast();
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [notes, setNotes] = useState("");
+  const [aiInsight, setAiInsight] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
@@ -214,7 +217,11 @@ function RecognitionScreen() {
       });
     supabase.from("healing_tool_entries").select("entry_data").eq("user_id", user.id).eq("tool_id", "workbook_recognition")
       .then(({ data }) => {
-        if (data?.[0]) setNotes((data[0] as any).entry_data?.notes || "");
+        if (data?.[0]) {
+          const d = (data[0] as any).entry_data;
+          setNotes(d?.notes || "");
+          if (d?.aiInsight) setAiInsight(d.aiInsight);
+        }
       });
   }, [user]);
 
@@ -242,19 +249,41 @@ function RecognitionScreen() {
       await supabase.from("healing_tool_entries").upsert({
         user_id: user.id,
         tool_id: "workbook_recognition",
-        entry_data: { notes } as any,
+        entry_data: { notes, aiInsight } as any,
       }, { onConflict: "user_id,tool_id" } as any);
     }, 1000);
-  }, [user, notes]);
+  }, [user, notes, aiInsight]);
 
   const saveReflection = async () => {
     if (!user) return;
     await supabase.from("healing_tool_entries").upsert({
       user_id: user.id,
       tool_id: "workbook_recognition",
-      entry_data: { notes } as any,
+      entry_data: { notes, aiInsight } as any,
     }, { onConflict: "user_id,tool_id" } as any);
     toast({ title: "Reflection saved ✨" });
+  };
+
+  const decodePatterns = async () => {
+    if (checkedItems.size === 0) { sonnerToast.error("Check at least one item first"); return; }
+    setAiLoading(true);
+    try {
+      const allItems = DEFICIT_CATEGORIES.flatMap(c => c.items);
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "workbook-recognition", checkedItems: Array.from(checkedItems), totalItems: allItems.length, notes },
+      });
+      if (error) throw error;
+      setAiInsight(data);
+      // Persist
+      if (user) {
+        await supabase.from("healing_tool_entries").upsert({
+          user_id: user.id,
+          tool_id: "workbook_recognition",
+          entry_data: { notes, aiInsight: data } as any,
+        }, { onConflict: "user_id,tool_id" } as any);
+      }
+    } catch (e) { console.error(e); sonnerToast.error("Could not generate insight"); }
+    setAiLoading(false);
   };
 
   return (
@@ -301,7 +330,37 @@ function RecognitionScreen() {
           className="min-h-[100px] bg-muted/30 border-border/30"
         />
       </div>
-      <Button onClick={saveReflection} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold">Save My Reflection →</Button>
+      <Button onClick={saveReflection} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold mb-4">Save My Reflection →</Button>
+
+      {/* AI Decode */}
+      <Button onClick={decodePatterns} disabled={aiLoading || checkedItems.size === 0} variant="outline" className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10 mb-4">
+        {aiLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Decoding your patterns...</> : <><Brain className="w-4 h-4 mr-2" />✨ Decode My Patterns</>}
+      </Button>
+
+      {aiInsight && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 mt-2">
+          <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+            <div className="flex items-start gap-2 mb-2"><Eye className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Dominant Pattern</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.dominantPattern}</p>
+          </Card>
+          <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+            <div className="flex items-start gap-2 mb-2"><Heart className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Root Wound</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.rootWound}</p>
+          </Card>
+          <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+            <div className="flex items-start gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Blind Spot</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.blindSpot}</p>
+          </Card>
+          <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+            <div className="flex items-start gap-2 mb-2"><Shield className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Compassionate Reframe</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.compassionateReframe}</p>
+          </Card>
+          <Card className="p-4 bg-emerald-500/5 border-emerald-500/20">
+            <div className="flex items-start gap-2 mb-2"><Sparkles className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Your Next Step</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.nextStep}</p>
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -317,6 +376,8 @@ function LoveResponseScreen() {
   const [loveResponse, setLoveResponse] = useState("");
   const [pastEntries, setPastEntries] = useState<any[]>([]);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
+  const [aiInsight, setAiInsight] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -326,16 +387,29 @@ function LoveResponseScreen() {
       });
   }, [user]);
 
+  const coachMe = async () => {
+    if (!scenario.trim()) { sonnerToast.error("Describe a situation first"); return; }
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "workbook-love-response", scenario, fearResponse, loveResponse },
+      });
+      if (error) throw error;
+      setAiInsight(data);
+    } catch (e) { console.error(e); sonnerToast.error("Could not generate coaching"); }
+    setAiLoading(false);
+  };
+
   const savePractice = async () => {
     if (!user || !scenario.trim()) return;
     const { data, error } = await supabase.from("healing_tool_entries").insert({
       user_id: user.id,
       tool_id: "workbook_love_response",
-      entry_data: { scenario, fearResponse, loveResponse } as any,
+      entry_data: { scenario, fearResponse, loveResponse, aiInsight } as any,
     }).select();
     if (!error && data) {
       setPastEntries(prev => [data[0], ...prev]);
-      setScenario(""); setFearResponse(""); setLoveResponse("");
+      setScenario(""); setFearResponse(""); setLoveResponse(""); setAiInsight(null);
       toast({ title: "Practice saved ✨" });
     }
   };
@@ -385,6 +459,36 @@ function LoveResponseScreen() {
             <Textarea value={loveResponse} onChange={e => setLoveResponse(e.target.value)} placeholder="Love would..." className="min-h-[60px] bg-muted/30 border-border/30" />
           </div>
         </div>
+
+        {/* AI Coach */}
+        <Button onClick={coachMe} disabled={aiLoading || !scenario.trim()} variant="outline" className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10 mb-4">
+          {aiLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Coaching you...</> : <><Brain className="w-4 h-4 mr-2" />✨ Coach Me Deeper</>}
+        </Button>
+
+        {aiInsight && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 mb-6">
+            <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+              <div className="flex items-start gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Fear Decoded</h4></div>
+              <p className="text-sm text-muted-foreground">{aiInsight.fearDecode}</p>
+            </Card>
+            <Card className="p-4 bg-emerald-500/5 border-emerald-500/20">
+              <div className="flex items-start gap-2 mb-2"><Heart className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Your Love Response Shows…</h4></div>
+              <p className="text-sm text-muted-foreground">{aiInsight.loveValidation}</p>
+            </Card>
+            <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+              <div className="flex items-start gap-2 mb-2"><Sparkles className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">An Even Deeper Love Response</h4></div>
+              <p className="text-sm text-muted-foreground italic">"{aiInsight.deeperLoveResponse}"</p>
+            </Card>
+            <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+              <div className="flex items-start gap-2 mb-2"><Eye className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Body Check</h4></div>
+              <p className="text-sm text-muted-foreground">{aiInsight.bodyCheck}</p>
+            </Card>
+            <div className="p-4 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-center">
+              <p className="text-sm text-foreground italic">"{aiInsight.affirmation}"</p>
+            </div>
+          </motion.div>
+        )}
+
         <Button onClick={savePractice} disabled={!scenario.trim()} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold">Save This Practice →</Button>
       </div>
 
@@ -409,6 +513,12 @@ function LoveResponseScreen() {
                       <div className="mt-3 space-y-2 text-xs">
                         <div><span className="font-bold text-red-400">Fear:</span> <span className="text-muted-foreground">{entry.entry_data?.fearResponse}</span></div>
                         <div><span className="font-bold text-[#C9A84C]">Love:</span> <span className="text-muted-foreground">{entry.entry_data?.loveResponse}</span></div>
+                        {entry.entry_data?.aiInsight && (
+                          <div className="mt-2 p-2 rounded-lg bg-purple-500/5 border border-purple-500/10">
+                            <p className="text-[10px] uppercase tracking-wider text-purple-400 mb-1">AI Coaching</p>
+                            <p className="text-muted-foreground">{entry.entry_data.aiInsight.affirmation}</p>
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   )}
@@ -432,11 +542,12 @@ function BeforeAfterScreen() {
   const [scoreAfter, setScoreAfter] = useState("");
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState(false);
+  const [aiInsight, setAiInsight] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     if (!user) return;
-    // Try loading from profiles first (auto-populated from journey)
     supabase.from("profiles").select("worth_score_before, worth_score_after, worth_score_day1, worth_score_day24").eq("user_id", user.id).single()
       .then(({ data }) => {
         if (data) {
@@ -450,6 +561,7 @@ function BeforeAfterScreen() {
         if (data?.[0]) {
           const d = (data[0] as any).entry_data;
           setResponses(d?.responses || {});
+          if (d?.aiInsight) setAiInsight(d.aiInsight);
         }
       });
   }, [user]);
@@ -463,10 +575,35 @@ function BeforeAfterScreen() {
       await supabase.from("healing_tool_entries").upsert({
         user_id: user.id,
         tool_id: "workbook_before_after",
-        entry_data: { responses: updated } as any,
+        entry_data: { responses: updated, aiInsight } as any,
       }, { onConflict: "user_id,tool_id" } as any);
     }, 1000);
-  }, [user, responses]);
+  }, [user, responses, aiInsight]);
+
+  const analyzeTransformation = async () => {
+    const pairs = BA_PROMPTS.map((p, i) => ({
+      before: responses[`before_${i}`] || "",
+      after: responses[`after_${i}`] || "",
+    })).filter(p => p.before || p.after);
+    if (pairs.length === 0) { sonnerToast.error("Fill in at least one Before & After pair first"); return; }
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "workbook-before-after", pairs, scoreBefore, scoreAfter },
+      });
+      if (error) throw error;
+      setAiInsight(data);
+      // Persist
+      if (user) {
+        await supabase.from("healing_tool_entries").upsert({
+          user_id: user.id,
+          tool_id: "workbook_before_after",
+          entry_data: { responses, aiInsight: data } as any,
+        }, { onConflict: "user_id,tool_id" } as any);
+      }
+    } catch (e) { console.error(e); sonnerToast.error("Could not analyze transformation"); }
+    setAiLoading(false);
+  };
 
   const saveAll = async () => {
     if (!user) return;
@@ -479,7 +616,7 @@ function BeforeAfterScreen() {
     await supabase.from("healing_tool_entries").upsert({
       user_id: user.id,
       tool_id: "workbook_before_after",
-      entry_data: { responses } as any,
+      entry_data: { responses, aiInsight } as any,
     }, { onConflict: "user_id,tool_id" } as any);
     setSaved(true);
     toast({ title: "Before & After saved ✨" });
@@ -546,10 +683,40 @@ function BeforeAfterScreen() {
         ))}
       </div>
 
-      <Button onClick={saveAll} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold">Save My Before & After →</Button>
+      <Button onClick={saveAll} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold mb-4">Save My Before & After →</Button>
+
+      {/* AI Transformation Analysis */}
+      <Button onClick={analyzeTransformation} disabled={aiLoading} variant="outline" className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10 mb-4">
+        {aiLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Analyzing your transformation...</> : <><Brain className="w-4 h-4 mr-2" />✨ Reveal My Transformation</>}
+      </Button>
+
+      {aiInsight && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 mb-4">
+          <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+            <div className="flex items-start gap-2 mb-2"><Sparkles className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Transformation Theme</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.transformationTheme}</p>
+          </Card>
+          <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+            <div className="flex items-start gap-2 mb-2"><Eye className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Biggest Shift</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.biggestShift}</p>
+          </Card>
+          <Card className="p-4 bg-emerald-500/5 border-emerald-500/20">
+            <div className="flex items-start gap-2 mb-2"><Shield className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Hidden Growth</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.hiddenGrowth}</p>
+          </Card>
+          <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+            <div className="flex items-start gap-2 mb-2"><Heart className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Worth Evidence</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.worthEvidence}</p>
+          </Card>
+          <div className="p-4 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-center">
+            <p className="text-xs uppercase tracking-wider text-[#C9A84C] mb-2">Your Celebration</p>
+            <p className="text-sm text-foreground italic">"{aiInsight.celebrationMessage}"</p>
+          </div>
+        </motion.div>
+      )}
 
       <AnimatePresence>
-        {saved && (
+        {saved && !aiInsight && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 p-4 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/20 text-center">
             <p className="text-sm text-foreground"><Sparkles className="w-4 h-4 inline mr-1 text-[#C9A84C]" />You just wrote the proof of your transformation.</p>
             <p className="text-xs text-muted-foreground italic mt-1">This is evidence. Come back and read it on hard days.</p>
