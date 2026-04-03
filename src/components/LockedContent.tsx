@@ -56,7 +56,7 @@ export function LockedContent({ children, requiredTier, currentTier }: LockedCon
           <p className="text-muted-foreground text-sm max-w-xs">
             This content is available with the {tierLabels[requiredTier]} plan and above.
           </p>
-          <Link to="/#pricing">
+          <Link to="/upgrade">
             <Button variant="gold" size="lg">
               Upgrade Now
             </Button>
