@@ -4,6 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navigation } from "@/components/Navigation";
 import { PastDueBanner } from "@/components/PastDueBanner";
 import { BottomNav } from "@/components/BottomNav";
+import { TrialDayBanner } from "@/components/TrialDayBanner";
+import { TrialExpiredOverlay } from "@/components/TrialExpiredOverlay";
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
