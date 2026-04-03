@@ -57,6 +57,7 @@ const App = () => (
             <Route path="/saved-readings" element={<SavedReadings />} />
             <Route path="/30-day-experience" element={<ThirtyDayExperience />} />
             <Route path="/emotional-surgery" element={<EmotionalSurgery />} />
+            <Route path="/module/:slug" element={<EmotionalSurgeryModule />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
