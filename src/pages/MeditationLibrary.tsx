@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { LockedContent } from "@/components/LockedContent";
+import { TrialLockedContent } from "@/components/TrialLockedContent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Headphones, Play, Clock, Lock } from "lucide-react";
@@ -8,6 +9,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
 const mindMeditations = Array.from({ length: 10 }, (_, i) => ({
   id: `mind-${i + 1}`,
