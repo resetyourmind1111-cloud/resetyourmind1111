@@ -185,6 +185,16 @@ export default function Home() {
             </Link>
           </motion.div>
 
+          {/* Journey Check-in Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.47 }}
+            className="mb-8"
+          >
+            <JourneyCheckinCard />
+          </motion.div>
+
           {/* Daily Snapshot Card */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
