@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, Lock } from "lucide-react";
+import { Check, Sparkles, Lock, Brain, Eye, Heart, Shield, AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { journeyWeeks } from "@/data/journeyData";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { toast as sonnerToast } from "sonner";
 
 // ─── Tier access logic ───
 const TIER_LEVEL: Record<string, number> = { free: 0, trial: 0.5, reset: 1, expand: 2, embody: 3, founding_full_access: 3 };
