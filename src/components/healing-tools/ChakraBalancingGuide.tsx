@@ -59,6 +59,26 @@ export default function ChakraBalancingGuide() {
   const [selectedChakra, setSelectedChakra] = useState<number | null>(null);
   const [journalText, setJournalText] = useState("");
   const [dailyCheckin, setDailyCheckin] = useState<Record<number, string>>({});
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsight, setAiInsight] = useState<any>(null);
+
+  const handleAiInsight = async () => {
+    setIsAnalyzing(true);
+    setAiInsight(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "chakra-insight", scores: chakraScores },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiInsight(data);
+      toast.success("Chakra insight revealed ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get insight");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleAnswer = (value: number) => {
     const newAnswers = [...answers];
