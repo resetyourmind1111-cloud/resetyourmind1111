@@ -28,6 +28,9 @@ import EmotionalSurgery from "./pages/EmotionalSurgery";
 import EmotionalSurgeryModule from "./pages/EmotionalSurgeryModule";
 import Tools from "./pages/Tools";
 import Upgrade from "./pages/Upgrade";
+import SupportFlow from "./pages/SupportFlow";
+import SupportFlowCategory from "./pages/SupportFlowCategory";
+import SupportFlowComplete from "./pages/SupportFlowComplete";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +66,9 @@ const App = () => (
             <Route path="/emotional-surgery" element={<EmotionalSurgery />} />
             <Route path="/tools" element={<Tools />} />
             <Route path="/upgrade" element={<Upgrade />} />
+            <Route path="/support-flow" element={<SupportFlow />} />
+            <Route path="/support-flow/complete" element={<SupportFlowComplete />} />
+            <Route path="/support-flow/:state" element={<SupportFlowCategory />} />
             <Route path="/module/:slug" element={<EmotionalSurgeryModule />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
