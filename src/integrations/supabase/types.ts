@@ -427,6 +427,7 @@ export type Database = {
           onboarding_reason: string | null
           phone: string | null
           profile_photo_url: string | null
+          recognition_deficit_count: number | null
           stripe_customer_id: string | null
           subscription_tier: string | null
           total_points: number | null
@@ -438,6 +439,8 @@ export type Database = {
           user_id: string
           user_source: string | null
           welcome_banner_dismissed: boolean
+          worth_score_after: number | null
+          worth_score_before: number | null
           worth_score_day1: number | null
           worth_score_day24: number | null
         }
@@ -457,6 +460,7 @@ export type Database = {
           onboarding_reason?: string | null
           phone?: string | null
           profile_photo_url?: string | null
+          recognition_deficit_count?: number | null
           stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
@@ -468,6 +472,8 @@ export type Database = {
           user_id: string
           user_source?: string | null
           welcome_banner_dismissed?: boolean
+          worth_score_after?: number | null
+          worth_score_before?: number | null
           worth_score_day1?: number | null
           worth_score_day24?: number | null
         }
@@ -487,6 +493,7 @@ export type Database = {
           onboarding_reason?: string | null
           phone?: string | null
           profile_photo_url?: string | null
+          recognition_deficit_count?: number | null
           stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
@@ -498,8 +505,34 @@ export type Database = {
           user_id?: string
           user_source?: string | null
           welcome_banner_dismissed?: boolean
+          worth_score_after?: number | null
+          worth_score_before?: number | null
           worth_score_day1?: number | null
           worth_score_day24?: number | null
+        }
+        Relationships: []
+      }
+      recognition_deficit_items: {
+        Row: {
+          checked: boolean
+          id: string
+          item_text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checked?: boolean
+          id?: string
+          item_text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checked?: boolean
+          id?: string
+          item_text?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
