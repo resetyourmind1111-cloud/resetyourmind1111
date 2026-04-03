@@ -27,6 +27,7 @@ import ThirtyDayExperience from "./pages/ThirtyDayExperience";
 import EmotionalSurgery from "./pages/EmotionalSurgery";
 import EmotionalSurgeryModule from "./pages/EmotionalSurgeryModule";
 import Tools from "./pages/Tools";
+import Upgrade from "./pages/Upgrade";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/30-day-experience" element={<ThirtyDayExperience />} />
             <Route path="/emotional-surgery" element={<EmotionalSurgery />} />
             <Route path="/tools" element={<Tools />} />
+            <Route path="/upgrade" element={<Upgrade />} />
             <Route path="/module/:slug" element={<EmotionalSurgeryModule />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
