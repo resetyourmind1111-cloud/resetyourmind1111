@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Sparkles, Loader2 } from "lucide-react";
 
 type NervousState = "fight" | "flight" | "freeze" | "fawn";
 
@@ -213,6 +215,8 @@ export default function NervousSystemDiagnostic() {
   const [journalText, setJournalText] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiGuide, setAiGuide] = useState<any>(null);
 
   const { data: history = [] } = useQuery({
     queryKey: ["nervous-system-checkins", user?.id],
@@ -280,6 +284,28 @@ export default function NervousSystemDiagnostic() {
     setSecondaryState(null);
     setJournalText("");
     setSaved(false);
+    setAiGuide(null);
+  };
+
+  const handleAiGuide = async () => {
+    if (!primaryState) return;
+    setIsAnalyzing(true);
+    setAiGuide(null);
+    try {
+      const counts: Record<NervousState, number> = { fight: 0, flight: 0, freeze: 0, fawn: 0 };
+      answers.forEach((s) => counts[s]++);
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "nervous-system-guide", primaryState, secondaryState, journalEntry: journalText, scores: counts },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiGuide(data);
+      toast.success("Personalized guidance ready ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get guidance");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   // SCREEN 1: Entry
@@ -447,6 +473,36 @@ export default function NervousSystemDiagnostic() {
             ))}
           </div>
         </motion.div>
+
+        <Button
+          onClick={handleAiGuide}
+          variant="outline"
+          className="w-full border-accent/30 text-accent hover:bg-accent/10"
+          disabled={isAnalyzing}
+        >
+          {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Getting personalized guidance...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Personalized Guidance for My State</>}
+        </Button>
+
+        {aiGuide && (
+          <Card className="border-accent/20 bg-accent/5">
+            <CardContent className="pt-4 space-y-3">
+              <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Personalized Guidance</p>
+              <p className="text-sm text-foreground">{aiGuide.validation}</p>
+              <div className="border-l-2 border-accent/30 pl-3">
+                <p className="text-xs text-muted-foreground font-semibold">What Your Body Is Protecting</p>
+                <p className="text-sm text-muted-foreground">{aiGuide.bodyWisdom}</p>
+              </div>
+              <div className="border-l-2 border-accent/30 pl-3">
+                <p className="text-xs text-muted-foreground font-semibold">Try This Now</p>
+                <p className="text-sm text-muted-foreground">{aiGuide.gentleAction}</p>
+              </div>
+              <div className="border-l-2 border-accent/30 pl-3">
+                <p className="text-xs text-muted-foreground font-semibold">Watch For</p>
+                <p className="text-sm text-muted-foreground">{aiGuide.longerTerm}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="flex justify-center">
           <Button variant="gold" size="lg" onClick={() => setScreen("save")}>

@@ -8,8 +8,10 @@ import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, DollarSign, TrendingUp, Sparkles } from "lucide-react";
+import { Plus, Trash2, DollarSign, TrendingUp, Sparkles, Loader2 } from "lucide-react";
 import { format, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function IncomeFrequencyTracker() {
   const { entries, saveEntry, deleteEntry } = useHealingToolEntries("income-frequency-tracker");
@@ -20,6 +22,8 @@ export default function IncomeFrequencyTracker() {
   const [unexpected, setUnexpected] = useState(false);
   const [celebration, setCelebration] = useState("");
   const [monthlyGoal, setMonthlyGoal] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsight, setAiInsight] = useState<any>(null);
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -31,6 +35,7 @@ export default function IncomeFrequencyTracker() {
 
     entries.forEach((e: any) => {
       const d = e.entry_data;
+      if (d.type === "goal") return;
       const amt = parseFloat(d.amount) || 0;
       total += amt;
       if (d.unexpected) unexpectedTotal += amt;
@@ -66,6 +71,37 @@ export default function IncomeFrequencyTracker() {
     if (!monthlyGoal) return;
     saveEntry.mutate({ type: "goal", goalAmount: monthlyGoal });
     setMonthlyGoal("");
+  };
+
+  const handleAiInsight = async () => {
+    if (incomeEntries.length === 0) {
+      toast.error("Log at least one income entry first");
+      return;
+    }
+    setIsAnalyzing(true);
+    setAiInsight(null);
+    try {
+      const sources = incomeEntries.slice(0, 5).map((e: any) => e.entry_data.source).join(", ");
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: {
+          toolType: "income-frequency",
+          total: stats.total,
+          thisMonth: stats.thisMonth,
+          unexpected: stats.unexpectedTotal,
+          entryCount: incomeEntries.length,
+          goal: currentGoal || null,
+          sources,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiInsight(data);
+      toast.success("Abundance insight revealed ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get insight");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -104,21 +140,38 @@ export default function IncomeFrequencyTracker() {
             <Plus className="w-4 h-4 mr-2" /> Log Income
           </Button>
         )}
+        <Button
+          onClick={handleAiInsight}
+          variant="outline"
+          className="border-accent/30 text-accent hover:bg-accent/10"
+          disabled={isAnalyzing || incomeEntries.length === 0}
+        >
+          {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Decode My Income Energy</>}
+        </Button>
         {!currentGoal && (
           <div className="flex gap-2 items-center">
-            <Input
-              type="number"
-              placeholder="Monthly goal..."
-              value={monthlyGoal}
-              onChange={(e) => setMonthlyGoal(e.target.value)}
-              className="w-40 bg-input border-border"
-            />
-            <Button variant="outline" size="sm" onClick={handleSaveGoal} disabled={!monthlyGoal}>
-              Set Goal
-            </Button>
+            <Input type="number" placeholder="Monthly goal..." value={monthlyGoal} onChange={(e) => setMonthlyGoal(e.target.value)} className="w-40 bg-input border-border" />
+            <Button variant="outline" size="sm" onClick={handleSaveGoal} disabled={!monthlyGoal}>Set Goal</Button>
           </div>
         )}
       </div>
+
+      {aiInsight && (
+        <Card className="glass-card border-accent/20 bg-accent/5">
+          <CardContent className="pt-5 space-y-3">
+            <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Abundance Insight</p>
+            <p className="text-sm text-foreground">{aiInsight.abundanceReflection}</p>
+            <div className="border-l-2 border-accent/30 pl-3">
+              <p className="text-xs text-muted-foreground font-semibold">Blind Spot</p>
+              <p className="text-sm text-muted-foreground">{aiInsight.blindSpot}</p>
+            </div>
+            <div className="border-l-2 border-accent/30 pl-3">
+              <p className="text-xs text-muted-foreground font-semibold">Amplify Action</p>
+              <p className="text-sm text-muted-foreground">{aiInsight.amplifyAction}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <AnimatePresence>
         {showForm && (

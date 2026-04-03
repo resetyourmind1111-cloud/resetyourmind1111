@@ -8,8 +8,10 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const chakras = [
   { name: "Root", color: "bg-red-500", sanskrit: "Muladhara", location: "Base of spine", element: "Earth", theme: "Safety, security, survival, grounding", balancedSign: "Feeling safe, stable, and grounded in your body and life", blockedSign: "Anxiety, fear, financial stress, feeling unrooted or disconnected from your body" },
@@ -57,6 +59,26 @@ export default function ChakraBalancingGuide() {
   const [selectedChakra, setSelectedChakra] = useState<number | null>(null);
   const [journalText, setJournalText] = useState("");
   const [dailyCheckin, setDailyCheckin] = useState<Record<number, string>>({});
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsight, setAiInsight] = useState<any>(null);
+
+  const handleAiInsight = async () => {
+    setIsAnalyzing(true);
+    setAiInsight(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "chakra-insight", scores: chakraScores },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiInsight(data);
+      toast.success("Chakra insight revealed ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get insight");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleAnswer = (value: number) => {
     const newAnswers = [...answers];
@@ -162,12 +184,41 @@ export default function ChakraBalancingGuide() {
                       </div>
                     ))}
                   </div>
-                  <div className="flex gap-3 mt-6">
+                  <div className="flex gap-3 mt-6 flex-wrap">
                     <Button onClick={saveAssessment} disabled={saveEntry.isPending} className="bg-accent text-accent-foreground hover:bg-accent/90">
                       {saveEntry.isPending ? "Saving..." : "Save Results"}
                     </Button>
-                    <Button variant="ghost" onClick={() => { setShowResults(false); setAssessmentStep(0); setAnswers(new Array(14).fill(0)); }}>Retake</Button>
+                    <Button
+                      onClick={handleAiInsight}
+                      variant="outline"
+                      className="border-accent/30 text-accent hover:bg-accent/10"
+                      disabled={isAnalyzing}
+                    >
+                      {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Decode My Energy</>}
+                    </Button>
+                    <Button variant="ghost" onClick={() => { setShowResults(false); setAssessmentStep(0); setAnswers(new Array(14).fill(0)); setAiInsight(null); }}>Retake</Button>
                   </div>
+                  {aiInsight && (
+                    <Card className="mt-4 border-accent/20 bg-accent/5">
+                      <CardContent className="pt-4 space-y-3">
+                        <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Energy Profile</p>
+                        <p className="text-sm text-foreground">{aiInsight.energyProfile}</p>
+                        <div className="border-l-2 border-accent/30 pl-3">
+                          <p className="text-xs text-accent font-semibold">Most Blocked: {aiInsight.mostBlocked?.chakra}</p>
+                          <p className="text-sm text-muted-foreground">{aiInsight.mostBlocked?.insight}</p>
+                          <p className="text-sm text-foreground mt-1">→ {aiInsight.mostBlocked?.healingAction}</p>
+                        </div>
+                        <div className="border-l-2 border-accent/30 pl-3">
+                          <p className="text-xs text-accent font-semibold">Strongest: {aiInsight.mostOpen?.chakra}</p>
+                          <p className="text-sm text-muted-foreground">{aiInsight.mostOpen?.insight}</p>
+                        </div>
+                        <div className="border-l-2 border-accent/30 pl-3">
+                          <p className="text-xs text-muted-foreground font-semibold">Connection Pattern</p>
+                          <p className="text-sm text-muted-foreground">{aiInsight.connectionPattern}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>

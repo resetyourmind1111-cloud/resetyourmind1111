@@ -8,7 +8,9 @@ import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Scissors, Heart, Sparkles } from "lucide-react";
+import { Plus, Trash2, Scissors, Heart, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { format } from "date-fns";
 
 const ritualSteps = [
@@ -45,6 +47,27 @@ export default function EnergyCordCutting() {
   const [preIntensity, setPreIntensity] = useState([5]);
   const [postIntensity, setPostIntensity] = useState([5]);
   const [journalReflection, setJournalReflection] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiGuide, setAiGuide] = useState<any>(null);
+
+  const handleAiGuide = async () => {
+    if (!person.trim()) return;
+    setIsAnalyzing(true);
+    setAiGuide(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "cord-cutting-guide", person, relationship, cordLocation, preFeelings, preIntensity: preIntensity[0] },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiGuide(data);
+      toast.success("Cord insight revealed ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get guidance");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const resetForm = () => {
     setPerson(""); setRelationship(""); setCordLocation(""); setLesson("");
@@ -124,6 +147,26 @@ export default function EnergyCordCutting() {
                     <Label className="text-foreground text-sm">Emotional intensity: {preIntensity[0]}/10</Label>
                     <Slider value={preIntensity} onValueChange={setPreIntensity} min={1} max={10} step={1} className="mt-2" />
                   </div>
+
+                  <Button
+                    onClick={handleAiGuide}
+                    variant="outline"
+                    className="w-full border-accent/30 text-accent hover:bg-accent/10 mb-2"
+                    disabled={!person.trim() || isAnalyzing}
+                  >
+                    {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Reading the cord...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Decode This Cord</>}
+                  </Button>
+
+                  {aiGuide && (
+                    <Card className="border-accent/20 bg-accent/5 mb-2">
+                      <CardContent className="pt-4 space-y-2">
+                        <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Cord Insight</p>
+                        <p className="text-sm text-foreground">{aiGuide.cordInsight}</p>
+                        {aiGuide.bodyWisdom && <p className="text-sm text-muted-foreground italic">Body: {aiGuide.bodyWisdom}</p>}
+                        {aiGuide.healingAffirmation && <p className="text-sm text-accent">"{aiGuide.healingAffirmation}"</p>}
+                      </CardContent>
+                    </Card>
+                  )}
 
                   <Button
                     onClick={() => setRitualStep(1)}
