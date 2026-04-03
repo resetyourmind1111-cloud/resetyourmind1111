@@ -49,6 +49,7 @@ export function useNotificationPreferences() {
         quiet_phase_alerts_enabled: data.quiet_phase_alerts_enabled,
         streak_protection_enabled: data.streak_protection_enabled,
         milestone_celebrations_enabled: data.milestone_celebrations_enabled,
+        weekly_coaching_enabled: data.weekly_coaching_enabled,
       } as NotificationPreferences;
     },
     enabled: !!user,
