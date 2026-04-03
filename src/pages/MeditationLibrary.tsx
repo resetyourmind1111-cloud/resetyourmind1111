@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { LockedContent } from "@/components/LockedContent";
+import { TrialLockedContent } from "@/components/TrialLockedContent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Headphones, Play, Clock, Lock } from "lucide-react";
@@ -8,6 +9,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
 const mindMeditations = Array.from({ length: 10 }, (_, i) => ({
   id: `mind-${i + 1}`,
@@ -74,40 +76,71 @@ export default function MeditationLibrary() {
   });
 
   const tier = profile?.subscription_tier || "free";
+  const { isTrialActive, trialExpired } = useTrialStatus();
+  const isTrialUser = isTrialActive || trialExpired;
 
   return (
     <AuthenticatedLayout title="Meditation Library" subtitle="34 guided meditations for mind, soul, and body">
       <Tabs defaultValue="mind" className="space-y-6">
         <TabsList className="bg-muted/50">
-          <TabsTrigger value="mind">🧠 Mind (10)</TabsTrigger>
+          <TabsTrigger value="mind">🧠 Mind ({isTrialUser ? "3 preview" : "10"})</TabsTrigger>
           <TabsTrigger value="soul">💜 Soul (12)</TabsTrigger>
           <TabsTrigger value="body">🧘 Body (12)</TabsTrigger>
         </TabsList>
 
         <TabsContent value="mind" className="space-y-3">
-          {mindMeditations.map((m, i) => (
+          {mindMeditations.slice(0, isTrialUser ? 3 : 10).map((m, i) => (
             <MeditationCard key={m.id} meditation={m} index={i} />
           ))}
+          {isTrialUser && (
+            <TrialLockedContent isLocked={true}>
+              <div className="space-y-3">
+                {mindMeditations.slice(3).map((m, i) => (
+                  <MeditationCard key={m.id} meditation={m} index={i} />
+                ))}
+              </div>
+            </TrialLockedContent>
+          )}
         </TabsContent>
 
         <TabsContent value="soul">
-          <LockedContent requiredTier="expand" currentTier={tier}>
-            <div className="space-y-3">
-              {soulMeditations.map((m, i) => (
-                <MeditationCard key={m.id} meditation={m} index={i} />
-              ))}
-            </div>
-          </LockedContent>
+          {isTrialUser ? (
+            <TrialLockedContent isLocked={true}>
+              <div className="space-y-3">
+                {soulMeditations.map((m, i) => (
+                  <MeditationCard key={m.id} meditation={m} index={i} />
+                ))}
+              </div>
+            </TrialLockedContent>
+          ) : (
+            <LockedContent requiredTier="expand" currentTier={tier}>
+              <div className="space-y-3">
+                {soulMeditations.map((m, i) => (
+                  <MeditationCard key={m.id} meditation={m} index={i} />
+                ))}
+              </div>
+            </LockedContent>
+          )}
         </TabsContent>
 
         <TabsContent value="body">
-          <LockedContent requiredTier="expand" currentTier={tier}>
-            <div className="space-y-3">
-              {bodyMeditations.map((m, i) => (
-                <MeditationCard key={m.id} meditation={m} index={i} />
-              ))}
-            </div>
-          </LockedContent>
+          {isTrialUser ? (
+            <TrialLockedContent isLocked={true}>
+              <div className="space-y-3">
+                {bodyMeditations.map((m, i) => (
+                  <MeditationCard key={m.id} meditation={m} index={i} />
+                ))}
+              </div>
+            </TrialLockedContent>
+          ) : (
+            <LockedContent requiredTier="expand" currentTier={tier}>
+              <div className="space-y-3">
+                {bodyMeditations.map((m, i) => (
+                  <MeditationCard key={m.id} meditation={m} index={i} />
+                ))}
+              </div>
+            </LockedContent>
+          )}
         </TabsContent>
       </Tabs>
     </AuthenticatedLayout>

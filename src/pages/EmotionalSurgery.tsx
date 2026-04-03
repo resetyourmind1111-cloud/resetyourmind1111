@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { useSubscription } from "@/hooks/useSubscription";
+import { TrialLockedContent } from "@/components/TrialLockedContent";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
 interface ModuleInfo {
   phase: number;
@@ -50,6 +52,8 @@ function hasTierAccess(userTier: string, requiredTier: string): boolean {
 export default function EmotionalSurgery() {
   const { user } = useAuth();
   const { effectiveTier, isLoading: tierLoading } = useSubscription();
+  const { isTrialActive, trialExpired } = useTrialStatus();
+  const isTrialUser = isTrialActive || trialExpired;
   const navigate = useNavigate();
 
   // Track completions per lesson_number across all tracks (4 tracks total)
@@ -94,6 +98,7 @@ export default function EmotionalSurgery() {
 
   return (
     <AuthenticatedLayout title="Emotional Surgery™">
+      <TrialLockedContent isLocked={isTrialUser}>
       <div className="min-h-screen pt-24 pb-32 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
@@ -252,6 +257,7 @@ export default function EmotionalSurgery() {
           </motion.div>
         </div>
       </div>
+      </TrialLockedContent>
     </AuthenticatedLayout>
   );
 }

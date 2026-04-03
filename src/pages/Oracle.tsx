@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 
 import { DeckSelector } from '@/components/oracle/DeckSelector';
 import { SpreadSelector } from '@/components/oracle/SpreadSelector';
+import { TrialLockedContent } from '@/components/TrialLockedContent';
+import { useTrialStatus } from '@/hooks/useTrialStatus';
 import { CardSpread } from '@/components/oracle/CardSpread';
 import { ReadingResults } from '@/components/oracle/ReadingResults';
 import { 
@@ -33,6 +35,8 @@ const Oracle = () => {
   const [pulledCards, setPulledCards] = useState<OracleCardType[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [subscriptionTier, setSubscriptionTier] = useState('free');
+  const { isTrialActive, trialExpired } = useTrialStatus();
+  const isTrialUser = isTrialActive || trialExpired;
 
   useEffect(() => {
     if (isLoading) return;
@@ -135,6 +139,7 @@ const Oracle = () => {
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
+        <TrialLockedContent isLocked={isTrialUser}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -274,6 +279,7 @@ const Oracle = () => {
             </motion.div>
           )}
         </AnimatePresence>
+        </TrialLockedContent>
       </main>
 
       <Footer />
