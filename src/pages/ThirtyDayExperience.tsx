@@ -133,6 +133,8 @@ function DayCard({ day, progress, isToday, isFuture, onSelect }: {
 export default function ThirtyDayExperience() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { isTrialActive, trialExpired } = useTrialStatus();
+  const isTrialUser = isTrialActive || trialExpired;
   const [progressMap, setProgressMap] = useState<Record<number, DayProgress>>({});
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [morningText, setMorningText] = useState("");
