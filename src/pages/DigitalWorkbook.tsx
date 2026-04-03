@@ -542,11 +542,12 @@ function BeforeAfterScreen() {
   const [scoreAfter, setScoreAfter] = useState("");
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState(false);
+  const [aiInsight, setAiInsight] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     if (!user) return;
-    // Try loading from profiles first (auto-populated from journey)
     supabase.from("profiles").select("worth_score_before, worth_score_after, worth_score_day1, worth_score_day24").eq("user_id", user.id).single()
       .then(({ data }) => {
         if (data) {
@@ -560,6 +561,7 @@ function BeforeAfterScreen() {
         if (data?.[0]) {
           const d = (data[0] as any).entry_data;
           setResponses(d?.responses || {});
+          if (d?.aiInsight) setAiInsight(d.aiInsight);
         }
       });
   }, [user]);
@@ -573,10 +575,35 @@ function BeforeAfterScreen() {
       await supabase.from("healing_tool_entries").upsert({
         user_id: user.id,
         tool_id: "workbook_before_after",
-        entry_data: { responses: updated } as any,
+        entry_data: { responses: updated, aiInsight } as any,
       }, { onConflict: "user_id,tool_id" } as any);
     }, 1000);
-  }, [user, responses]);
+  }, [user, responses, aiInsight]);
+
+  const analyzeTransformation = async () => {
+    const pairs = BA_PROMPTS.map((p, i) => ({
+      before: responses[`before_${i}`] || "",
+      after: responses[`after_${i}`] || "",
+    })).filter(p => p.before || p.after);
+    if (pairs.length === 0) { sonnerToast.error("Fill in at least one Before & After pair first"); return; }
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "workbook-before-after", pairs, scoreBefore, scoreAfter },
+      });
+      if (error) throw error;
+      setAiInsight(data);
+      // Persist
+      if (user) {
+        await supabase.from("healing_tool_entries").upsert({
+          user_id: user.id,
+          tool_id: "workbook_before_after",
+          entry_data: { responses, aiInsight: data } as any,
+        }, { onConflict: "user_id,tool_id" } as any);
+      }
+    } catch (e) { console.error(e); sonnerToast.error("Could not analyze transformation"); }
+    setAiLoading(false);
+  };
 
   const saveAll = async () => {
     if (!user) return;
@@ -589,7 +616,7 @@ function BeforeAfterScreen() {
     await supabase.from("healing_tool_entries").upsert({
       user_id: user.id,
       tool_id: "workbook_before_after",
-      entry_data: { responses } as any,
+      entry_data: { responses, aiInsight } as any,
     }, { onConflict: "user_id,tool_id" } as any);
     setSaved(true);
     toast({ title: "Before & After saved ✨" });
@@ -656,10 +683,40 @@ function BeforeAfterScreen() {
         ))}
       </div>
 
-      <Button onClick={saveAll} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold">Save My Before & After →</Button>
+      <Button onClick={saveAll} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold mb-4">Save My Before & After →</Button>
+
+      {/* AI Transformation Analysis */}
+      <Button onClick={analyzeTransformation} disabled={aiLoading} variant="outline" className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10 mb-4">
+        {aiLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Analyzing your transformation...</> : <><Brain className="w-4 h-4 mr-2" />✨ Reveal My Transformation</>}
+      </Button>
+
+      {aiInsight && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 mb-4">
+          <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+            <div className="flex items-start gap-2 mb-2"><Sparkles className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Transformation Theme</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.transformationTheme}</p>
+          </Card>
+          <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+            <div className="flex items-start gap-2 mb-2"><Eye className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Biggest Shift</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.biggestShift}</p>
+          </Card>
+          <Card className="p-4 bg-emerald-500/5 border-emerald-500/20">
+            <div className="flex items-start gap-2 mb-2"><Shield className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Hidden Growth</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.hiddenGrowth}</p>
+          </Card>
+          <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+            <div className="flex items-start gap-2 mb-2"><Heart className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Worth Evidence</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.worthEvidence}</p>
+          </Card>
+          <div className="p-4 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-center">
+            <p className="text-xs uppercase tracking-wider text-[#C9A84C] mb-2">Your Celebration</p>
+            <p className="text-sm text-foreground italic">"{aiInsight.celebrationMessage}"</p>
+          </div>
+        </motion.div>
+      )}
 
       <AnimatePresence>
-        {saved && (
+        {saved && !aiInsight && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 p-4 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/20 text-center">
             <p className="text-sm text-foreground"><Sparkles className="w-4 h-4 inline mr-1 text-[#C9A84C]" />You just wrote the proof of your transformation.</p>
             <p className="text-xs text-muted-foreground italic mt-1">This is evidence. Come back and read it on hard days.</p>
