@@ -144,6 +144,20 @@ export default function Home() {
             ))}
           </div>
 
+          {/* Support Flow Entry */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="mb-8"
+          >
+            <Link to="/support-flow">
+              <Button className="w-full bg-[#3D1A6E] text-[#C9A84C] hover:bg-[#3D1A6E]/90 font-serif font-semibold text-base py-6 rounded-xl">
+                What Do You Need Right Now?
+              </Button>
+            </Link>
+          </motion.div>
+
           {/* Daily Snapshot Card */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
