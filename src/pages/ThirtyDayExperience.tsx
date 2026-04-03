@@ -9,7 +9,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { LockedContent } from "@/components/LockedContent";
+import { TrialLockedContent } from "@/components/TrialLockedContent";
 import { thirtyDayContent, DayContent } from "@/data/thirtyDayExperienceData";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useToast } from "@/hooks/use-toast";
 
 const dailyAffirmations = [
