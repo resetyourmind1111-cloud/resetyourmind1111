@@ -52,6 +52,8 @@ function hasTierAccess(userTier: string, requiredTier: string): boolean {
 export default function EmotionalSurgery() {
   const { user } = useAuth();
   const { effectiveTier, isLoading: tierLoading } = useSubscription();
+  const { isTrialActive, trialExpired } = useTrialStatus();
+  const isTrialUser = isTrialActive || trialExpired;
   const navigate = useNavigate();
 
   // Track completions per lesson_number across all tracks (4 tracks total)
