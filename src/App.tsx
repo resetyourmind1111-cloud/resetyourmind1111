@@ -19,6 +19,7 @@ import HealingToolPage from "./pages/HealingToolPage";
 import HumanDesign from "./pages/HumanDesign";
 import Manifesto from "./pages/Manifesto";
 import MyProgress from "./pages/MyProgress";
+import Progress from "./pages/Progress";
 import MyAccount from "./pages/MyAccount";
 import WellnessHub from "./pages/WellnessHub";
 import SavedReadings from "./pages/SavedReadings";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/human-design" element={<HumanDesign />} />
             <Route path="/manifesto" element={<Manifesto />} />
             <Route path="/my-progress" element={<MyProgress />} />
+            <Route path="/progress" element={<Progress />} />
             <Route path="/my-account" element={<MyAccount />} />
             <Route path="/wellness" element={<WellnessHub />} />
             <Route path="/saved-readings" element={<SavedReadings />} />
