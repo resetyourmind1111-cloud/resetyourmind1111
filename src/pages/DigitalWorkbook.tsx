@@ -729,6 +729,251 @@ function BeforeAfterScreen() {
 }
 
 // ═════════════════════════════════════════════════════════════════
+// SCREEN 5 — AI Transformation Report
+// ═════════════════════════════════════════════════════════════════
+function TransformationReportScreen() {
+  const { user } = useAuth();
+  const [report, setReport] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Load saved report
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("healing_tool_entries").select("entry_data").eq("user_id", user.id).eq("tool_id", "workbook_transformation_report")
+      .then(({ data }) => {
+        if (data?.[0]) {
+          const d = (data[0] as any).entry_data;
+          if (d?.report) setReport(d.report);
+        }
+      });
+  }, [user]);
+
+  const generateReport = async () => {
+    if (!user) return;
+    setLoading(true);
+    setError("");
+
+    try {
+      // Gather all data in parallel
+      const [profileRes, deficitRes, beforeAfterRes, loveRes, journeyRes, toolsRes, checkinsRes, assessmentRes] = await Promise.all([
+        supabase.from("profiles").select("full_name, current_streak, total_points, journey_current_day, recognition_deficit_count, worth_score_before, worth_score_after, worth_score_day1, worth_score_day24").eq("user_id", user.id).single(),
+        supabase.from("recognition_deficit_items" as any).select("item_text, checked").eq("user_id", user.id),
+        supabase.from("healing_tool_entries").select("entry_data").eq("user_id", user.id).eq("tool_id", "workbook_before_after"),
+        supabase.from("healing_tool_entries").select("entry_data, created_at").eq("user_id", user.id).eq("tool_id", "workbook_love_response").order("created_at", { ascending: false }).limit(5),
+        supabase.from("thirty_day_progress").select("day_number, marked_complete").eq("user_id", user.id),
+        supabase.from("healing_tool_entries").select("tool_id").eq("user_id", user.id),
+        supabase.from("user_checkins").select("daily_state").eq("user_id", user.id).order("created_at", { ascending: false }).limit(30),
+        supabase.from("assessment_results").select("percentage_score, thermostat_type, completed_at").eq("user_id", user.id).order("completed_at", { ascending: false }).limit(5),
+      ]);
+
+      const profile = profileRes.data ? {
+        fullName: (profileRes.data as any).full_name,
+        streak: (profileRes.data as any).current_streak,
+        points: (profileRes.data as any).total_points,
+        journeyDay: (profileRes.data as any).journey_current_day,
+      } : null;
+
+      // Recognition deficit
+      const deficitItems = (deficitRes.data as any[] || []);
+      const checkedItems = deficitItems.filter((d: any) => d.checked).map((d: any) => d.item_text);
+      const allDeficitItems = DEFICIT_CATEGORIES.flatMap(c => c.items);
+
+      // Categorize checked items
+      const catCounts: Record<string, number> = {};
+      DEFICIT_CATEGORIES.forEach(cat => {
+        const count = cat.items.filter(i => checkedItems.includes(i)).length;
+        if (count > 0) catCounts[cat.title] = count;
+      });
+      const topCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).map(([k]) => k).join(", ");
+
+      const recognitionDeficit = checkedItems.length > 0 ? {
+        checkedCount: checkedItems.length,
+        totalItems: allDeficitItems.length,
+        topCategories: topCats,
+        checkedItems: checkedItems.slice(0, 10),
+      } : null;
+
+      // Before/After
+      const baData = beforeAfterRes.data?.[0] ? (beforeAfterRes.data[0] as any).entry_data : null;
+      const beforeAfter = baData ? {
+        scoreBefore: (profileRes.data as any)?.worth_score_before ?? (profileRes.data as any)?.worth_score_day1,
+        scoreAfter: (profileRes.data as any)?.worth_score_after ?? (profileRes.data as any)?.worth_score_day24,
+        pairs: BA_PROMPTS.map((p, i) => ({
+          before: baData.responses?.[`before_${i}`] || "",
+          after: baData.responses?.[`after_${i}`] || "",
+        })),
+      } : null;
+
+      // Love responses
+      const loveResponses = (loveRes.data || []).map((e: any) => e.entry_data);
+
+      // Journey
+      const completedDays = (journeyRes.data || []).filter((d: any) => d.marked_complete).length;
+      const journeyProgress = { completedDays, currentPhase: completedDays <= 7 ? "Recognition" : completedDays <= 14 ? "Release" : completedDays <= 21 ? "Quiet Phase" : "Recalibration" };
+
+      // Unique tools
+      const toolsUsed = [...new Set((toolsRes.data || []).map((t: any) => t.tool_id))].filter(t => !t.startsWith("workbook_"));
+
+      // Check-in states
+      const checkinStates = (checkinsRes.data || []).map((c: any) => c.daily_state);
+
+      // Assessments
+      const assessmentScores = (assessmentRes.data || []).map((a: any) => ({
+        score: a.percentage_score,
+        type: a.thermostat_type,
+        date: new Date(a.completed_at).toLocaleDateString(),
+      }));
+
+      const { data, error: fnError } = await supabase.functions.invoke("transformation-report", {
+        body: {
+          profile,
+          recognitionDeficit,
+          beforeAfter,
+          loveResponses,
+          journeyProgress,
+          toolsUsed,
+          checkinStates,
+          assessmentScores,
+        },
+      });
+
+      if (fnError) throw fnError;
+      setReport(data);
+
+      // Persist
+      await supabase.from("healing_tool_entries").upsert({
+        user_id: user.id,
+        tool_id: "workbook_transformation_report",
+        entry_data: { report: data, generatedAt: new Date().toISOString() } as any,
+      }, { onConflict: "user_id,tool_id" } as any);
+
+    } catch (e: any) {
+      console.error(e);
+      setError(e.message || "Failed to generate report");
+      sonnerToast.error("Could not generate report");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <h2 className="font-serif text-2xl font-bold text-foreground mb-1">Your Transformation Report</h2>
+      <p className="text-sm text-muted-foreground italic mb-6">AI-powered analysis of your entire healing journey — every tool, every reflection, every shift.</p>
+
+      {!report && !loading && (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#C9A84C]/10 border border-[#C9A84C]/20 flex items-center justify-center">
+            <FileText className="w-8 h-8 text-[#C9A84C]" />
+          </div>
+          <p className="text-sm text-muted-foreground mb-2">This report analyzes your Recognition Deficit, Before & After reflections,<br/>Love Response practices, healing tools, check-ins, and assessment scores.</p>
+          <p className="text-xs text-muted-foreground italic mb-6">The more you've completed, the deeper your report will be.</p>
+          <Button onClick={generateReport} className="bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold px-8">
+            <Brain className="w-4 h-4 mr-2" />Generate My Report
+          </Button>
+        </div>
+      )}
+
+      {loading && (
+        <div className="text-center py-16">
+          <Loader2 className="w-8 h-8 text-[#C9A84C] animate-spin mx-auto mb-4" />
+          <p className="text-sm text-foreground font-medium">Analyzing your entire journey…</p>
+          <p className="text-xs text-muted-foreground mt-1">Reading your reflections, patterns, and growth across all tools.</p>
+        </div>
+      )}
+
+      {error && !loading && (
+        <div className="text-center py-8">
+          <p className="text-sm text-destructive mb-4">{error}</p>
+          <Button onClick={generateReport} variant="outline">Try Again</Button>
+        </div>
+      )}
+
+      {report && !loading && (
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+          {/* Report Title */}
+          <div className="text-center py-6 rounded-xl bg-gradient-to-b from-[#C9A84C]/10 to-transparent border border-[#C9A84C]/20">
+            <Sparkles className="w-6 h-6 text-[#C9A84C] mx-auto mb-2" />
+            <h3 className="font-serif text-xl font-bold text-foreground">{report.reportTitle}</h3>
+          </div>
+
+          {/* Summary */}
+          <Card className="p-5 bg-card/80 border-border/30">
+            <p className="text-sm text-foreground leading-relaxed">{report.transformationSummary}</p>
+          </Card>
+
+          {/* Top Insights */}
+          <div>
+            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Key Insights</h4>
+            <div className="space-y-3">
+              {(report.topInsights || []).map((insight: any, i: number) => (
+                <Card key={i} className="p-4 bg-purple-500/5 border-purple-500/20">
+                  <div className="flex items-start gap-2 mb-2">
+                    <Star className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" />
+                    <h5 className="text-sm font-bold text-foreground">{insight.title}</h5>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{insight.insight}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Growth Evidence */}
+          <Card className="p-4 bg-emerald-500/5 border-emerald-500/20">
+            <div className="flex items-start gap-2 mb-2"><Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Growth Evidence</h4></div>
+            <p className="text-sm text-muted-foreground">{report.growthEvidence}</p>
+          </Card>
+
+          {/* Blind Spot */}
+          <Card className="p-4 bg-amber-500/5 border-amber-500/20">
+            <div className="flex items-start gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Your Blind Spot</h4></div>
+            <p className="text-sm text-muted-foreground">{report.blindSpot}</p>
+          </Card>
+
+          {/* Strength Profile */}
+          <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+            <div className="flex items-start gap-2 mb-2"><Shield className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Your Core Strength</h4></div>
+            <p className="text-sm text-muted-foreground">{report.strengthProfile}</p>
+          </Card>
+
+          {/* Next Chapter */}
+          {report.nextChapter && (
+            <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-5">
+              <h4 className="text-xs uppercase tracking-wider text-purple-400 mb-3">Your Next Chapter</h4>
+              <div className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <Target className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" />
+                  <div><p className="text-xs font-bold text-foreground mb-0.5">Focus</p><p className="text-sm text-muted-foreground">{report.nextChapter.focus}</p></div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" />
+                  <div><p className="text-xs font-bold text-foreground mb-0.5">This Week's Action</p><p className="text-sm text-muted-foreground">{report.nextChapter.action}</p></div>
+                </div>
+                <div className="p-3 rounded-lg bg-[#C9A84C]/10 border border-[#C9A84C]/20 text-center">
+                  <p className="text-sm text-foreground italic">"{report.nextChapter.affirmation}"</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Celebration */}
+          <div className="p-5 rounded-xl bg-gradient-to-b from-[#C9A84C]/10 to-[#C9A84C]/5 border border-[#C9A84C]/30 text-center">
+            <Heart className="w-5 h-5 text-rose-400 mx-auto mb-2" />
+            <p className="text-xs uppercase tracking-wider text-[#C9A84C] mb-2">A Letter From Your Future Self</p>
+            <p className="text-sm text-foreground italic leading-relaxed">"{report.celebrationMessage}"</p>
+          </div>
+
+          {/* Regenerate */}
+          <Button onClick={generateReport} variant="outline" className="w-full border-border/30 text-muted-foreground hover:text-foreground mt-2">
+            <Brain className="w-4 h-4 mr-2" />Regenerate Report
+          </Button>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════
 // Main Workbook Page
 // ═════════════════════════════════════════════════════════════════
 export default function DigitalWorkbook() {
@@ -748,6 +993,7 @@ export default function DigitalWorkbook() {
       case 2: return <RecognitionScreen />;
       case 3: return <LoveResponseScreen />;
       case 4: return <BeforeAfterScreen />;
+      case 5: return <TransformationReportScreen />;
       default: return <TrackerScreen />;
     }
   };
