@@ -59,7 +59,7 @@ export const journeyWeeks: JourneyWeek[] = [
     accentHex: "#3D1A6E",
     days: [
       { day: 15, week: 3, title: "Daily Nervous System Reset", teaching: "Regulation is not a luxury. It is the foundation of transformation.", actionType: "tool", actionLabel: "Open Nervous System Reset", toolRoute: "/healing-tools/nervous-system-diagnostic" },
-      { day: 16, week: 3, title: "How Would Love Respond?", teaching: "When you don't know what to do — ask this question.", actionType: "journal", actionLabel: "Journal Prompt", journalPrompt: "Think of a situation you're facing right now. How would love respond?" },
+      { day: 16, week: 3, title: "How Would Love Respond?", teaching: "When you don't know what to do — ask this question.", actionType: "tool", actionLabel: "Open Digital Workbook", toolRoute: "/workbook?screen=3", journalPrompt: "Think of a situation you're facing right now. How would love respond?" },
       { day: 17, week: 3, title: "Abundance Evidence", teaching: "Your brain looks for what you train it to find. Train it to find abundance.", actionType: "tool", actionLabel: "Open Abundance Evidence Log", toolRoute: "/healing-tools/abundance-evidence-log" },
       { day: 18, week: 3, title: "Decision Alignment", teaching: "Every decision either expands your worth or contracts it.", actionType: "journal", actionLabel: "Journal Prompt", journalPrompt: "What decision am I facing right now? Which choice expands my worth?" },
       { day: 19, week: 3, title: "Oracle Pull", teaching: "Your subconscious already knows. Let it speak.", actionType: "tool", actionLabel: "Open Oracle Cards", toolRoute: "/oracle" },
