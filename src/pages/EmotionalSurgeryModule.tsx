@@ -13,6 +13,8 @@ import { LockedContent } from "@/components/LockedContent";
 import { useSubscription } from "@/hooks/useSubscription";
 import { emotionalSurgeryTracks, Lesson } from "@/data/emotionalSurgeryData";
 import { useToast } from "@/hooks/use-toast";
+import { moduleScreens } from "@/data/emotionalSurgeryModules";
+import ModuleScreen from "@/components/emotional-surgery/ModuleScreen";
 
 const MODULE_SLUG_MAP: Record<string, { lessonNumber: number; title: string }> = {
   recognition: { lessonNumber: 1, title: "Recognition" },
@@ -169,6 +171,20 @@ export default function EmotionalSurgeryModule() {
           <Button variant="ghost" onClick={() => navigate("/emotional-surgery")} className="mt-4">
             <ChevronLeft className="w-4 h-4 mr-1" /> Back to Emotional Surgery™
           </Button>
+        </div>
+      </AuthenticatedLayout>
+    );
+  }
+
+  // Use new module screens for 1, 2, 4, 5 (not quiet-phase)
+  const newModuleContent = slug ? moduleScreens[slug] : null;
+  if (newModuleContent) {
+    return (
+      <AuthenticatedLayout title={`${moduleInfo.title} — Emotional Surgery™`}>
+        <div className="min-h-screen pt-24 pb-32 px-4">
+          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTier}>
+            <ModuleScreen module={newModuleContent} />
+          </LockedContent>
         </div>
       </AuthenticatedLayout>
     );
