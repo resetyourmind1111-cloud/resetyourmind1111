@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 
 import { DeckSelector } from '@/components/oracle/DeckSelector';
 import { SpreadSelector } from '@/components/oracle/SpreadSelector';
+import { TrialLockedContent } from '@/components/TrialLockedContent';
+import { useTrialStatus } from '@/hooks/useTrialStatus';
 import { CardSpread } from '@/components/oracle/CardSpread';
 import { ReadingResults } from '@/components/oracle/ReadingResults';
 import { 
