@@ -10,8 +10,6 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 
 type NervousState = "fight" | "flight" | "freeze" | "fawn";
 
