@@ -201,6 +201,8 @@ function RecognitionScreen() {
   const { toast } = useToast();
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [notes, setNotes] = useState("");
+  const [aiInsight, setAiInsight] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
@@ -215,7 +217,11 @@ function RecognitionScreen() {
       });
     supabase.from("healing_tool_entries").select("entry_data").eq("user_id", user.id).eq("tool_id", "workbook_recognition")
       .then(({ data }) => {
-        if (data?.[0]) setNotes((data[0] as any).entry_data?.notes || "");
+        if (data?.[0]) {
+          const d = (data[0] as any).entry_data;
+          setNotes(d?.notes || "");
+          if (d?.aiInsight) setAiInsight(d.aiInsight);
+        }
       });
   }, [user]);
 
@@ -243,19 +249,41 @@ function RecognitionScreen() {
       await supabase.from("healing_tool_entries").upsert({
         user_id: user.id,
         tool_id: "workbook_recognition",
-        entry_data: { notes } as any,
+        entry_data: { notes, aiInsight } as any,
       }, { onConflict: "user_id,tool_id" } as any);
     }, 1000);
-  }, [user, notes]);
+  }, [user, notes, aiInsight]);
 
   const saveReflection = async () => {
     if (!user) return;
     await supabase.from("healing_tool_entries").upsert({
       user_id: user.id,
       tool_id: "workbook_recognition",
-      entry_data: { notes } as any,
+      entry_data: { notes, aiInsight } as any,
     }, { onConflict: "user_id,tool_id" } as any);
     toast({ title: "Reflection saved ✨" });
+  };
+
+  const decodePatterns = async () => {
+    if (checkedItems.size === 0) { sonnerToast.error("Check at least one item first"); return; }
+    setAiLoading(true);
+    try {
+      const allItems = DEFICIT_CATEGORIES.flatMap(c => c.items);
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "workbook-recognition", checkedItems: Array.from(checkedItems), totalItems: allItems.length, notes },
+      });
+      if (error) throw error;
+      setAiInsight(data);
+      // Persist
+      if (user) {
+        await supabase.from("healing_tool_entries").upsert({
+          user_id: user.id,
+          tool_id: "workbook_recognition",
+          entry_data: { notes, aiInsight: data } as any,
+        }, { onConflict: "user_id,tool_id" } as any);
+      }
+    } catch (e) { console.error(e); sonnerToast.error("Could not generate insight"); }
+    setAiLoading(false);
   };
 
   return (
@@ -302,7 +330,37 @@ function RecognitionScreen() {
           className="min-h-[100px] bg-muted/30 border-border/30"
         />
       </div>
-      <Button onClick={saveReflection} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold">Save My Reflection →</Button>
+      <Button onClick={saveReflection} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold mb-4">Save My Reflection →</Button>
+
+      {/* AI Decode */}
+      <Button onClick={decodePatterns} disabled={aiLoading || checkedItems.size === 0} variant="outline" className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10 mb-4">
+        {aiLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Decoding your patterns...</> : <><Brain className="w-4 h-4 mr-2" />✨ Decode My Patterns</>}
+      </Button>
+
+      {aiInsight && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 mt-2">
+          <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+            <div className="flex items-start gap-2 mb-2"><Eye className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Dominant Pattern</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.dominantPattern}</p>
+          </Card>
+          <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+            <div className="flex items-start gap-2 mb-2"><Heart className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Root Wound</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.rootWound}</p>
+          </Card>
+          <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+            <div className="flex items-start gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Blind Spot</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.blindSpot}</p>
+          </Card>
+          <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+            <div className="flex items-start gap-2 mb-2"><Shield className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Compassionate Reframe</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.compassionateReframe}</p>
+          </Card>
+          <Card className="p-4 bg-emerald-500/5 border-emerald-500/20">
+            <div className="flex items-start gap-2 mb-2"><Sparkles className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Your Next Step</h4></div>
+            <p className="text-sm text-muted-foreground">{aiInsight.nextStep}</p>
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 }
