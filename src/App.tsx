@@ -66,6 +66,7 @@ const App = () => (
             <Route path="/30-day-experience" element={<ThirtyDayExperience />} />
             <Route path="/emotional-surgery" element={<EmotionalSurgery />} />
             <Route path="/tools" element={<Tools />} />
+            <Route path="/workbook" element={<DigitalWorkbook />} />
             <Route path="/upgrade" element={<Upgrade />} />
             <Route path="/support-flow" element={<SupportFlow />} />
             <Route path="/support-flow/complete" element={<SupportFlowComplete />} />
