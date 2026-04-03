@@ -426,6 +426,7 @@ export type Database = {
           stripe_customer_id: string | null
           subscription_tier: string | null
           total_points: number | null
+          trial_start_date: string | null
           updated_at: string
           user_id: string
         }
@@ -444,6 +445,7 @@ export type Database = {
           stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
+          trial_start_date?: string | null
           updated_at?: string
           user_id: string
         }
@@ -462,6 +464,7 @@ export type Database = {
           stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
+          trial_start_date?: string | null
           updated_at?: string
           user_id?: string
         }
