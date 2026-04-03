@@ -21,7 +21,7 @@ const TIER_LEVEL: Record<string, number> = { free: 0, trial: 0.5, reset: 1, expa
 function canAccessScreen(tier: string, screen: number, isTrialActive: boolean): boolean {
   const level = TIER_LEVEL[tier] ?? 0;
   if (isTrialActive) return screen === 2 || screen === 3;
-  if (level >= 2) return true; // expand+ gets all
+  if (level >= 2) return true; // expand+ gets all including AI report
   if (level >= 1) return screen <= 3; // reset gets 1-3
   return false;
 }
