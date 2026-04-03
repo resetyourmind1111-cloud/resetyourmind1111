@@ -242,6 +242,48 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          checkin_reminder_enabled: boolean
+          checkin_reminder_time: string
+          created_at: string
+          daily_affirmation_enabled: boolean
+          daily_affirmation_time: string
+          id: string
+          milestone_celebrations_enabled: boolean
+          quiet_phase_alerts_enabled: boolean
+          streak_protection_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checkin_reminder_enabled?: boolean
+          checkin_reminder_time?: string
+          created_at?: string
+          daily_affirmation_enabled?: boolean
+          daily_affirmation_time?: string
+          id?: string
+          milestone_celebrations_enabled?: boolean
+          quiet_phase_alerts_enabled?: boolean
+          streak_protection_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checkin_reminder_enabled?: boolean
+          checkin_reminder_time?: string
+          created_at?: string
+          daily_affirmation_enabled?: boolean
+          daily_affirmation_time?: string
+          id?: string
+          milestone_celebrations_enabled?: boolean
+          quiet_phase_alerts_enabled?: boolean
+          streak_protection_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       onboarding_responses: {
         Row: {
           abundance_evidence: string | null
