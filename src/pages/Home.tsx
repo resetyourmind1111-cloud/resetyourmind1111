@@ -17,6 +17,7 @@ import { Day7BottomBanner } from "@/components/trial/Day7BottomBanner";
 import { TrialDayBanner } from "@/components/TrialDayBanner";
 import { TrialExpiredOverlay } from "@/components/TrialExpiredOverlay";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { JourneyCheckinCard } from "@/components/journey/JourneyCheckinCard";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
@@ -182,6 +183,16 @@ export default function Home() {
                 What Do You Need Right Now?
               </Button>
             </Link>
+          </motion.div>
+
+          {/* Journey Check-in Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.47 }}
+            className="mb-8"
+          >
+            <JourneyCheckinCard />
           </motion.div>
 
           {/* Daily Snapshot Card */}

@@ -420,6 +420,8 @@ export type Database = {
           full_name: string | null
           human_design_type: string | null
           id: string
+          journey_current_day: number | null
+          journey_start_date: string | null
           last_login: string | null
           onboarding_complete: boolean | null
           onboarding_reason: string | null
@@ -434,7 +436,10 @@ export type Database = {
           trial_tool_2: string | null
           updated_at: string
           user_id: string
+          user_source: string | null
           welcome_banner_dismissed: boolean
+          worth_score_day1: number | null
+          worth_score_day24: number | null
         }
         Insert: {
           body_type?: string | null
@@ -445,6 +450,8 @@ export type Database = {
           full_name?: string | null
           human_design_type?: string | null
           id?: string
+          journey_current_day?: number | null
+          journey_start_date?: string | null
           last_login?: string | null
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
@@ -459,7 +466,10 @@ export type Database = {
           trial_tool_2?: string | null
           updated_at?: string
           user_id: string
+          user_source?: string | null
           welcome_banner_dismissed?: boolean
+          worth_score_day1?: number | null
+          worth_score_day24?: number | null
         }
         Update: {
           body_type?: string | null
@@ -470,6 +480,8 @@ export type Database = {
           full_name?: string | null
           human_design_type?: string | null
           id?: string
+          journey_current_day?: number | null
+          journey_start_date?: string | null
           last_login?: string | null
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
@@ -484,7 +496,10 @@ export type Database = {
           trial_tool_2?: string | null
           updated_at?: string
           user_id?: string
+          user_source?: string | null
           welcome_banner_dismissed?: boolean
+          worth_score_day1?: number | null
+          worth_score_day24?: number | null
         }
         Relationships: []
       }
