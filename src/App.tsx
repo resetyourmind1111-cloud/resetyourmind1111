@@ -24,6 +24,7 @@ import WellnessHub from "./pages/WellnessHub";
 import SavedReadings from "./pages/SavedReadings";
 import ThirtyDayExperience from "./pages/ThirtyDayExperience";
 import EmotionalSurgery from "./pages/EmotionalSurgery";
+import EmotionalSurgeryModule from "./pages/EmotionalSurgeryModule";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
