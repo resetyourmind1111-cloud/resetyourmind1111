@@ -35,6 +35,8 @@ const Oracle = () => {
   const [pulledCards, setPulledCards] = useState<OracleCardType[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [subscriptionTier, setSubscriptionTier] = useState('free');
+  const { isTrialActive, trialExpired } = useTrialStatus();
+  const isTrialUser = isTrialActive || trialExpired;
 
   useEffect(() => {
     if (isLoading) return;
