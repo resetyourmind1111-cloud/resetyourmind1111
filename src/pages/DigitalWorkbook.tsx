@@ -964,10 +964,47 @@ function TransformationReportScreen() {
             <p className="text-sm text-foreground italic leading-relaxed">"{report.celebrationMessage}"</p>
           </div>
 
-          {/* Regenerate */}
-          <Button onClick={generateReport} variant="outline" className="w-full border-border/30 text-muted-foreground hover:text-foreground mt-2">
-            <Brain className="w-4 h-4 mr-2" />Regenerate Report
-          </Button>
+          {/* Download & Regenerate */}
+          <div className="flex gap-3 mt-2">
+            <Button
+              onClick={async () => {
+                setPdfLoading(true);
+                try {
+                  const profileRes = await supabase.from("profiles").select("full_name").eq("user_id", user!.id).single();
+                  const userName = (profileRes.data as any)?.full_name || "";
+                  const { data, error: fnErr } = await supabase.functions.invoke("generate-report-pdf", {
+                    body: { report, userName },
+                  });
+                  if (fnErr) throw fnErr;
+                  // Decode base64 and download
+                  const byteChars = atob(data.pdf);
+                  const byteArray = new Uint8Array(byteChars.length);
+                  for (let i = 0; i < byteChars.length; i++) byteArray[i] = byteChars.charCodeAt(i);
+                  const blob = new Blob([byteArray], { type: "application/pdf" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "Transformation-Report.pdf";
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                  sonnerToast.success("PDF downloaded!");
+                } catch (e) {
+                  console.error(e);
+                  sonnerToast.error("Could not generate PDF");
+                }
+                setPdfLoading(false);
+              }}
+              className="flex-1 bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold"
+              disabled={pdfLoading}
+            >
+              {pdfLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating PDF...</> : <><Download className="w-4 h-4 mr-2" />Download PDF</>}
+            </Button>
+            <Button onClick={generateReport} variant="outline" className="flex-1 border-border/30 text-muted-foreground hover:text-foreground">
+              <Brain className="w-4 h-4 mr-2" />Regenerate
+            </Button>
+          </div>
         </motion.div>
       )}
     </div>
