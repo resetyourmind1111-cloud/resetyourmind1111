@@ -98,6 +98,7 @@ export default function EmotionalSurgery() {
 
   return (
     <AuthenticatedLayout title="Emotional Surgery™">
+      <TrialLockedContent isLocked={isTrialUser}>
       <div className="min-h-screen pt-24 pb-32 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
