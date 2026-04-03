@@ -32,6 +32,7 @@ const TABS = [
   { id: 2, icon: "🔍", label: "Recognition Deficit" },
   { id: 3, icon: "💛", label: "How Would Love Respond?" },
   { id: 4, icon: "🌡", label: "Before & After" },
+  { id: 5, icon: "✨", label: "AI Report" },
 ];
 
 // ─── Recognition deficit items ───
