@@ -81,10 +81,11 @@ export default function Dashboard() {
       if (!user) return;
       const { data } = await supabase
         .from("profiles")
-        .select("onboarding_complete")
+        .select("onboarding_complete, onboarding_reason")
         .eq("user_id", user.id)
         .single();
-      if (data && !(data as any).onboarding_complete) {
+      // Skip old onboarding if trial welcome was completed (onboarding_reason set)
+      if (data && !(data as any).onboarding_complete && !(data as any).onboarding_reason) {
         setShowOnboarding(true);
       }
       setOnboardingChecked(true);
