@@ -176,6 +176,20 @@ export default function EmotionalSurgeryModule() {
     );
   }
 
+  // Use new module screens for 1, 2, 4, 5 (not quiet-phase)
+  const newModuleContent = slug ? moduleScreens[slug] : null;
+  if (newModuleContent) {
+    return (
+      <AuthenticatedLayout title={`${moduleInfo.title} — Emotional Surgery™`}>
+        <div className="min-h-screen pt-24 pb-32 px-4">
+          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTier}>
+            <ModuleScreen module={newModuleContent} />
+          </LockedContent>
+        </div>
+      </AuthenticatedLayout>
+    );
+  }
+
   const completedCount = trackLessons.filter((tl) => completions[completionKey(tl.trackName)]?.completed_at).length;
 
   return (
