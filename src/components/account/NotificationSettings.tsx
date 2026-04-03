@@ -1,17 +1,40 @@
-import { Bell, Clock } from "lucide-react";
+import { useState } from "react";
+import { Bell, Clock, Mail, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function NotificationSettings() {
   const { preferences, updatePreferences } = useNotificationPreferences();
+  const { user } = useAuth();
+  const [sendingCoaching, setSendingCoaching] = useState(false);
 
-  const formatTimeForInput = (time: string) => time.slice(0, 5); // "08:00:00" → "08:00"
-  const formatTimeForDb = (time: string) => time + ":00"; // "08:00" → "08:00:00"
+  const formatTimeForInput = (time: string) => time.slice(0, 5);
+  const formatTimeForDb = (time: string) => time + ":00";
+
+  const handleSendCoachingSummary = async () => {
+    if (!user) return;
+    setSendingCoaching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("weekly-coaching-summary", {
+        body: { user_id: user.id },
+      });
+      if (error) throw error;
+      toast.success("Your coaching summary has been sent to your email!");
+    } catch (err) {
+      toast.error("Failed to send coaching summary. Please try again.");
+    } finally {
+      setSendingCoaching(false);
+    }
+  };
 
   const toggleItems = [
     {
@@ -41,6 +64,11 @@ export function NotificationSettings() {
       label: "Milestone Celebrations",
       description: "Celebrate when you complete a module",
     },
+    {
+      key: "weekly_coaching_enabled" as const,
+      label: "Weekly AI Coaching Summary",
+      description: "Personalized insights emailed every Monday",
+    },
   ];
 
   return (
@@ -69,7 +97,7 @@ export function NotificationSettings() {
                 />
               </div>
 
-              {item.timeKey && preferences[item.key] && (
+              {"timeKey" in item && item.timeKey && preferences[item.key] && (
                 <div className="flex items-center gap-2 ml-1 mt-1 mb-2">
                   <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                   <Label className="text-xs text-muted-foreground">Time:</Label>
@@ -81,6 +109,25 @@ export function NotificationSettings() {
                     }
                     className="w-28 h-8 text-xs"
                   />
+                </div>
+              )}
+
+              {item.key === "weekly_coaching_enabled" && preferences.weekly_coaching_enabled && (
+                <div className="ml-1 mt-1 mb-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSendCoachingSummary}
+                    disabled={sendingCoaching}
+                    className="gap-2"
+                  >
+                    {sendingCoaching ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Mail className="w-3.5 h-3.5" />
+                    )}
+                    {sendingCoaching ? "Sending..." : "Send My Weekly Summary Now"}
+                  </Button>
                 </div>
               )}
             </div>

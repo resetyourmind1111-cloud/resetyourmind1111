@@ -255,6 +255,7 @@ export type Database = {
           streak_protection_enabled: boolean
           updated_at: string
           user_id: string
+          weekly_coaching_enabled: boolean
         }
         Insert: {
           checkin_reminder_enabled?: boolean
@@ -268,6 +269,7 @@ export type Database = {
           streak_protection_enabled?: boolean
           updated_at?: string
           user_id: string
+          weekly_coaching_enabled?: boolean
         }
         Update: {
           checkin_reminder_enabled?: boolean
@@ -281,6 +283,7 @@ export type Database = {
           streak_protection_enabled?: boolean
           updated_at?: string
           user_id?: string
+          weekly_coaching_enabled?: boolean
         }
         Relationships: []
       }
