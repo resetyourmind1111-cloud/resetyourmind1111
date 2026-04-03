@@ -40,12 +40,6 @@ export default function MyAccount() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [notifications, setNotifications] = useState({
-    dailySlips: true,
-    streakReminder: true,
-    newContent: true,
-    marketing: false,
-  });
 
   const { data: profile, refetch } = useQuery({
     queryKey: ["profile", user?.id],
