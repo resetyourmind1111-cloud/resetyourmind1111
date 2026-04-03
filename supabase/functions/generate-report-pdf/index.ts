@@ -284,7 +284,17 @@ function buildPdf(report: any, userName: string): Uint8Array {
     drawLine(PAGE_W / 2 - 40, curY, PAGE_W / 2 + 40, curY, ROSE, 0.5);
     curY -= 16;
 
-    drawText(`"${report.celebrationMessage}"`, MARGIN + 20, 10.5, { r: 0.85, g: 0.82, b: 0.88 }, "/F1", CONTENT_W - 40);
+    // Center the celebration text
+    const celebLines = wrapText(`"${report.celebrationMessage}"`, 10.5, CONTENT_W - 80);
+    const celebLineH = 10.5 * 1.45;
+    for (const line of celebLines) {
+      ensureSpace(celebLineH);
+      const tw = line.length * 10.5 * 0.48;
+      const cx = (PAGE_W - tw) / 2;
+      setColor({ r: 0.85, g: 0.82, b: 0.88 });
+      currentPage().push(`BT /F1 10.5 Tf ${cx} ${curY} Td (${esc(line)}) Tj ET`);
+      curY -= celebLineH;
+    }
   }
 
   // Footer on last page
