@@ -474,6 +474,36 @@ export default function NervousSystemDiagnostic() {
           </div>
         </motion.div>
 
+        <Button
+          onClick={handleAiGuide}
+          variant="outline"
+          className="w-full border-accent/30 text-accent hover:bg-accent/10"
+          disabled={isAnalyzing}
+        >
+          {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Getting personalized guidance...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Personalized Guidance for My State</>}
+        </Button>
+
+        {aiGuide && (
+          <Card className="border-accent/20 bg-accent/5">
+            <CardContent className="pt-4 space-y-3">
+              <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Personalized Guidance</p>
+              <p className="text-sm text-foreground">{aiGuide.validation}</p>
+              <div className="border-l-2 border-accent/30 pl-3">
+                <p className="text-xs text-muted-foreground font-semibold">What Your Body Is Protecting</p>
+                <p className="text-sm text-muted-foreground">{aiGuide.bodyWisdom}</p>
+              </div>
+              <div className="border-l-2 border-accent/30 pl-3">
+                <p className="text-xs text-muted-foreground font-semibold">Try This Now</p>
+                <p className="text-sm text-muted-foreground">{aiGuide.gentleAction}</p>
+              </div>
+              <div className="border-l-2 border-accent/30 pl-3">
+                <p className="text-xs text-muted-foreground font-semibold">Watch For</p>
+                <p className="text-sm text-muted-foreground">{aiGuide.longerTerm}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex justify-center">
           <Button variant="gold" size="lg" onClick={() => setScreen("save")}>
             Save My Reset Plan & Journal
