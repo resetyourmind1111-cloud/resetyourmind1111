@@ -37,6 +37,8 @@ export function AuthenticatedLayout({ children, title, subtitle }: Authenticated
     <div className="min-h-screen bg-background">
       <Navigation />
       <PastDueBanner />
+      <TrialDayBanner />
+      <TrialExpiredOverlay />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-10">
