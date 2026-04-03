@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Trash2 } from "lucide-react";
+import { Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const dimensions = [
   { id: "vision", name: "Vision & Strategy", q: "Do I have a clear vision for my life and am I actively working toward it?" },
@@ -25,6 +27,8 @@ export default function CEOSelfAssessment() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("ceo-self-assessment");
   const [scores, setScores] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiPlan, setAiPlan] = useState<any>(null);
 
   const setScore = (id: string, val: number) => setScores(prev => ({ ...prev, [id]: val }));
   const allScored = dimensions.every(d => scores[d.id] !== undefined);
@@ -39,9 +43,28 @@ export default function CEOSelfAssessment() {
     return { label: "Foundation Phase 🧱", color: "text-muted-foreground" };
   };
 
+  const handleAiPlan = async () => {
+    setIsAnalyzing(true);
+    setAiPlan(null);
+    try {
+      const namedScores = dimensions.reduce((acc, d) => ({ ...acc, [d.name]: scores[d.id] }), {});
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "ceo-growth-plan", scores: namedScores, percentage, grade: getGrade(percentage).label, reflection },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiPlan(data);
+      toast.success("Leadership growth plan ready ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to generate plan");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleSave = () => {
-    saveEntry.mutate({ scores, total_score: totalScore, percentage, reflection, grade: getGrade(percentage).label });
-    setScores({}); setReflection("");
+    saveEntry.mutate({ scores, total_score: totalScore, percentage, reflection, grade: getGrade(percentage).label, aiPlan: aiPlan || undefined });
+    setScores({}); setReflection(""); setAiPlan(null);
   };
 
   return (
@@ -73,6 +96,35 @@ export default function CEOSelfAssessment() {
                 <p className="text-4xl font-bold text-foreground">{percentage}%</p>
                 <Progress value={percentage} className="h-3" />
                 <Textarea value={reflection} onChange={e => setReflection(e.target.value)} placeholder="What stood out? What's one thing you'll shift this week?" rows={3} />
+                <Button
+                  onClick={handleAiPlan}
+                  variant="outline"
+                  className="w-full border-accent/30 text-accent hover:bg-accent/10"
+                  disabled={isAnalyzing}
+                >
+                  {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating your growth plan...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Generate My Growth Plan</>}
+                </Button>
+                {aiPlan && (
+                  <Card className="border-accent/20 bg-accent/5 text-left">
+                    <CardContent className="pt-4 space-y-3">
+                      <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Your Leadership Profile</p>
+                      <p className="text-sm text-foreground">{aiPlan.leadershipProfile}</p>
+                      <div className="border-l-2 border-accent/30 pl-3">
+                        <p className="text-xs text-accent font-semibold">Top Strength: {aiPlan.topStrength?.area}</p>
+                        <p className="text-sm text-muted-foreground">{aiPlan.topStrength?.insight}</p>
+                      </div>
+                      <div className="border-l-2 border-accent/30 pl-3">
+                        <p className="text-xs text-accent font-semibold">Growth Edge: {aiPlan.growthEdge?.area}</p>
+                        <p className="text-sm text-muted-foreground">{aiPlan.growthEdge?.insight}</p>
+                        <p className="text-sm text-foreground font-medium mt-1">→ {aiPlan.growthEdge?.action}</p>
+                      </div>
+                      <div className="border-l-2 border-accent/30 pl-3">
+                        <p className="text-xs text-muted-foreground font-semibold">Blind Spot</p>
+                        <p className="text-sm text-muted-foreground">{aiPlan.blindSpot}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
                 <Button onClick={handleSave} variant="gold" className="w-full">Save Assessment</Button>
               </CardContent>
             </Card>
@@ -87,6 +139,12 @@ export default function CEOSelfAssessment() {
                 <p className="font-semibold text-foreground">{e.entry_data.grade} — {e.entry_data.percentage}%</p>
                 <p className="text-sm text-muted-foreground">{format(new Date(e.created_at), "MMM d, yyyy")}</p>
                 {e.entry_data.reflection && <p className="text-sm text-muted-foreground mt-1 italic">"{e.entry_data.reflection}"</p>}
+                {e.entry_data.aiPlan && (
+                  <div className="mt-2 pt-2 border-t border-accent/10">
+                    <p className="text-xs text-accent flex items-center gap-1"><Sparkles className="w-3 h-3" /> Growth Edge: {e.entry_data.aiPlan.growthEdge?.area}</p>
+                    <p className="text-xs text-muted-foreground">{e.entry_data.aiPlan.growthEdge?.action}</p>
+                  </div>
+                )}
               </div>
               <Button variant="ghost" size="icon" onClick={() => deleteEntry.mutate(e.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
             </CardContent></Card>

@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const INTERPRETATIONS: Record<string, string> = {
   "111": "Thoughts becoming reality — choose them wisely",
@@ -39,6 +41,8 @@ export default function AngelNumberJournal() {
   const [location, setLocation] = useState("");
   const [thinking, setThinking] = useState("");
   const [personalMeaning, setPersonalMeaning] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsight, setAiInsight] = useState<any>(null);
 
   const patterns = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -49,13 +53,32 @@ export default function AngelNumberJournal() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [entries]);
 
+  const handleAiDecode = async () => {
+    if (!number.trim()) return;
+    setIsAnalyzing(true);
+    setAiInsight(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "angel-number-deeper", number, location, thinking, personalMeaning },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiInsight(data);
+      toast.success("Deeper meaning revealed ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to decode");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleSave = () => {
     if (!number.trim()) return;
     saveEntry.mutate(
-      { number, location, thinking, personalMeaning, interpretation: getInterpretation(number), date: new Date().toISOString() },
+      { number, location, thinking, personalMeaning, interpretation: getInterpretation(number), aiInsight: aiInsight || undefined, date: new Date().toISOString() },
       {
         onSuccess: () => {
-          setNumber(""); setLocation(""); setThinking(""); setPersonalMeaning(""); setShowForm(false);
+          setNumber(""); setLocation(""); setThinking(""); setPersonalMeaning(""); setShowForm(false); setAiInsight(null);
         },
       }
     );
@@ -98,11 +121,34 @@ export default function AngelNumberJournal() {
                   <Label className="text-foreground font-semibold">What does this number mean to you specifically right now?</Label>
                   <Textarea placeholder="To me, this means..." value={personalMeaning} onChange={(e) => setPersonalMeaning(e.target.value)} className="bg-input border-border" />
                 </div>
+
+                <Button
+                  onClick={handleAiDecode}
+                  variant="outline"
+                  className="w-full border-accent/30 text-accent hover:bg-accent/10"
+                  disabled={!number.trim() || isAnalyzing}
+                >
+                  {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Decoding...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Go Deeper on This Number</>}
+                </Button>
+
+                {aiInsight && (
+                  <Card className="border-accent/20 bg-accent/5">
+                    <CardContent className="pt-4 space-y-2">
+                      <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Deeper Meaning</p>
+                      <p className="text-sm text-foreground">{aiInsight.deeperMeaning}</p>
+                      <p className="text-xs text-muted-foreground font-semibold mt-2">Soul Message</p>
+                      <p className="text-sm text-muted-foreground italic">"{aiInsight.soulMessage}"</p>
+                      <p className="text-xs text-muted-foreground font-semibold mt-2">Action Guidance</p>
+                      <p className="text-sm text-muted-foreground">{aiInsight.actionGuidance}</p>
+                    </CardContent>
+                  </Card>
+                )}
+
                 <div className="flex gap-3">
                   <Button onClick={handleSave} disabled={saveEntry.isPending} className="bg-accent text-accent-foreground">
                     {saveEntry.isPending ? "Saving..." : "Log Number"}
                   </Button>
-                  <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+                  <Button variant="ghost" onClick={() => { setShowForm(false); setAiInsight(null); }}>Cancel</Button>
                 </div>
               </CardContent>
             </Card>
@@ -136,6 +182,12 @@ export default function AngelNumberJournal() {
                     {d.location && <p className="text-xs text-muted-foreground">📍 {d.location}</p>}
                     {d.thinking && <p className="text-xs text-muted-foreground">💭 {d.thinking}</p>}
                     {d.personalMeaning && <p className="text-sm text-foreground/80 mt-1">"{d.personalMeaning}"</p>}
+                    {d.aiInsight && (
+                      <div className="mt-2 pt-2 border-t border-accent/10">
+                        <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> AI Decode</p>
+                        <p className="text-xs text-muted-foreground">{d.aiInsight.deeperMeaning}</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>

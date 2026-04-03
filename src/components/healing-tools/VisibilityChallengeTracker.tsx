@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Trash2, CheckCircle, Circle } from "lucide-react";
+import { Trash2, CheckCircle, Circle, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const challenges = [
   "Post a photo of yourself with zero filters", "Share an unpopular opinion publicly", "Go live for 60 seconds on social media",
@@ -25,6 +27,8 @@ export default function VisibilityChallengeTracker() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("visibility-challenge");
   const [reflection, setReflection] = useState("");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [isCoaching, setIsCoaching] = useState(false);
+  const [aiCoach, setAiCoach] = useState<any>(null);
 
   const completedDays = new Set(entries.map((e: any) => e.entry_data.day));
   const progress = (completedDays.size / 30) * 100;
@@ -32,12 +36,38 @@ export default function VisibilityChallengeTracker() {
   const handleComplete = (day: number) => {
     if (completedDays.has(day)) return;
     setSelectedDay(day);
+    setAiCoach(null);
+  };
+
+  const handleAiCoach = async () => {
+    if (selectedDay === null) return;
+    setIsCoaching(true);
+    setAiCoach(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: {
+          toolType: "visibility-coach",
+          challenge: challenges[selectedDay - 1],
+          day: selectedDay,
+          completedCount: completedDays.size,
+          reflection,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiCoach(data);
+      toast.success("Visibility coaching ready ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get coaching");
+    } finally {
+      setIsCoaching(false);
+    }
   };
 
   const handleSave = () => {
     if (selectedDay === null) return;
-    saveEntry.mutate({ day: selectedDay, challenge: challenges[selectedDay - 1], reflection, completed_at: new Date().toISOString() });
-    setReflection(""); setSelectedDay(null);
+    saveEntry.mutate({ day: selectedDay, challenge: challenges[selectedDay - 1], reflection, aiCoach: aiCoach || undefined, completed_at: new Date().toISOString() });
+    setReflection(""); setSelectedDay(null); setAiCoach(null);
   };
 
   return (
@@ -78,6 +108,29 @@ export default function VisibilityChallengeTracker() {
             <CardContent className="space-y-3">
               <p className="text-foreground font-medium">{challenges[selectedDay - 1]}</p>
               <Textarea value={reflection} onChange={e => setReflection(e.target.value)} placeholder="How did it feel? What came up for you?" rows={3} />
+              <Button
+                onClick={handleAiCoach}
+                variant="outline"
+                className="w-full border-accent/30 text-accent hover:bg-accent/10"
+                disabled={isCoaching}
+              >
+                {isCoaching ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Getting coaching...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Coach Me Through This</>}
+              </Button>
+              {aiCoach && (
+                <Card className="border-accent/20 bg-accent/5">
+                  <CardContent className="pt-4 space-y-2">
+                    <p className="text-sm text-foreground">{aiCoach.courage}</p>
+                    <div className="border-l-2 border-accent/30 pl-3">
+                      <p className="text-xs text-muted-foreground font-semibold">What This Touches</p>
+                      <p className="text-sm text-muted-foreground">{aiCoach.innerResistance}</p>
+                    </div>
+                    <div className="border-l-2 border-accent/30 pl-3">
+                      <p className="text-xs text-muted-foreground font-semibold">Micro Step</p>
+                      <p className="text-sm text-muted-foreground">{aiCoach.microStep}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
               <Button onClick={handleSave} variant="gold" className="w-full">Mark Complete</Button>
             </CardContent>
           </Card>
@@ -90,6 +143,9 @@ export default function VisibilityChallengeTracker() {
               <div>
                 <p className="font-semibold text-foreground">Day {e.entry_data.day}: {e.entry_data.challenge}</p>
                 {e.entry_data.reflection && <p className="text-sm text-muted-foreground mt-1 italic">"{e.entry_data.reflection}"</p>}
+                {e.entry_data.aiCoach && (
+                  <p className="text-xs text-accent mt-1 flex items-center gap-1"><Sparkles className="w-3 h-3" /> {e.entry_data.aiCoach.microStep}</p>
+                )}
                 <p className="text-xs text-muted-foreground mt-1">{format(new Date(e.created_at), "MMM d, yyyy")}</p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => deleteEntry.mutate(e.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
