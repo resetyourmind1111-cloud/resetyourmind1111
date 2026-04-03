@@ -184,12 +184,41 @@ export default function ChakraBalancingGuide() {
                       </div>
                     ))}
                   </div>
-                  <div className="flex gap-3 mt-6">
+                  <div className="flex gap-3 mt-6 flex-wrap">
                     <Button onClick={saveAssessment} disabled={saveEntry.isPending} className="bg-accent text-accent-foreground hover:bg-accent/90">
                       {saveEntry.isPending ? "Saving..." : "Save Results"}
                     </Button>
-                    <Button variant="ghost" onClick={() => { setShowResults(false); setAssessmentStep(0); setAnswers(new Array(14).fill(0)); }}>Retake</Button>
+                    <Button
+                      onClick={handleAiInsight}
+                      variant="outline"
+                      className="border-accent/30 text-accent hover:bg-accent/10"
+                      disabled={isAnalyzing}
+                    >
+                      {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Decode My Energy</>}
+                    </Button>
+                    <Button variant="ghost" onClick={() => { setShowResults(false); setAssessmentStep(0); setAnswers(new Array(14).fill(0)); setAiInsight(null); }}>Retake</Button>
                   </div>
+                  {aiInsight && (
+                    <Card className="mt-4 border-accent/20 bg-accent/5">
+                      <CardContent className="pt-4 space-y-3">
+                        <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Energy Profile</p>
+                        <p className="text-sm text-foreground">{aiInsight.energyProfile}</p>
+                        <div className="border-l-2 border-accent/30 pl-3">
+                          <p className="text-xs text-accent font-semibold">Most Blocked: {aiInsight.mostBlocked?.chakra}</p>
+                          <p className="text-sm text-muted-foreground">{aiInsight.mostBlocked?.insight}</p>
+                          <p className="text-sm text-foreground mt-1">→ {aiInsight.mostBlocked?.healingAction}</p>
+                        </div>
+                        <div className="border-l-2 border-accent/30 pl-3">
+                          <p className="text-xs text-accent font-semibold">Strongest: {aiInsight.mostOpen?.chakra}</p>
+                          <p className="text-sm text-muted-foreground">{aiInsight.mostOpen?.insight}</p>
+                        </div>
+                        <div className="border-l-2 border-accent/30 pl-3">
+                          <p className="text-xs text-muted-foreground font-semibold">Connection Pattern</p>
+                          <p className="text-sm text-muted-foreground">{aiInsight.connectionPattern}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
