@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, Lock, Brain, Eye, Heart, Shield, AlertTriangle, Loader2, FileText, Star, Target } from "lucide-react";
+import { Check, Sparkles, Lock, Brain, Eye, Heart, Shield, AlertTriangle, Loader2, FileText, Star, Target, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
