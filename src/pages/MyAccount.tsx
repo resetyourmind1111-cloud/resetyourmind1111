@@ -230,33 +230,7 @@ export default function MyAccount() {
           </Card>
         </motion.div>
 
-        {/* Notifications */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <Card className="glass-card">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Bell className="w-5 h-5 text-accent" />
-                <h2 className="font-serif text-xl font-bold text-foreground">Notifications</h2>
-              </div>
-              {[
-                { key: "dailySlips", label: "Daily Permission Slip" },
-                { key: "streakReminder", label: "Streak Reminders" },
-                { key: "newContent", label: "New Content Alerts" },
-                { key: "marketing", label: "Marketing & Offers" },
-              ].map((item) => (
-                <div key={item.key} className="flex items-center justify-between py-2">
-                  <span className="text-foreground text-sm">{item.label}</span>
-                  <Switch
-                    checked={notifications[item.key as keyof typeof notifications]}
-                    onCheckedChange={(checked) =>
-                      setNotifications((prev) => ({ ...prev, [item.key]: checked }))
-                    }
-                  />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
+        <NotificationSettings />
 
         {/* Sign Out */}
         <Button variant="outline" className="w-full" onClick={signOut}>
