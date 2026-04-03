@@ -376,6 +376,8 @@ function LoveResponseScreen() {
   const [loveResponse, setLoveResponse] = useState("");
   const [pastEntries, setPastEntries] = useState<any[]>([]);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
+  const [aiInsight, setAiInsight] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -385,16 +387,29 @@ function LoveResponseScreen() {
       });
   }, [user]);
 
+  const coachMe = async () => {
+    if (!scenario.trim()) { sonnerToast.error("Describe a situation first"); return; }
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "workbook-love-response", scenario, fearResponse, loveResponse },
+      });
+      if (error) throw error;
+      setAiInsight(data);
+    } catch (e) { console.error(e); sonnerToast.error("Could not generate coaching"); }
+    setAiLoading(false);
+  };
+
   const savePractice = async () => {
     if (!user || !scenario.trim()) return;
     const { data, error } = await supabase.from("healing_tool_entries").insert({
       user_id: user.id,
       tool_id: "workbook_love_response",
-      entry_data: { scenario, fearResponse, loveResponse } as any,
+      entry_data: { scenario, fearResponse, loveResponse, aiInsight } as any,
     }).select();
     if (!error && data) {
       setPastEntries(prev => [data[0], ...prev]);
-      setScenario(""); setFearResponse(""); setLoveResponse("");
+      setScenario(""); setFearResponse(""); setLoveResponse(""); setAiInsight(null);
       toast({ title: "Practice saved ✨" });
     }
   };
@@ -444,6 +459,36 @@ function LoveResponseScreen() {
             <Textarea value={loveResponse} onChange={e => setLoveResponse(e.target.value)} placeholder="Love would..." className="min-h-[60px] bg-muted/30 border-border/30" />
           </div>
         </div>
+
+        {/* AI Coach */}
+        <Button onClick={coachMe} disabled={aiLoading || !scenario.trim()} variant="outline" className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10 mb-4">
+          {aiLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Coaching you...</> : <><Brain className="w-4 h-4 mr-2" />✨ Coach Me Deeper</>}
+        </Button>
+
+        {aiInsight && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 mb-6">
+            <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+              <div className="flex items-start gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Fear Decoded</h4></div>
+              <p className="text-sm text-muted-foreground">{aiInsight.fearDecode}</p>
+            </Card>
+            <Card className="p-4 bg-emerald-500/5 border-emerald-500/20">
+              <div className="flex items-start gap-2 mb-2"><Heart className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Your Love Response Shows…</h4></div>
+              <p className="text-sm text-muted-foreground">{aiInsight.loveValidation}</p>
+            </Card>
+            <Card className="p-4 bg-[#C9A84C]/5 border-[#C9A84C]/20">
+              <div className="flex items-start gap-2 mb-2"><Sparkles className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">An Even Deeper Love Response</h4></div>
+              <p className="text-sm text-muted-foreground italic">"{aiInsight.deeperLoveResponse}"</p>
+            </Card>
+            <Card className="p-4 bg-purple-500/5 border-purple-500/20">
+              <div className="flex items-start gap-2 mb-2"><Eye className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" /><h4 className="text-sm font-bold text-foreground">Body Check</h4></div>
+              <p className="text-sm text-muted-foreground">{aiInsight.bodyCheck}</p>
+            </Card>
+            <div className="p-4 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-center">
+              <p className="text-sm text-foreground italic">"{aiInsight.affirmation}"</p>
+            </div>
+          </motion.div>
+        )}
+
         <Button onClick={savePractice} disabled={!scenario.trim()} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold">Save This Practice →</Button>
       </div>
 
@@ -468,6 +513,12 @@ function LoveResponseScreen() {
                       <div className="mt-3 space-y-2 text-xs">
                         <div><span className="font-bold text-red-400">Fear:</span> <span className="text-muted-foreground">{entry.entry_data?.fearResponse}</span></div>
                         <div><span className="font-bold text-[#C9A84C]">Love:</span> <span className="text-muted-foreground">{entry.entry_data?.loveResponse}</span></div>
+                        {entry.entry_data?.aiInsight && (
+                          <div className="mt-2 p-2 rounded-lg bg-purple-500/5 border border-purple-500/10">
+                            <p className="text-[10px] uppercase tracking-wider text-purple-400 mb-1">AI Coaching</p>
+                            <p className="text-muted-foreground">{entry.entry_data.aiInsight.affirmation}</p>
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   )}
