@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2 } from "lucide-react";
+import { Trash2, Sparkles, Loader2, Eye, AlertTriangle, Heart, Shield } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const allValues = [
   "Freedom", "Security", "Adventure", "Creativity", "Love", "Connection", "Growth", "Authenticity",
@@ -14,12 +16,22 @@ const allValues = [
   "Passion", "Purpose", "Simplicity", "Excellence", "Humor", "Gratitude", "Honesty", "Resilience",
 ];
 
+interface ValuesInsight {
+  blindSpots: { value: string; insight: string }[];
+  tensions: { values: string[]; insight: string }[];
+  alignment: string;
+  shadowValues: { value: string; insight: string }[];
+  coreMessage: string;
+}
+
 export default function ValuesClarityTool() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("values-clarity-tool");
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState<string[]>([]);
   const [topFive, setTopFive] = useState<string[]>([]);
   const [reflections, setReflections] = useState<Record<string, string>>({});
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsight, setAiInsight] = useState<ValuesInsight | null>(null);
 
   const toggleValue = (v: string) => {
     if (step === 1) {
@@ -29,9 +41,34 @@ export default function ValuesClarityTool() {
     }
   };
 
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true);
+    setAiInsight(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("values-insight", {
+        body: { topFive, reflections, allSelected: selected },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiInsight(data);
+      setStep(4);
+      toast.success("Values analysis complete ✨");
+    } catch (err: any) {
+      console.error("Values insight error:", err);
+      toast.error(err.message || "Failed to analyze values");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleSave = () => {
-    saveEntry.mutate({ top_five: topFive, reflections, all_selected: selected });
-    setStep(1); setSelected([]); setTopFive([]); setReflections({});
+    saveEntry.mutate({
+      top_five: topFive,
+      reflections,
+      all_selected: selected,
+      aiInsight: aiInsight || undefined,
+    });
+    setStep(1); setSelected([]); setTopFive([]); setReflections({}); setAiInsight(null);
   };
 
   return (
@@ -88,8 +125,103 @@ export default function ValuesClarityTool() {
                 <Button onClick={() => setStep(2)} variant="outline">← Back</Button>
                 <Button onClick={handleSave} variant="gold" className="flex-1">Save My Values</Button>
               </div>
+              <Button
+                onClick={handleAnalyze}
+                variant="outline"
+                className="w-full border-accent/30 text-accent hover:bg-accent/10"
+                disabled={isAnalyzing}
+              >
+                {isAnalyzing ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing your values...</>
+                ) : (
+                  <><Sparkles className="w-4 h-4 mr-2" /> AI: Reveal My Blind Spots</>
+                )}
+              </Button>
             </CardContent>
           </Card>
+        )}
+        {step === 4 && aiInsight && (
+          <div className="space-y-6">
+            {/* Core Message */}
+            <Card className="glass-card border-accent/20 bg-accent/5">
+              <CardContent className="pt-6 text-center">
+                <p className="font-serif text-xl text-foreground leading-relaxed">"{aiInsight.coreMessage}"</p>
+              </CardContent>
+            </Card>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Blind Spots */}
+              <Card className="glass-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="font-serif text-lg flex items-center gap-2">
+                    <Eye className="w-5 h-5 text-accent" /> Blind Spots
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {aiInsight.blindSpots.map((bs, i) => (
+                    <div key={i} className="border-l-2 border-accent/30 pl-3">
+                      <p className="text-sm font-semibold text-foreground">{bs.value}</p>
+                      <p className="text-sm text-muted-foreground">{bs.insight}</p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Shadow Values */}
+              <Card className="glass-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="font-serif text-lg flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-accent" /> Shadow Values
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-xs text-muted-foreground mb-2">Values you dropped — but they may hold wisdom.</p>
+                  {aiInsight.shadowValues.map((sv, i) => (
+                    <div key={i} className="border-l-2 border-accent/30 pl-3">
+                      <p className="text-sm font-semibold text-foreground">{sv.value}</p>
+                      <p className="text-sm text-muted-foreground">{sv.insight}</p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Tensions */}
+              {aiInsight.tensions.length > 0 && (
+                <Card className="glass-card">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="font-serif text-lg flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-amber-500" /> Value Tensions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {aiInsight.tensions.map((t, i) => (
+                      <div key={i} className="border-l-2 border-amber-500/30 pl-3">
+                        <p className="text-sm font-semibold text-foreground">{t.values.join(" ↔ ")}</p>
+                        <p className="text-sm text-muted-foreground">{t.insight}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Alignment */}
+              <Card className="glass-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="font-serif text-lg flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-accent" /> What Your Values Reveal
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{aiInsight.alignment}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="flex gap-3">
+              <Button onClick={() => { setStep(3); setAiInsight(null); }} variant="outline">← Back to Reflections</Button>
+              <Button onClick={handleSave} variant="gold" className="flex-1">Save Values + AI Insights</Button>
+            </div>
+          </div>
         )}
       </TabsContent>
       <TabsContent value="results">
@@ -108,6 +240,15 @@ export default function ValuesClarityTool() {
               {e.entry_data.reflections && Object.entries(e.entry_data.reflections).map(([k, v]: any) => v && (
                 <div key={k} className="mb-2"><p className="text-xs font-bold text-foreground">{k}</p><p className="text-sm text-muted-foreground italic">"{v}"</p></div>
               ))}
+              {e.entry_data.aiInsight && (
+                <div className="mt-4 pt-4 border-t border-accent/10">
+                  <p className="text-xs text-accent font-semibold mb-2 flex items-center gap-1"><Sparkles className="w-3 h-3" /> AI Analysis</p>
+                  <p className="text-sm text-muted-foreground italic mb-2">"{e.entry_data.aiInsight.coreMessage}"</p>
+                  {e.entry_data.aiInsight.blindSpots?.map((bs: any, i: number) => (
+                    <p key={i} className="text-xs text-muted-foreground">🔍 <strong>{bs.value}</strong>: {bs.insight}</p>
+                  ))}
+                </div>
+              )}
             </CardContent></Card>
           ))}</div>}
       </TabsContent>
