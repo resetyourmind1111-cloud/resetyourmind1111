@@ -6,7 +6,7 @@ const tabs = [
   { label: "Home", icon: Home, href: "/home" },
   { label: "Emotional Surgery™", icon: Brain, href: "/emotional-surgery" },
   { label: "Tools", icon: LayoutGrid, href: "/tools" },
-  { label: "Progress", icon: TrendingUp, href: "/my-progress" },
+  { label: "Progress", icon: TrendingUp, href: "/progress" },
   { label: "Profile", icon: User, href: "/my-account" },
 ];
 

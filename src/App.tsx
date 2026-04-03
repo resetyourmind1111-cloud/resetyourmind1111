@@ -19,6 +19,7 @@ import HealingToolPage from "./pages/HealingToolPage";
 import HumanDesign from "./pages/HumanDesign";
 import Manifesto from "./pages/Manifesto";
 import MyProgress from "./pages/MyProgress";
+import Progress from "./pages/Progress";
 import MyAccount from "./pages/MyAccount";
 import WellnessHub from "./pages/WellnessHub";
 import SavedReadings from "./pages/SavedReadings";
