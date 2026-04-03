@@ -149,6 +149,26 @@ export default function EnergyCordCutting() {
                   </div>
 
                   <Button
+                    onClick={handleAiGuide}
+                    variant="outline"
+                    className="w-full border-accent/30 text-accent hover:bg-accent/10 mb-2"
+                    disabled={!person.trim() || isAnalyzing}
+                  >
+                    {isAnalyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Reading the cord...</> : <><Sparkles className="w-4 h-4 mr-2" /> AI: Decode This Cord</>}
+                  </Button>
+
+                  {aiGuide && (
+                    <Card className="border-accent/20 bg-accent/5 mb-2">
+                      <CardContent className="pt-4 space-y-2">
+                        <p className="text-xs text-accent font-semibold flex items-center gap-1"><Sparkles className="w-3 h-3" /> Cord Insight</p>
+                        <p className="text-sm text-foreground">{aiGuide.cordInsight}</p>
+                        {aiGuide.bodyWisdom && <p className="text-sm text-muted-foreground italic">Body: {aiGuide.bodyWisdom}</p>}
+                        {aiGuide.healingAffirmation && <p className="text-sm text-accent">"{aiGuide.healingAffirmation}"</p>}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  <Button
                     onClick={() => setRitualStep(1)}
                     disabled={!person.trim()}
                     className="bg-accent text-accent-foreground hover:bg-accent/90"
