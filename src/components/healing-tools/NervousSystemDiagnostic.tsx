@@ -284,6 +284,28 @@ export default function NervousSystemDiagnostic() {
     setSecondaryState(null);
     setJournalText("");
     setSaved(false);
+    setAiGuide(null);
+  };
+
+  const handleAiGuide = async () => {
+    if (!primaryState) return;
+    setIsAnalyzing(true);
+    setAiGuide(null);
+    try {
+      const counts: Record<NervousState, number> = { fight: 0, flight: 0, freeze: 0, fawn: 0 };
+      answers.forEach((s) => counts[s]++);
+      const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
+        body: { toolType: "nervous-system-guide", primaryState, secondaryState, journalEntry: journalText, scores: counts },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiGuide(data);
+      toast.success("Personalized guidance ready ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get guidance");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   // SCREEN 1: Entry
