@@ -139,6 +139,7 @@ const Oracle = () => {
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
+        <TrialLockedContent isLocked={isTrialUser}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
