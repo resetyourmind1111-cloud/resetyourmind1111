@@ -11,6 +11,7 @@ export interface NotificationPreferences {
   quiet_phase_alerts_enabled: boolean;
   streak_protection_enabled: boolean;
   milestone_celebrations_enabled: boolean;
+  weekly_coaching_enabled: boolean;
 }
 
 const defaults: NotificationPreferences = {
@@ -21,6 +22,7 @@ const defaults: NotificationPreferences = {
   quiet_phase_alerts_enabled: true,
   streak_protection_enabled: true,
   milestone_celebrations_enabled: true,
+  weekly_coaching_enabled: true,
 };
 
 export function useNotificationPreferences() {
