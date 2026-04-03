@@ -28,6 +28,7 @@ import EmotionalSurgery from "./pages/EmotionalSurgery";
 import EmotionalSurgeryModule from "./pages/EmotionalSurgeryModule";
 import Tools from "./pages/Tools";
 import Upgrade from "./pages/Upgrade";
+import DigitalWorkbook from "./pages/DigitalWorkbook";
 import SupportFlow from "./pages/SupportFlow";
 import SupportFlowCategory from "./pages/SupportFlowCategory";
 import SupportFlowComplete from "./pages/SupportFlowComplete";
