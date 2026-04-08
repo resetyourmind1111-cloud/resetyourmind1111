@@ -205,6 +205,7 @@ function RecognitionScreen() {
   const [notes, setNotes] = useState("");
   const [aiInsight, setAiInsight] = useState<any>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const { isLimitReached, incrementUsage } = useUsage();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
@@ -268,6 +269,8 @@ function RecognitionScreen() {
 
   const decodePatterns = async () => {
     if (checkedItems.size === 0) { sonnerToast.error("Check at least one item first"); return; }
+    if (isLimitReached) { sonnerToast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setAiLoading(true);
     try {
       const allItems = DEFICIT_CATEGORIES.flatMap(c => c.items);
@@ -380,6 +383,7 @@ function LoveResponseScreen() {
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   const [aiInsight, setAiInsight] = useState<any>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const { isLimitReached, incrementUsage } = useUsage();
 
   useEffect(() => {
     if (!user) return;
@@ -391,6 +395,8 @@ function LoveResponseScreen() {
 
   const coachMe = async () => {
     if (!scenario.trim()) { sonnerToast.error("Describe a situation first"); return; }
+    if (isLimitReached) { sonnerToast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setAiLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
@@ -546,6 +552,7 @@ function BeforeAfterScreen() {
   const [saved, setSaved] = useState(false);
   const [aiInsight, setAiInsight] = useState<any>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const { isLimitReached, incrementUsage } = useUsage();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
@@ -588,6 +595,8 @@ function BeforeAfterScreen() {
       after: responses[`after_${i}`] || "",
     })).filter(p => p.before || p.after);
     if (pairs.length === 0) { sonnerToast.error("Fill in at least one Before & After pair first"); return; }
+    if (isLimitReached) { sonnerToast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setAiLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("healing-tool-insight", {
@@ -738,6 +747,7 @@ function TransformationReportScreen() {
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
+  const { isLimitReached, incrementUsage } = useUsage();
 
   // Load saved report
   useEffect(() => {
@@ -753,6 +763,8 @@ function TransformationReportScreen() {
 
   const generateReport = async () => {
     if (!user) return;
+    if (isLimitReached) { sonnerToast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setLoading(true);
     setError("");
 
