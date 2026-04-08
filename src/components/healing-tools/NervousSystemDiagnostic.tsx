@@ -289,8 +289,12 @@ export default function NervousSystemDiagnostic() {
     setAiGuide(null);
   };
 
+  const { isLimitReached, incrementUsage } = useUsage();
+
   const handleAiGuide = async () => {
     if (!primaryState) return;
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsAnalyzing(true);
     setAiGuide(null);
     try {
