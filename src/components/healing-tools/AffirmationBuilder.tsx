@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trash2, Copy, Shuffle, Sparkles, Loader2, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const categories = ["Self-Worth", "Abundance", "Love", "Healing", "Power", "Purpose", "Boundaries", "Joy"];

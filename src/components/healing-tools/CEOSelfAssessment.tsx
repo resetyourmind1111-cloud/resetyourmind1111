@@ -9,6 +9,8 @@ import { Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const dimensions = [
   { id: "vision", name: "Vision & Strategy", q: "Do I have a clear vision for my life and am I actively working toward it?" },

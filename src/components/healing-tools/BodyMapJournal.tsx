@@ -10,6 +10,8 @@ import { Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const bodyAreas = ["Head", "Jaw/Throat", "Neck/Shoulders", "Chest/Heart", "Stomach/Solar Plexus", "Lower Belly/Sacral", "Hips/Pelvis", "Upper Back", "Lower Back", "Arms/Hands", "Legs/Feet", "Full Body"];
 const sensations = ["Tension", "Pain", "Tightness", "Heaviness", "Warmth", "Tingling", "Numbness", "Fluttering", "Pressure", "Buzzing", "Coldness", "Emptiness"];

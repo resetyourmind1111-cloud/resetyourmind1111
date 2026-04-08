@@ -10,6 +10,8 @@ import { Plus, Trash2, Shield, ChevronRight, ChevronLeft, Sparkles, Loader2 } fr
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const STEPS = [
   { title: "Identify", prompt: "Who or what needs a boundary right now?" },

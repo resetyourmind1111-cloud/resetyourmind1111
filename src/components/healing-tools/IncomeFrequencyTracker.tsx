@@ -12,6 +12,8 @@ import { Plus, Trash2, DollarSign, TrendingUp, Sparkles, Loader2 } from "lucide-
 import { format, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 export default function IncomeFrequencyTracker() {
   const { entries, saveEntry, deleteEntry } = useHealingToolEntries("income-frequency-tracker");

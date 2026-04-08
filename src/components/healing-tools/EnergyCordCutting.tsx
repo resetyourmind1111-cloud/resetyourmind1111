@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, Scissors, Heart, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 import { format } from "date-fns";
 
 const ritualSteps = [

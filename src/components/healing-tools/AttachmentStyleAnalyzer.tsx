@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { RotateCcw, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const QUESTIONS = [
   { q: "When my partner is distant, I tend to:", o: ["Feel comfortable giving them space", "Feel anxious and seek reassurance", "Feel relieved and enjoy the freedom", "Feel confused — wanting closeness but also wanting to run"] },

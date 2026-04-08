@@ -10,6 +10,8 @@ import { Plus, Trash2, Sparkles, Wand2, Loader2 } from "lucide-react";
 import { format, isThisWeek, isToday, differenceInCalendarDays } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const CATEGORIES = [
   "Money Received", "Unexpected Gift", "Support Shown", "Beauty Noticed",

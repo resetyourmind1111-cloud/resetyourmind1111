@@ -8,6 +8,8 @@ import { Trash2, Sparkles, Loader2, Eye, AlertTriangle, Heart, Shield } from "lu
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const allValues = [
   "Freedom", "Security", "Adventure", "Creativity", "Love", "Connection", "Growth", "Authenticity",

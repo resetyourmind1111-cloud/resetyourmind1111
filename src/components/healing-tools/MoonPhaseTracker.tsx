@@ -9,6 +9,8 @@ import { Plus, Trash2, Wand2, Loader2 } from "lucide-react";
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const REFERENCE_NEW_MOON = new Date("2024-01-11T11:57:00Z");
 const LUNAR_CYCLE = 29.53;

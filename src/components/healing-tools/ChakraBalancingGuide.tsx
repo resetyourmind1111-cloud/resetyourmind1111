@@ -12,6 +12,8 @@ import { Plus, Trash2, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const chakras = [
   { name: "Root", color: "bg-red-500", sanskrit: "Muladhara", location: "Base of spine", element: "Earth", theme: "Safety, security, survival, grounding", balancedSign: "Feeling safe, stable, and grounded in your body and life", blockedSign: "Anxiety, fear, financial stress, feeling unrooted or disconnected from your body" },

@@ -11,6 +11,8 @@ import { Plus, Trash2, Sparkles, Loader2, Wand2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const EMOTIONS = [
   "Anger", "Shame", "Fear", "Sadness", "Abandonment",

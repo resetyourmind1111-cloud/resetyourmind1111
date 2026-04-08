@@ -12,6 +12,8 @@ import { Play, Pause, RotateCcw, Trash2, Sparkles, Loader2, Wind, Flame, Moon, S
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 import { playPhaseTone, playCompletionTone } from "@/lib/breathingAudio";
 
 const exercises = [
