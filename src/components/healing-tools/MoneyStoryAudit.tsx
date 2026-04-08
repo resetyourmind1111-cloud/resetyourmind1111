@@ -5,7 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, RotateCcw, Sparkles, Loader2 } from "lucide-react";
+import { ChevronRight, RotateCcw, Sparkles } from "lucide-react";
+import { AiButton } from "@/components/AiButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -156,18 +157,15 @@ export default function MoneyStoryAudit() {
           <p className="text-xs text-muted-foreground">Write your new money story in first person, present tense.</p>
 
           {/* AI Rewrite Button */}
-          <Button
+          <AiButton
             onClick={handleAiRewrite}
-            disabled={isRewriting}
+            isLoading={isRewriting}
+            loadingText="Rewriting with AI..."
             variant="outline"
             className="w-full border-primary/30 text-primary hover:bg-primary/10"
           >
-            {isRewriting ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Rewriting with AI...</>
-            ) : (
-              <><Sparkles className="w-4 h-4 mr-2" /> Help Me Rewrite My Money Story (AI)</>
-            )}
-          </Button>
+            <Sparkles className="w-4 h-4 mr-2" /> Help Me Rewrite My Money Story (AI)
+          </AiButton>
 
           {patternInsight && (
             <div className="glass-card p-4 text-sm text-muted-foreground italic">
