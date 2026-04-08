@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { journeyWeeks } from "@/data/journeyData";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { toast as sonnerToast } from "sonner";
+import { useUsage } from "@/contexts/UsageContext";
 
 // ─── Tier access logic ───
 const TIER_LEVEL: Record<string, number> = { free: 0, trial: 0.5, reset: 1, expand: 2, embody: 3, founding_full_access: 3 };
