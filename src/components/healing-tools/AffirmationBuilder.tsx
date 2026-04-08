@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trash2, Copy, Shuffle, Sparkles, Loader2, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const categories = ["Self-Worth", "Abundance", "Love", "Healing", "Power", "Purpose", "Boundaries", "Joy"];
@@ -31,6 +33,7 @@ interface AiAffirmation {
 
 export default function AffirmationBuilder() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("affirmation-builder");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [category, setCategory] = useState("Self-Worth");
   const [affirmation, setAffirmation] = useState("");
   const [reminder, setReminder] = useState("morning");
@@ -58,6 +61,8 @@ export default function AffirmationBuilder() {
   };
 
   const handleGenerate = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsGenerating(true);
     setAiResults([]);
     try {

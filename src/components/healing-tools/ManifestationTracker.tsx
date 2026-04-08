@@ -11,6 +11,8 @@ import { Plus, Trash2, Star, Sparkles, Wand2, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const STATUSES = ["Calling In", "In Progress", "Manifested"] as const;
 
@@ -22,6 +24,7 @@ type ManifestationInsight = {
 
 export default function ManifestationTracker() {
   const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("manifestation-tracker");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showForm, setShowForm] = useState(false);
   const [intention, setIntention] = useState("");
   const [feeling, setFeeling] = useState("");
@@ -52,6 +55,8 @@ export default function ManifestationTracker() {
   };
 
   const fetchInsight = async (entryId: string, entryData: any) => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setInsightLoading(entryId);
     try {
       const { data, error } = await supabase.functions.invoke("manifestation-insight", {

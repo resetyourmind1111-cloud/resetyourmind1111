@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Loader2 } from "lucide-react";
@@ -287,8 +289,12 @@ export default function NervousSystemDiagnostic() {
     setAiGuide(null);
   };
 
+  const { isLimitReached, incrementUsage } = useUsage();
+
   const handleAiGuide = async () => {
     if (!primaryState) return;
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsAnalyzing(true);
     setAiGuide(null);
     try {

@@ -10,6 +10,8 @@ import { Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const bodyAreas = ["Head", "Jaw/Throat", "Neck/Shoulders", "Chest/Heart", "Stomach/Solar Plexus", "Lower Belly/Sacral", "Hips/Pelvis", "Upper Back", "Lower Back", "Arms/Hands", "Legs/Feet", "Full Body"];
 const sensations = ["Tension", "Pain", "Tightness", "Heaviness", "Warmth", "Tingling", "Numbness", "Fluttering", "Pressure", "Buzzing", "Coldness", "Emptiness"];
@@ -17,6 +19,7 @@ const emotions = ["Anxiety", "Sadness", "Anger", "Fear", "Shame", "Joy", "Love",
 
 export default function BodyMapJournal() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("body-map-journal");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [area, setArea] = useState("");
   const [sensation, setSensation] = useState("");
   const [emotion, setEmotion] = useState("");
@@ -37,6 +40,9 @@ export default function BodyMapJournal() {
       toast.error("Please select a body area and sensation first");
       return;
     }
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
+
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("body-map-insight", {

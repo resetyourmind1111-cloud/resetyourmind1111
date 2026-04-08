@@ -10,6 +10,8 @@ import { Plus, Trash2, Shield, ChevronRight, ChevronLeft, Sparkles, Loader2 } fr
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const STEPS = [
   { title: "Identify", prompt: "Who or what needs a boundary right now?" },
@@ -22,6 +24,7 @@ const STEPS = [
 
 export default function BoundaryBuilder() {
   const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("boundary-builder");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showForm, setShowForm] = useState(false);
   const [step, setStep] = useState(0);
   const [who, setWho] = useState("");
@@ -54,6 +57,9 @@ export default function BoundaryBuilder() {
       toast.error("Please identify who or what needs a boundary first");
       return;
     }
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
+
     setIsCoaching(true);
     try {
       const { data, error } = await supabase.functions.invoke("boundary-coach", {

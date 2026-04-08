@@ -731,12 +731,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_usage: {
+        Row: {
+          date: string
+          id: string
+          session_count: number
+          user_id: string
+        }
+        Insert: {
+          date?: string
+          id?: string
+          session_count?: number
+          user_id: string
+        }
+        Update: {
+          date?: string
+          id?: string
+          session_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_user_usage: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never

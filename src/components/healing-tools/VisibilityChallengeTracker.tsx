@@ -9,6 +9,8 @@ import { Trash2, CheckCircle, Circle, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const challenges = [
   "Post a photo of yourself with zero filters", "Share an unpopular opinion publicly", "Go live for 60 seconds on social media",
@@ -25,6 +27,7 @@ const challenges = [
 
 export default function VisibilityChallengeTracker() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("visibility-challenge");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [reflection, setReflection] = useState("");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [isCoaching, setIsCoaching] = useState(false);
@@ -40,6 +43,8 @@ export default function VisibilityChallengeTracker() {
   };
 
   const handleAiCoach = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     if (selectedDay === null) return;
     setIsCoaching(true);
     setAiCoach(null);

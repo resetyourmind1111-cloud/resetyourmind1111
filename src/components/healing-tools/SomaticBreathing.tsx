@@ -12,6 +12,8 @@ import { Play, Pause, RotateCcw, Trash2, Sparkles, Loader2, Wind, Flame, Moon, S
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 import { playPhaseTone, playCompletionTone } from "@/lib/breathingAudio";
 
 const exercises = [
@@ -54,6 +56,7 @@ type AiData = {
 
 export default function SomaticBreathing() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("somatic-breathing");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [selected, setSelected] = useState(exercises[0]);
   const [running, setRunning] = useState(false);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -135,6 +138,8 @@ export default function SomaticBreathing() {
   };
 
   const handleAiCoach = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsCoaching(true);
     try {
       const { data, error } = await supabase.functions.invoke("somatic-coach", {

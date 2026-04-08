@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, Scissors, Heart, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 import { format } from "date-fns";
 
 const ritualSteps = [
@@ -35,6 +37,7 @@ const emotionScale = ["Peaceful", "Relieved", "Neutral", "Unsettled", "Heavy", "
 
 export default function EnergyCordCutting() {
   const { entries, saveEntry, deleteEntry } = useHealingToolEntries("energy-cord-cutting");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showRitual, setShowRitual] = useState(false);
   const [ritualStep, setRitualStep] = useState(0);
   const [person, setPerson] = useState("");
@@ -51,6 +54,8 @@ export default function EnergyCordCutting() {
   const [aiGuide, setAiGuide] = useState<any>(null);
 
   const handleAiGuide = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     if (!person.trim()) return;
     setIsAnalyzing(true);
     setAiGuide(null);

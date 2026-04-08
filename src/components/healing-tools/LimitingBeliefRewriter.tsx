@@ -5,7 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useHealingToolEntries } from "@/hooks/useHealingToolEntries";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
+import { Plus, Trash2, Sparkles } from "lucide-react";
+import { AiButton } from "@/components/AiButton";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -74,18 +75,16 @@ export default function LimitingBeliefRewriter() {
                 </div>
 
                 {/* AI Reframe Button */}
-                <Button
+                <AiButton
                   onClick={handleAiReframe}
-                  disabled={isReframing || !belief.trim()}
+                  isLoading={isReframing}
+                  loadingText="Reframing with AI..."
+                  disabled={!belief.trim()}
                   variant="outline"
                   className="w-full border-primary/30 text-primary hover:bg-primary/10"
                 >
-                  {isReframing ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Reframing with AI...</>
-                  ) : (
-                    <><Sparkles className="w-4 h-4 mr-2" /> Help Me Reframe This (AI)</>
-                  )}
-                </Button>
+                  <Sparkles className="w-4 h-4 mr-2" /> Help Me Reframe This (AI)
+                </AiButton>
 
                 <div className="glass-card p-4 text-sm text-muted-foreground italic space-y-1">
                   <p>Where do you think this belief came from?</p>

@@ -11,6 +11,8 @@ import { Plus, Trash2, Sparkles, Loader2, Wand2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const EMOTIONS = [
   "Anger", "Shame", "Fear", "Sadness", "Abandonment",
@@ -25,6 +27,7 @@ type TriggerInsight = {
 
 export default function EmotionalTriggerTracker() {
   const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("emotional-trigger-tracker");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showForm, setShowForm] = useState(false);
   const [trigger, setTrigger] = useState("");
   const [emotion, setEmotion] = useState("");
@@ -54,6 +57,9 @@ export default function EmotionalTriggerTracker() {
       toast.error("Please describe the trigger and select an emotion first");
       return;
     }
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
+
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("analyze-trigger", {
@@ -77,6 +83,8 @@ export default function EmotionalTriggerTracker() {
   };
 
   const fetchInsight = async (entryId: string, entryData: any) => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setInsightLoading(entryId);
     try {
       const { data, error } = await supabase.functions.invoke("analyze-trigger", {

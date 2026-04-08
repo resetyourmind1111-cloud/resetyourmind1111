@@ -9,6 +9,8 @@ import { Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 const dimensions = [
   { id: "vision", name: "Vision & Strategy", q: "Do I have a clear vision for my life and am I actively working toward it?" },
@@ -25,6 +27,7 @@ const dimensions = [
 
 export default function CEOSelfAssessment() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("ceo-self-assessment");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [scores, setScores] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -44,6 +47,8 @@ export default function CEOSelfAssessment() {
   };
 
   const handleAiPlan = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsAnalyzing(true);
     setAiPlan(null);
     try {

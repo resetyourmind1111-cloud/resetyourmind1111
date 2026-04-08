@@ -5,6 +5,7 @@ import { Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { TrialProgressPill } from "@/components/trial/TrialProgressPill";
+import { UsageTracker } from "@/components/UsageTracker";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
@@ -120,6 +121,7 @@ export function Navigation() {
                   </Link>
                 </motion.div>
               ))}
+              {user && <UsageTracker />}
               <div className="pt-4 flex flex-col gap-2 border-t border-border mt-4">
                 {user ? (
                   <Button variant="outline" className="w-full justify-center" onClick={handleSignOut}>

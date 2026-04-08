@@ -12,9 +12,12 @@ import { Plus, Trash2, DollarSign, TrendingUp, Sparkles, Loader2 } from "lucide-
 import { format, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiButton } from "@/components/AiButton";
+import { useUsage } from "@/contexts/UsageContext";
 
 export default function IncomeFrequencyTracker() {
   const { entries, saveEntry, deleteEntry } = useHealingToolEntries("income-frequency-tracker");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showForm, setShowForm] = useState(false);
   const [amount, setAmount] = useState("");
   const [source, setSource] = useState("");
@@ -74,6 +77,8 @@ export default function IncomeFrequencyTracker() {
   };
 
   const handleAiInsight = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     if (incomeEntries.length === 0) {
       toast.error("Log at least one income entry first");
       return;
