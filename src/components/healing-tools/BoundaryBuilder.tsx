@@ -53,12 +53,13 @@ export default function BoundaryBuilder() {
   };
 
   const handleAiCoach = async () => {
-    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
-    const allowed = await incrementUsage(); if (!allowed) return;
     if (!who.trim()) {
       toast.error("Please identify who or what needs a boundary first");
       return;
     }
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
+
     setIsCoaching(true);
     try {
       const { data, error } = await supabase.functions.invoke("boundary-coach", {

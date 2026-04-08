@@ -36,12 +36,13 @@ export default function BodyMapJournal() {
   };
 
   const handleAiInsight = async () => {
-    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
-    const allowed = await incrementUsage(); if (!allowed) return;
     if (!area || !sensation) {
       toast.error("Please select a body area and sensation first");
       return;
     }
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
+
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("body-map-insight", {

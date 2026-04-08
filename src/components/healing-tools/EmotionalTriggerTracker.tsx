@@ -53,12 +53,13 @@ export default function EmotionalTriggerTracker() {
   };
 
   const handleAiAnalyze = async () => {
-    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
-    const allowed = await incrementUsage(); if (!allowed) return;
     if (!trigger.trim() || !emotion) {
       toast.error("Please describe the trigger and select an emotion first");
       return;
     }
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
+
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("analyze-trigger", {
