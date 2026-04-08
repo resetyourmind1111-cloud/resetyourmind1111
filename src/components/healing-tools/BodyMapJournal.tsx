@@ -19,6 +19,7 @@ const emotions = ["Anxiety", "Sadness", "Anger", "Fear", "Shame", "Joy", "Love",
 
 export default function BodyMapJournal() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("body-map-journal");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [area, setArea] = useState("");
   const [sensation, setSensation] = useState("");
   const [emotion, setEmotion] = useState("");
@@ -35,6 +36,8 @@ export default function BodyMapJournal() {
   };
 
   const handleAiInsight = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     if (!area || !sensation) {
       toast.error("Please select a body area and sensation first");
       return;

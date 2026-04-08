@@ -38,6 +38,7 @@ function getInterpretation(num: string): string {
 
 export default function AngelNumberJournal() {
   const { entries, saveEntry, deleteEntry } = useHealingToolEntries("angel-number-journal");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showForm, setShowForm] = useState(false);
   const [number, setNumber] = useState("");
   const [location, setLocation] = useState("");
@@ -56,6 +57,8 @@ export default function AngelNumberJournal() {
   }, [entries]);
 
   const handleAiDecode = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     if (!number.trim()) return;
     setIsAnalyzing(true);
     setAiInsight(null);

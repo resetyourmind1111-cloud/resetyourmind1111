@@ -21,6 +21,7 @@ type InnerChildInsight = {
 
 export default function InnerChildHealing() {
   const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("inner-child-healing");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showForm, setShowForm] = useState(false);
   const [age, setAge] = useState([7]);
   const [prompt1, setPrompt1] = useState("");
@@ -41,6 +42,8 @@ export default function InnerChildHealing() {
   };
 
   const handleAiGuide = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsGuiding(true);
     try {
       const { data, error } = await supabase.functions.invoke("inner-child-guide", {
@@ -62,6 +65,8 @@ export default function InnerChildHealing() {
   };
 
   const fetchInsight = async (entryId: string, entryData: any) => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setInsightLoading(entryId);
     try {
       const { data, error } = await supabase.functions.invoke("inner-child-guide", {

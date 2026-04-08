@@ -66,6 +66,7 @@ type MoonInsight = {
 
 export default function MoonPhaseTracker() {
   const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("moon-phase-tracker");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showJournal, setShowJournal] = useState(false);
   const [journalText, setJournalText] = useState("");
   const [insightLoading, setInsightLoading] = useState<string | null>(null);
@@ -93,6 +94,8 @@ export default function MoonPhaseTracker() {
   };
 
   const fetchInsight = async (entryId: string, entryData: any) => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setInsightLoading(entryId);
     try {
       const { data, error } = await supabase.functions.invoke("moon-insight", {

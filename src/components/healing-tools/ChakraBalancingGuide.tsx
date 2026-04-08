@@ -54,6 +54,7 @@ const meditationPrompts: Record<number, string[]> = {
 
 export default function ChakraBalancingGuide() {
   const { entries, saveEntry, deleteEntry } = useHealingToolEntries("chakra-balancing");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [activeTab, setActiveTab] = useState("assessment");
   const [assessmentStep, setAssessmentStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>(new Array(14).fill(0));
@@ -65,6 +66,8 @@ export default function ChakraBalancingGuide() {
   const [aiInsight, setAiInsight] = useState<any>(null);
 
   const handleAiInsight = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsAnalyzing(true);
     setAiInsight(null);
     try {

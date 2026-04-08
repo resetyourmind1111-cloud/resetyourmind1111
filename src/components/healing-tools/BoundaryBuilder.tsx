@@ -24,6 +24,7 @@ const STEPS = [
 
 export default function BoundaryBuilder() {
   const { entries, saveEntry, updateEntry, deleteEntry } = useHealingToolEntries("boundary-builder");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showForm, setShowForm] = useState(false);
   const [step, setStep] = useState(0);
   const [who, setWho] = useState("");
@@ -52,6 +53,8 @@ export default function BoundaryBuilder() {
   };
 
   const handleAiCoach = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     if (!who.trim()) {
       toast.error("Please identify who or what needs a boundary first");
       return;

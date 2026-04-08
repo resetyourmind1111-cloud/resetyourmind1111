@@ -33,6 +33,7 @@ interface AiAffirmation {
 
 export default function AffirmationBuilder() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("affirmation-builder");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [category, setCategory] = useState("Self-Worth");
   const [affirmation, setAffirmation] = useState("");
   const [reminder, setReminder] = useState("morning");
@@ -60,6 +61,8 @@ export default function AffirmationBuilder() {
   };
 
   const handleGenerate = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsGenerating(true);
     setAiResults([]);
     try {

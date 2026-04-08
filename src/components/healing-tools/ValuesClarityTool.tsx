@@ -28,6 +28,7 @@ interface ValuesInsight {
 
 export default function ValuesClarityTool() {
   const { entries, isLoading, saveEntry, deleteEntry } = useHealingToolEntries("values-clarity-tool");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState<string[]>([]);
   const [topFive, setTopFive] = useState<string[]>([]);
@@ -44,6 +45,8 @@ export default function ValuesClarityTool() {
   };
 
   const handleAnalyze = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsAnalyzing(true);
     setAiInsight(null);
     try {

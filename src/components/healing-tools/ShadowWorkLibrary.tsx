@@ -68,6 +68,7 @@ type ShadowInsight = {
 
 export default function ShadowWorkLibrary() {
   const { entries, saveEntry, updateEntry } = useHealingToolEntries("shadow-work-library");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [activePrompt, setActivePrompt] = useState<{ category: string; prompt: string; globalIndex: number } | null>(null);
   const [response, setResponse] = useState("");
   const [aiInsight, setAiInsight] = useState("");
@@ -88,6 +89,8 @@ export default function ShadowWorkLibrary() {
   };
 
   const handleAiGuide = async () => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     if (!activePrompt) return;
     setIsGuiding(true);
     try {
@@ -114,6 +117,8 @@ export default function ShadowWorkLibrary() {
   };
 
   const fetchInsight = async (entryId: string, entryData: any) => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setInsightLoading(entryId);
     try {
       const { data, error } = await supabase.functions.invoke("shadow-work-guide", {

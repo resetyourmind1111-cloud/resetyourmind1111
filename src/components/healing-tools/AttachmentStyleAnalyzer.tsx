@@ -79,6 +79,7 @@ const STYLE_INFO: Record<string, { color: string; description: string; developed
 
 export default function AttachmentStyleAnalyzer() {
   const { entries, saveEntry } = useHealingToolEntries("attachment-style-analyzer");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>(Array(20).fill(-1));
   const [started, setStarted] = useState(false);
@@ -117,6 +118,8 @@ export default function AttachmentStyleAnalyzer() {
   };
 
   const handleAiInsight = async (d: any) => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setIsInsighting(true);
     try {
       const { data, error } = await supabase.functions.invoke("attachment-insight", {

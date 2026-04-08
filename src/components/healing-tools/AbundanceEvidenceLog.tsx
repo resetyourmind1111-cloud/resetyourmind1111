@@ -26,6 +26,7 @@ type AbundanceInsight = {
 
 export default function AbundanceEvidenceLog() {
   const { entries, saveEntry, deleteEntry, updateEntry } = useHealingToolEntries("abundance-evidence-log");
+  const { isLimitReached, incrementUsage } = useUsage();
   const [showForm, setShowForm] = useState(false);
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
@@ -40,6 +41,8 @@ export default function AbundanceEvidenceLog() {
   };
 
   const fetchInsight = async (entryId: string, entryData: any) => {
+    if (isLimitReached) { toast.error("Daily limit reached — resets at midnight"); return; }
+    const allowed = await incrementUsage(); if (!allowed) return;
     setInsightLoading(entryId);
     try {
       const { data: result, error } = await supabase.functions.invoke("abundance-insight", {
