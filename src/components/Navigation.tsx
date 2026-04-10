@@ -10,6 +10,7 @@ import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", href: "/" },
+  { name: "My Reset Plan", href: "/reset-plan" },
   { name: "Dashboard", href: "/dashboard" },
   { name: "Worth Thermostat", href: "/assessment" },
   { name: "Meditations", href: "/meditations" },

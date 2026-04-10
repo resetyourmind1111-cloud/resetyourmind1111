@@ -20,6 +20,7 @@ import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { JourneyCheckinCard } from "@/components/journey/JourneyCheckinCard";
 import { VisualResetMap } from "@/components/home/VisualResetMap";
 import { TodaysResetToolCard } from "@/components/home/TodaysResetToolCard";
+import { ResetPlanWidget } from "@/components/home/ResetPlanWidget";
 import { TrialJourneyBar } from "@/components/trial/TrialJourneyBar";
 import { Day7CompletionModal } from "@/components/trial/Day7CompletionModal";
 
@@ -143,6 +144,9 @@ export default function Home() {
               Your transformation is not linear. Let's meet you where you are.
             </p>
           </motion.div>
+
+          {/* Reset Plan Widget */}
+          <ResetPlanWidget />
 
           {/* Trial Journey Bar (Bridge 2) */}
           <TrialJourneyBar />
