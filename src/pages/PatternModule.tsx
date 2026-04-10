@@ -116,9 +116,6 @@ export default function PatternModule() {
     setTimeout(() => setShowCelebration(false), 2500);
   };
 
-  useEffect(() => {
-    if (screen === TOTAL_SCREENS - 1) handleComplete();
-  }, [screen]);
 
   const renderScreen = () => {
     if (isLockedScreen) {
