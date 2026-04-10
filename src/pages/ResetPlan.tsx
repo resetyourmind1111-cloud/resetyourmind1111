@@ -48,7 +48,7 @@ export default function ResetPlan() {
   };
 
   return (
-    <AuthenticatedLayout>
+    <AuthenticatedLayout title="My Reset Plan">
       <div className="container mx-auto px-4 md:px-6 max-w-2xl py-8">
         {!onboardingComplete ? (
           <motion.div
