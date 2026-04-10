@@ -241,18 +241,14 @@ export default function ReleasingResistance() {
                     <div className="rounded-2xl bg-[#1a0f2e] border border-primary/20 p-6 mb-6">
                       <div className="flex items-center gap-4">
                         <button
-                          onClick={toggleAudio}
+                          onClick={openAudioInMindist}
                           className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shrink-0 hover:bg-primary/90 transition-colors shadow-[0_0_20px_hsl(var(--primary)/0.4)]"
                         >
-                          {isPlaying ? (
-                            <Pause className="w-6 h-6 text-primary-foreground" />
-                          ) : (
-                            <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
-                          )}
+                          <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
                         </button>
                         <div>
                           <p className="text-sm font-semibold text-foreground">Releasing Resistance — Guided Reset</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Guided meditation</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Opens in Mindist · Guided meditation</p>
                         </div>
                       </div>
                     </div>
