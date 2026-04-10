@@ -280,6 +280,19 @@ export default function ReleasingResistance() {
                           </p>
                         </div>
                       </div>
+                      {ambientPlaying && (
+                        <div className="mt-4 flex items-center gap-3">
+                          <Volume2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <Slider
+                            value={[ambientVolume]}
+                            onValueChange={handleVolumeChange}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            className="flex-1"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Mindist External Link */}
