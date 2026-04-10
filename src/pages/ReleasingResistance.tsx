@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Pause, Check, Sparkles, BookOpen, Repeat, Home } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Check, Sparkles, BookOpen, Repeat, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useRef, useEffect } from "react";
+
 
 const AUDIO_URL = "https://mindist.page.link/Uiar";
 
@@ -28,10 +28,8 @@ export default function ReleasingResistance() {
   const [screen, setScreen] = useState<Screen>("insight");
   const [reflectionText, setReflectionText] = useState("");
   const [reflectionSaved, setReflectionSaved] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [lessonCompleted, setLessonCompleted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const screenIndex = SCREENS.indexOf(screen);
 
@@ -51,17 +49,8 @@ export default function ReleasingResistance() {
     toast({ title: "Reflection saved ✨" });
   };
 
-  const toggleAudio = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio(AUDIO_URL);
-      audioRef.current.onended = () => setIsPlaying(false);
-    }
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
+  const openAudioInMindist = () => {
+    window.open(AUDIO_URL, "_blank", "noopener,noreferrer");
   };
 
   const markComplete = async () => {
@@ -79,27 +68,11 @@ export default function ReleasingResistance() {
     setLessonCompleted(true);
     setShowCelebration(true);
 
-    // Stop audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-
     setTimeout(() => {
       setShowCelebration(false);
       setScreen("complete");
     }, 2600);
   };
-
-  // Cleanup audio on unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
 
   return (
     <AuthenticatedLayout title="Releasing Resistance">
@@ -250,18 +223,14 @@ export default function ReleasingResistance() {
                     <div className="rounded-2xl bg-[#1a0f2e] border border-primary/20 p-6 mb-6">
                       <div className="flex items-center gap-4">
                         <button
-                          onClick={toggleAudio}
+                          onClick={openAudioInMindist}
                           className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shrink-0 hover:bg-primary/90 transition-colors shadow-[0_0_20px_hsl(var(--primary)/0.4)]"
                         >
-                          {isPlaying ? (
-                            <Pause className="w-6 h-6 text-primary-foreground" />
-                          ) : (
-                            <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
-                          )}
+                          <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
                         </button>
                         <div>
                           <p className="text-sm font-semibold text-foreground">Releasing Resistance — Guided Reset</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Guided meditation</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Opens in Mindist · Guided meditation</p>
                         </div>
                       </div>
                     </div>
