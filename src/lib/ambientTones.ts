@@ -87,6 +87,14 @@ export function stopAmbientTone(): void {
   }, 2200);
 }
 
+export function setAmbientVolume(volume: number): void {
+  if (!activeNodes || !audioCtx) return;
+  const now = audioCtx.currentTime;
+  activeNodes.master.gain.cancelScheduledValues(now);
+  activeNodes.master.gain.setValueAtTime(activeNodes.master.gain.value, now);
+  activeNodes.master.gain.linearRampToValueAtTime(volume, now + 0.1);
+}
+
 export function isAmbientPlaying(): boolean {
   return activeNodes !== null;
 }
