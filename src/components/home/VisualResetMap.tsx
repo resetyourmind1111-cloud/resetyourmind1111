@@ -258,6 +258,19 @@ export function VisualResetMap() {
           )}
         </AnimatePresence>
       </Card>
+
+      <CelebrationOverlay
+        show={showCelebration}
+        message={`You've entered ${milestoneZoneName}!`}
+      />
+
+      <MilestoneShareCard
+        zoneName={milestoneZoneName}
+        zoneMessage={ZONES[getZoneIndex(score)]?.message || ""}
+        thermostatType={thermostatType}
+        show={showMilestoneCard}
+        onClose={() => setShowMilestoneCard(false)}
+      />
     </motion.div>
   );
 }
