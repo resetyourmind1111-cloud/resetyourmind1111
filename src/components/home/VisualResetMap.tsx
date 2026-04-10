@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Flame, Sun, RefreshCw, ArrowUp, Star, Crown } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -7,6 +7,9 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { CelebrationOverlay } from "@/components/trial/CelebrationOverlay";
+import { MilestoneShareCard } from "./MilestoneShareCard";
 
 interface Zone {
   name: string;
