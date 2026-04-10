@@ -31,6 +31,26 @@ export default function ReleasingResistance() {
   const [reflectionSaved, setReflectionSaved] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  const [ambientPlaying, setAmbientPlaying] = useState(false);
+
+  const toggleAmbient = useCallback(() => {
+    if (isAmbientPlaying()) {
+      stopAmbientTone();
+      setAmbientPlaying(false);
+    } else {
+      startAmbientTone(0.8);
+      setAmbientPlaying(true);
+    }
+  }, []);
+
+  // Cleanup ambient on unmount or screen change away from reset
+  useEffect(() => {
+    return () => {
+      if (isAmbientPlaying()) {
+        stopAmbientTone();
+      }
+    };
+  }, []);
 
   const screenIndex = SCREENS.indexOf(screen);
 
