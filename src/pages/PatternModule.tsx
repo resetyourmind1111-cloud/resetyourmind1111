@@ -14,6 +14,7 @@ import { TRAP_MODULES, SLUG_TO_TRAP } from "@/data/identityTrapData";
 import { useToast } from "@/hooks/use-toast";
 import { CelebrationOverlay } from "@/components/trial/CelebrationOverlay";
 import { LockedContent } from "@/components/LockedContent";
+import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
 
 const TOTAL_SCREENS = 12;
 
@@ -35,6 +36,7 @@ export default function PatternModule() {
   const [customAction, setCustomAction] = useState("");
   const [reflection, setReflection] = useState("");
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showAiChat, setShowAiChat] = useState(false);
 
   const trap = slug ? TRAP_MODULES[slug] : null;
 
@@ -346,15 +348,10 @@ export default function PatternModule() {
             <Button variant="gold" onClick={handleSaveReflection} className="w-full" disabled={!reflection.trim()}>
               Save Reflection
             </Button>
-            {hasAccess("expand") ? (
-              <button className="w-full text-sm text-muted-foreground hover:text-foreground text-center transition-colors">
-                Ask AI to help me reflect →
-              </button>
-            ) : (
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/50">
-                <Lock className="w-3 h-3" /> Available on Expand plan
-              </div>
-            )}
+            <PatternAiTriggerButton
+              label="Ask AI to help me reflect →"
+              onClick={() => setShowAiChat(true)}
+            />
           </div>
         );
       case 11: // Completion
@@ -420,6 +417,11 @@ export default function PatternModule() {
       </div>
 
       <CelebrationOverlay show={showCelebration} message="Pattern interrupted! ✦" />
+      <PatternAiChatPanel
+        trapName={trap.name}
+        show={showAiChat}
+        onClose={() => setShowAiChat(false)}
+      />
     </div>
   );
 }
