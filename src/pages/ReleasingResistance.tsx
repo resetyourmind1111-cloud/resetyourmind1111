@@ -240,21 +240,46 @@ export default function ReleasingResistance() {
                       Find a quiet space. Press play and let it move through you.
                     </p>
 
-                    {/* Audio Player Card */}
-                    <div className="rounded-2xl bg-[#1a0f2e] border border-primary/20 p-6 mb-6">
+                    {/* In-App Ambient Tones */}
+                    <div className="rounded-2xl bg-[#1a0f2e] border border-primary/20 p-6 mb-4">
                       <div className="flex items-center gap-4">
                         <button
-                          onClick={openAudioInMindist}
-                          className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shrink-0 hover:bg-primary/90 transition-colors shadow-[0_0_20px_hsl(var(--primary)/0.4)]"
+                          onClick={toggleAmbient}
+                          className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 transition-colors shadow-[0_0_20px_hsl(var(--primary)/0.4)] ${
+                            ambientPlaying
+                              ? "bg-primary/80 animate-pulse"
+                              : "bg-primary hover:bg-primary/90"
+                          }`}
                         >
-                          <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
+                          {ambientPlaying ? (
+                            <Pause className="w-6 h-6 text-primary-foreground" />
+                          ) : (
+                            <Volume2 className="w-6 h-6 text-primary-foreground" />
+                          )}
                         </button>
                         <div>
-                          <p className="text-sm font-semibold text-foreground">Releasing Resistance — Guided Reset</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Opens in Mindist · Guided meditation</p>
+                          <p className="text-sm font-semibold text-foreground">
+                            {ambientPlaying ? "Healing Tones Playing" : "Solfeggio Healing Tones"}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {ambientPlaying ? "Tap to stop · 396 Hz + 528 Hz drone" : "Play in-app ambient sound"}
+                          </p>
                         </div>
                       </div>
                     </div>
+
+                    {/* Mindist External Link */}
+                    <button
+                      onClick={openAudioInMindist}
+                      className="w-full rounded-xl border border-border/50 bg-card/60 p-4 mb-6 flex items-center gap-3 hover:border-primary/30 transition-colors text-left"
+                    >
+                      <Play className="w-8 h-8 text-primary shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground">Guided Reset Meditation</p>
+                        <p className="text-xs text-muted-foreground">Opens in Mindist</p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
+                    </button>
 
                     <Button
                       className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-6 rounded-2xl"
