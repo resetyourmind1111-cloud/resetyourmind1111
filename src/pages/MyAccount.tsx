@@ -226,6 +226,24 @@ export default function MyAccount() {
 
         <NotificationSettings />
 
+        {/* Redo Reset Plan */}
+        <Link to="/onboarding">
+          <Button
+            variant="outline"
+            className="w-full mb-2"
+            onClick={async () => {
+              if (user) {
+                await supabase
+                  .from("profiles")
+                  .update({ onboarding_complete: false, reset_plan_generated: false } as any)
+                  .eq("user_id", user.id);
+              }
+            }}
+          >
+            Redo my reset plan
+          </Button>
+        </Link>
+
         {/* Sign Out */}
         <Button variant="outline" className="w-full" onClick={signOut}>
           Sign Out
