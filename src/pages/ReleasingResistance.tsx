@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Pause, Check, Sparkles, BookOpen, Repeat, Home } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Check, Sparkles, BookOpen, Repeat, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useRef, useEffect } from "react";
+
 
 const AUDIO_URL = "https://mindist.page.link/Uiar";
 
@@ -28,10 +28,8 @@ export default function ReleasingResistance() {
   const [screen, setScreen] = useState<Screen>("insight");
   const [reflectionText, setReflectionText] = useState("");
   const [reflectionSaved, setReflectionSaved] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [lessonCompleted, setLessonCompleted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const screenIndex = SCREENS.indexOf(screen);
 
