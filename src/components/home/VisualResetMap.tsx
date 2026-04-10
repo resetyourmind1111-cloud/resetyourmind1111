@@ -56,11 +56,12 @@ export function VisualResetMap() {
       // Worth Thermostat score (latest assessment)
       const { data: assessment } = await supabase
         .from("assessment_results")
-        .select("percentage_score")
+        .select("percentage_score, thermostat_type")
         .eq("user_id", user.id)
         .order("completed_at", { ascending: false })
         .limit(1);
       const worthScore = assessment?.[0]?.percentage_score ?? 0;
+      setThermostatType(assessment?.[0]?.thermostat_type ?? undefined);
 
       // Lessons completed count
       const { count: lessonsCount } = await supabase
