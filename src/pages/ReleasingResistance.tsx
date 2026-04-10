@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Check, Sparkles, BookOpen, Repeat, Home } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Pause, Check, Sparkles, BookOpen, Repeat, Home, Volume2, ExternalLink } from "lucide-react";
+import { startAmbientTone, stopAmbientTone, isAmbientPlaying } from "@/lib/ambientTones";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
