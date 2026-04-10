@@ -21,7 +21,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { useRef, useCallback, useState } from "react";
+import { useRef, useCallback, useState, useEffect } from "react";
+import { PatternDiscoveryCard } from "@/components/patterns/PatternDiscoveryCard";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { supabase } from "@/integrations/supabase/client";
@@ -457,6 +458,9 @@ export function AssessmentResults({
             </form>
           )}
         </motion.div>
+
+        {/* Bridge: Discover My Pattern Card */}
+        <PatternDiscoveryCard />
 
         {/* Upgrade Section for Public Users */}
         <motion.div
