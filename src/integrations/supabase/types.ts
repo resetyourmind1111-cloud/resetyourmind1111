@@ -515,6 +515,7 @@ export type Database = {
           phone: string | null
           profile_photo_url: string | null
           recognition_deficit_count: number | null
+          shown_day7_modal: boolean
           stripe_customer_id: string | null
           subscription_tier: string | null
           total_points: number | null
@@ -548,6 +549,7 @@ export type Database = {
           phone?: string | null
           profile_photo_url?: string | null
           recognition_deficit_count?: number | null
+          shown_day7_modal?: boolean
           stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
@@ -581,6 +583,7 @@ export type Database = {
           phone?: string | null
           profile_photo_url?: string | null
           recognition_deficit_count?: number | null
+          shown_day7_modal?: boolean
           stripe_customer_id?: string | null
           subscription_tier?: string | null
           total_points?: number | null
