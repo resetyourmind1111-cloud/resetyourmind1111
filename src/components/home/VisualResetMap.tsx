@@ -83,6 +83,22 @@ export function VisualResetMap() {
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id);
 
+      // Pattern progress
+      const { data: patternData } = await supabase
+        .from("pattern_progress")
+        .select("total_interrupts, recodes_completed, self_trust_streak")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      const patternInterrupts = patternData?.total_interrupts ?? 0;
+      const recodes = patternData?.recodes_completed ?? 0;
+      const selfTrustStreak = patternData?.self_trust_streak ?? 0;
+      // Normalize: interrupts (max 20), recodes (max 5), streak (max 14)
+      const patternNorm = Math.min(
+        ((patternInterrupts / 20) * 40 + (recodes / 5) * 30 + (selfTrustStreak / 14) * 30),
+        100
+      );
+
       // Normalize each to 0-100
       const worthNorm = Math.min(worthScore, 100);
       const meditationNorm = Math.min(((meditationCount ?? 0) / 34) * 100, 100);
@@ -90,10 +106,11 @@ export function VisualResetMap() {
       const thirtyDayNorm = Math.min(((thirtyDayCount ?? 0) / 30) * 100, 100);
 
       const weighted = Math.round(
-        worthNorm * 0.4 +
-        meditationNorm * 0.2 +
-        lessonsNorm * 0.2 +
-        thirtyDayNorm * 0.2
+        worthNorm * 0.30 +
+        patternNorm * 0.20 +
+        meditationNorm * 0.15 +
+        lessonsNorm * 0.15 +
+        thirtyDayNorm * 0.20
       );
 
       setScore(weighted);
