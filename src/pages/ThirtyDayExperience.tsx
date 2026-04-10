@@ -14,6 +14,7 @@ import { TrialLockedContent } from "@/components/TrialLockedContent";
 import { journeyWeeks, allJourneyDays, getWeekForDay, type JourneyDay } from "@/data/journeyData";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useToast } from "@/hooks/use-toast";
+import { PatternBridge3Card } from "@/components/patterns/PatternBridge3Card";
 
 interface DayProgress {
   day_number: number;
