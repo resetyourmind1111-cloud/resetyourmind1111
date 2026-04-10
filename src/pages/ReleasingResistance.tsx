@@ -33,15 +33,22 @@ export default function ReleasingResistance() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [lessonCompleted, setLessonCompleted] = useState(false);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
+  const [ambientVolume, setAmbientVolumeState] = useState(0.8);
 
   const toggleAmbient = useCallback(() => {
     if (isAmbientPlaying()) {
       stopAmbientTone();
       setAmbientPlaying(false);
     } else {
-      startAmbientTone(0.8);
+      startAmbientTone(ambientVolume);
       setAmbientPlaying(true);
     }
+  }, [ambientVolume]);
+
+  const handleVolumeChange = useCallback((value: number[]) => {
+    const vol = value[0];
+    setAmbientVolumeState(vol);
+    setAmbientVolume(vol);
   }, []);
 
   // Cleanup ambient on unmount or screen change away from reset
