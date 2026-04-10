@@ -68,27 +68,11 @@ export default function ReleasingResistance() {
     setLessonCompleted(true);
     setShowCelebration(true);
 
-    // Stop audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-
     setTimeout(() => {
       setShowCelebration(false);
       setScreen("complete");
     }, 2600);
   };
-
-  // Cleanup audio on unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
 
   return (
     <AuthenticatedLayout title="Releasing Resistance">
