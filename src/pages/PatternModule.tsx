@@ -40,10 +40,11 @@ export default function PatternModule() {
 
   useEffect(() => { window.scrollTo(0, 0); }, [screen]);
 
-  if (!trap) {
-    navigate("/patterns");
-    return null;
-  }
+  useEffect(() => {
+    if (!trap) navigate("/patterns");
+  }, [trap, navigate]);
+
+  if (!trap) return null;
 
   const progressPercent = ((screen + 1) / TOTAL_SCREENS) * 100;
 
