@@ -98,6 +98,22 @@ export function VisualResetMap() {
 
       setScore(weighted);
 
+      // Detect zone change
+      const newZone = getZoneIndex(weighted);
+      const storedZone = localStorage.getItem(`reset-map-zone-${user.id}`);
+      const prevZone = storedZone !== null ? parseInt(storedZone) : null;
+      
+      if (prevZone !== null && newZone > prevZone) {
+        // User entered a new zone!
+        setMilestoneZoneName(ZONES[newZone].name);
+        setShowCelebration(true);
+        setTimeout(() => {
+          setShowCelebration(false);
+          setShowMilestoneCard(true);
+        }, 2600);
+      }
+      localStorage.setItem(`reset-map-zone-${user.id}`, String(newZone));
+
       // Get streak
       const { data: profile } = await supabase
         .from("profiles")
