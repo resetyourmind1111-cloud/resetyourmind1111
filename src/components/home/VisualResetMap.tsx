@@ -42,6 +42,12 @@ export function VisualResetMap() {
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [todayPoints, setTodayPoints] = useState(0);
+  const [thermostatType, setThermostatType] = useState<string | undefined>();
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [showMilestoneCard, setShowMilestoneCard] = useState(false);
+  const [milestoneZoneName, setMilestoneZoneName] = useState("");
+  const prevZoneRef = useRef<number | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!user) return;
