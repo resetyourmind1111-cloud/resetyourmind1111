@@ -20,6 +20,7 @@ import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { JourneyCheckinCard } from "@/components/journey/JourneyCheckinCard";
 import { VisualResetMap } from "@/components/home/VisualResetMap";
 import { TodaysResetToolCard } from "@/components/home/TodaysResetToolCard";
+import { ResetPlanWidget } from "@/components/home/ResetPlanWidget";
 import { TrialJourneyBar } from "@/components/trial/TrialJourneyBar";
 import { Day7CompletionModal } from "@/components/trial/Day7CompletionModal";
 
@@ -63,14 +64,19 @@ export default function Home() {
 
     supabase
       .from("profiles")
-      .select("full_name, current_streak, onboarding_reason")
+      .select("full_name, current_streak, onboarding_reason, onboarding_complete")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
         if (data) {
           setFirstName((data as any).full_name?.split(" ")[0] || null);
           setStreak((data as any).current_streak || 0);
-          // Show welcome flow if no onboarding_reason set yet (new user)
+          // Redirect to personalized onboarding if not complete
+          if (!(data as any).onboarding_complete) {
+            navigate("/onboarding");
+            return;
+          }
+          // Legacy: show welcome flow if no onboarding_reason set yet
           if (!(data as any).onboarding_reason) {
             setShowWelcomeFlow(true);
           }
@@ -143,6 +149,9 @@ export default function Home() {
               Your transformation is not linear. Let's meet you where you are.
             </p>
           </motion.div>
+
+          {/* Reset Plan Widget */}
+          <ResetPlanWidget />
 
           {/* Trial Journey Bar (Bridge 2) */}
           <TrialJourneyBar />

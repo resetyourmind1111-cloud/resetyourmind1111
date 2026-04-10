@@ -543,16 +543,21 @@ export type Database = {
           onboarding_complete: boolean | null
           onboarding_reason: string | null
           phone: string | null
+          primary_wound: string | null
           profile_photo_url: string | null
           recognition_deficit_count: number | null
+          reset_goal: string | null
+          reset_plan_generated: boolean
           shown_day7_modal: boolean
           stripe_customer_id: string | null
+          stuck_duration: string | null
           subscription_tier: string | null
           total_points: number | null
           trial_reflection_saved: boolean
           trial_start_date: string | null
           trial_tool_1: string | null
           trial_tool_2: string | null
+          tried_before: Json | null
           updated_at: string
           user_id: string
           user_source: string | null
@@ -577,16 +582,21 @@ export type Database = {
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
           phone?: string | null
+          primary_wound?: string | null
           profile_photo_url?: string | null
           recognition_deficit_count?: number | null
+          reset_goal?: string | null
+          reset_plan_generated?: boolean
           shown_day7_modal?: boolean
           stripe_customer_id?: string | null
+          stuck_duration?: string | null
           subscription_tier?: string | null
           total_points?: number | null
           trial_reflection_saved?: boolean
           trial_start_date?: string | null
           trial_tool_1?: string | null
           trial_tool_2?: string | null
+          tried_before?: Json | null
           updated_at?: string
           user_id: string
           user_source?: string | null
@@ -611,16 +621,21 @@ export type Database = {
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
           phone?: string | null
+          primary_wound?: string | null
           profile_photo_url?: string | null
           recognition_deficit_count?: number | null
+          reset_goal?: string | null
+          reset_plan_generated?: boolean
           shown_day7_modal?: boolean
           stripe_customer_id?: string | null
+          stuck_duration?: string | null
           subscription_tier?: string | null
           total_points?: number | null
           trial_reflection_saved?: boolean
           trial_start_date?: string | null
           trial_tool_1?: string | null
           trial_tool_2?: string | null
+          tried_before?: Json | null
           updated_at?: string
           user_id?: string
           user_source?: string | null
