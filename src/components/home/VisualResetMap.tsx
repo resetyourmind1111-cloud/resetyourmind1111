@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Flame, Sun, RefreshCw, ArrowUp, Star, Crown } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -7,6 +7,9 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { CelebrationOverlay } from "@/components/trial/CelebrationOverlay";
+import { MilestoneShareCard } from "./MilestoneShareCard";
 
 interface Zone {
   name: string;
@@ -39,6 +42,12 @@ export function VisualResetMap() {
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [todayPoints, setTodayPoints] = useState(0);
+  const [thermostatType, setThermostatType] = useState<string | undefined>();
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [showMilestoneCard, setShowMilestoneCard] = useState(false);
+  const [milestoneZoneName, setMilestoneZoneName] = useState("");
+  const prevZoneRef = useRef<number | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!user) return;
@@ -47,11 +56,12 @@ export function VisualResetMap() {
       // Worth Thermostat score (latest assessment)
       const { data: assessment } = await supabase
         .from("assessment_results")
-        .select("percentage_score")
+        .select("percentage_score, thermostat_type")
         .eq("user_id", user.id)
         .order("completed_at", { ascending: false })
         .limit(1);
       const worthScore = assessment?.[0]?.percentage_score ?? 0;
+      setThermostatType(assessment?.[0]?.thermostat_type ?? undefined);
 
       // Lessons completed count
       const { count: lessonsCount } = await supabase
@@ -87,6 +97,22 @@ export function VisualResetMap() {
       );
 
       setScore(weighted);
+
+      // Detect zone change
+      const newZone = getZoneIndex(weighted);
+      const storedZone = localStorage.getItem(`reset-map-zone-${user.id}`);
+      const prevZone = storedZone !== null ? parseInt(storedZone) : null;
+      
+      if (prevZone !== null && newZone > prevZone) {
+        // User entered a new zone!
+        setMilestoneZoneName(ZONES[newZone].name);
+        setShowCelebration(true);
+        setTimeout(() => {
+          setShowCelebration(false);
+          setShowMilestoneCard(true);
+        }, 2600);
+      }
+      localStorage.setItem(`reset-map-zone-${user.id}`, String(newZone));
 
       // Get streak
       const { data: profile } = await supabase
@@ -232,6 +258,19 @@ export function VisualResetMap() {
           )}
         </AnimatePresence>
       </Card>
+
+      <CelebrationOverlay
+        show={showCelebration}
+        message={`You've entered ${milestoneZoneName}!`}
+      />
+
+      <MilestoneShareCard
+        zoneName={milestoneZoneName}
+        zoneMessage={ZONES[getZoneIndex(score)]?.message || ""}
+        thermostatType={thermostatType}
+        show={showMilestoneCard}
+        onClose={() => setShowMilestoneCard(false)}
+      />
     </motion.div>
   );
 }
