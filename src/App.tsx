@@ -33,6 +33,7 @@ import DigitalWorkbook from "./pages/DigitalWorkbook";
 import SupportFlow from "./pages/SupportFlow";
 import SupportFlowCategory from "./pages/SupportFlowCategory";
 import SupportFlowComplete from "./pages/SupportFlowComplete";
+import ReleasingResistance from "./pages/ReleasingResistance";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/support-flow/complete" element={<SupportFlowComplete />} />
               <Route path="/support-flow/:state" element={<SupportFlowCategory />} />
               <Route path="/module/:slug" element={<EmotionalSurgeryModule />} />
+              <Route path="/releasing-resistance" element={<ReleasingResistance />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
