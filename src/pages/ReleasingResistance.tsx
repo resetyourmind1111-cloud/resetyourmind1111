@@ -51,17 +51,8 @@ export default function ReleasingResistance() {
     toast({ title: "Reflection saved ✨" });
   };
 
-  const toggleAudio = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio(AUDIO_URL);
-      audioRef.current.onended = () => setIsPlaying(false);
-    }
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
+  const openAudioInMindist = () => {
+    window.open(AUDIO_URL, "_blank", "noopener,noreferrer");
   };
 
   const markComplete = async () => {
