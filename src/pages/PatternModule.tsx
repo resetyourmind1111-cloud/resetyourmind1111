@@ -44,6 +44,10 @@ export default function PatternModule() {
     if (!trap) navigate("/patterns");
   }, [trap, navigate]);
 
+  useEffect(() => {
+    if (screen === TOTAL_SCREENS - 1 && trap) handleComplete();
+  }, [screen]);
+
   if (!trap) return null;
 
   const progressPercent = ((screen + 1) / TOTAL_SCREENS) * 100;
