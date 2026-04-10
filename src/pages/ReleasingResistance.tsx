@@ -86,6 +86,12 @@ export default function ReleasingResistance() {
       completed_at: new Date().toISOString(),
     }, { onConflict: "user_id,track_name,lesson_number" });
 
+    // Stop ambient tones if playing
+    if (isAmbientPlaying()) {
+      stopAmbientTone();
+      setAmbientPlaying(false);
+    }
+
     setLessonCompleted(true);
     setShowCelebration(true);
 
