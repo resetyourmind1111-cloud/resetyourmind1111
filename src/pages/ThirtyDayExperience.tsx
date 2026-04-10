@@ -14,6 +14,7 @@ import { TrialLockedContent } from "@/components/TrialLockedContent";
 import { journeyWeeks, allJourneyDays, getWeekForDay, type JourneyDay } from "@/data/journeyData";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useToast } from "@/hooks/use-toast";
+import { PatternBridge3Card } from "@/components/patterns/PatternBridge3Card";
 
 interface DayProgress {
   day_number: number;
@@ -333,10 +334,17 @@ export default function ThirtyDayExperience() {
                       <Award className="w-5 h-5 mr-2" /> Mark Day Complete
                     </Button>
                   ) : (
-                    <div className="text-center py-3 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/20">
-                      <p className="text-[#C9A84C] font-semibold flex items-center justify-center gap-2">
-                        <Check className="w-5 h-5" /> Day {selectedDay} Complete
-                      </p>
+                    <div className="space-y-4">
+                      <div className="text-center py-3 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/20">
+                        <p className="text-[#C9A84C] font-semibold flex items-center justify-center gap-2">
+                          <Check className="w-5 h-5" /> Day {selectedDay} Complete
+                        </p>
+                      </div>
+
+                      {/* Bridge 3: Pattern Reset card after Day 2 */}
+                      {selectedDay === 2 && isTrialUser && (
+                        <PatternBridge3Card />
+                      )}
                     </div>
                   )}
                 </Card>

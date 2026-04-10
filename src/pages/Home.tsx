@@ -20,6 +20,8 @@ import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { JourneyCheckinCard } from "@/components/journey/JourneyCheckinCard";
 import { VisualResetMap } from "@/components/home/VisualResetMap";
 import { TodaysResetToolCard } from "@/components/home/TodaysResetToolCard";
+import { TrialJourneyBar } from "@/components/trial/TrialJourneyBar";
+import { Day7CompletionModal } from "@/components/trial/Day7CompletionModal";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
@@ -123,6 +125,7 @@ export default function Home() {
       <TrialWelcomeBanner />
       <TrialDayBanner />
       <TrialExpiredOverlay />
+      <Day7CompletionModal />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
           {/* Header */}
@@ -140,6 +143,9 @@ export default function Home() {
               Your transformation is not linear. Let's meet you where you are.
             </p>
           </motion.div>
+
+          {/* Trial Journey Bar (Bridge 2) */}
+          <TrialJourneyBar />
 
           {/* Visual Reset Map */}
           <VisualResetMap />

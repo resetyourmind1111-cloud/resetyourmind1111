@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN shown_day7_modal BOOLEAN NOT NULL DEFAULT false;
