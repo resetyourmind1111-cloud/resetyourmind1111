@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Play, Pause, Check, Sparkles, BookOpen, Repeat, Home, Volume2, ExternalLink } from "lucide-react";
-import { startAmbientTone, stopAmbientTone, isAmbientPlaying } from "@/lib/ambientTones";
+import { startAmbientTone, stopAmbientTone, isAmbientPlaying, setAmbientVolume } from "@/lib/ambientTones";
+import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -32,15 +33,22 @@ export default function ReleasingResistance() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [lessonCompleted, setLessonCompleted] = useState(false);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
+  const [ambientVolume, setAmbientVolumeState] = useState(0.8);
 
   const toggleAmbient = useCallback(() => {
     if (isAmbientPlaying()) {
       stopAmbientTone();
       setAmbientPlaying(false);
     } else {
-      startAmbientTone(0.8);
+      startAmbientTone(ambientVolume);
       setAmbientPlaying(true);
     }
+  }, [ambientVolume]);
+
+  const handleVolumeChange = useCallback((value: number[]) => {
+    const vol = value[0];
+    setAmbientVolumeState(vol);
+    setAmbientVolume(vol);
   }, []);
 
   // Cleanup ambient on unmount or screen change away from reset
@@ -272,6 +280,19 @@ export default function ReleasingResistance() {
                           </p>
                         </div>
                       </div>
+                      {ambientPlaying && (
+                        <div className="mt-4 flex items-center gap-3">
+                          <Volume2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <Slider
+                            value={[ambientVolume]}
+                            onValueChange={handleVolumeChange}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            className="flex-1"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Mindist External Link */}
