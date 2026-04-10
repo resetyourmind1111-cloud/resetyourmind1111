@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Flame, Sparkles } from "lucide-react";
+import { Flame, Sparkles, RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -146,6 +146,28 @@ export default function Home() {
 
           {/* Today's Reset Tool */}
           <TodaysResetToolCard />
+
+          {/* My Patterns Quick Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mb-6"
+          >
+            <Link to="/patterns">
+              <Card className="p-5 bg-card/80 border-border/50 hover:border-primary/40 transition-all cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
+                    <RefreshCw className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-semibold">My Patterns</p>
+                    <p className="text-sm text-muted-foreground">Discover your pattern</p>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          </motion.div>
 
           {/* Daily Featured Card (trial) */}
           {isTrialActive && (

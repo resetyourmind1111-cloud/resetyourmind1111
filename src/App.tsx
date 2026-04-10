@@ -34,6 +34,11 @@ import SupportFlow from "./pages/SupportFlow";
 import SupportFlowCategory from "./pages/SupportFlowCategory";
 import SupportFlowComplete from "./pages/SupportFlowComplete";
 import ReleasingResistance from "./pages/ReleasingResistance";
+import Patterns from "./pages/Patterns";
+import PatternQuiz from "./pages/PatternQuiz";
+import PatternResult from "./pages/PatternResult";
+import PatternModule from "./pages/PatternModule";
+import PatternCheckin from "./pages/PatternCheckin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -76,6 +81,11 @@ const App = () => (
               <Route path="/support-flow/:state" element={<SupportFlowCategory />} />
               <Route path="/module/:slug" element={<EmotionalSurgeryModule />} />
               <Route path="/releasing-resistance" element={<ReleasingResistance />} />
+              <Route path="/patterns" element={<Patterns />} />
+              <Route path="/patterns/quiz" element={<PatternQuiz />} />
+              <Route path="/patterns/result" element={<PatternResult />} />
+              <Route path="/patterns/check-in" element={<PatternCheckin />} />
+              <Route path="/patterns/:slug" element={<PatternModule />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

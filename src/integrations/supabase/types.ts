@@ -143,6 +143,33 @@ export type Database = {
         }
         Relationships: []
       }
+      identity_trap_results: {
+        Row: {
+          created_at: string
+          id: string
+          primary_trap: string
+          quiz_answers: Json
+          secondary_trap: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          primary_trap: string
+          quiz_answers?: Json
+          secondary_trap?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          primary_trap?: string
+          quiz_answers?: Json
+          secondary_trap?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
@@ -383,6 +410,63 @@ export type Database = {
           message?: string
           related_meditation_id?: string | null
           title?: string
+        }
+        Relationships: []
+      }
+      pattern_interrupts: {
+        Row: {
+          action_taken: string
+          created_at: string
+          id: string
+          trap_name: string
+          user_id: string
+        }
+        Insert: {
+          action_taken: string
+          created_at?: string
+          id?: string
+          trap_name: string
+          user_id: string
+        }
+        Update: {
+          action_taken?: string
+          created_at?: string
+          id?: string
+          trap_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pattern_progress: {
+        Row: {
+          actions_before_certainty: number
+          honest_nos: number
+          id: string
+          last_updated: string
+          recodes_completed: number
+          self_trust_streak: number
+          total_interrupts: number
+          user_id: string
+        }
+        Insert: {
+          actions_before_certainty?: number
+          honest_nos?: number
+          id?: string
+          last_updated?: string
+          recodes_completed?: number
+          self_trust_streak?: number
+          total_interrupts?: number
+          user_id: string
+        }
+        Update: {
+          actions_before_certainty?: number
+          honest_nos?: number
+          id?: string
+          last_updated?: string
+          recodes_completed?: number
+          self_trust_streak?: number
+          total_interrupts?: number
+          user_id?: string
         }
         Relationships: []
       }
