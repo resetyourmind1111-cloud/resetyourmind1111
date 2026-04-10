@@ -259,8 +259,8 @@ export default function ThirtyDayExperience() {
           {/* Workshop / Welcome Banner */}
           {userSource === "workshop_april18" ? (
             <div className="mb-6 p-4 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/30">
-              <p className="text-sm text-foreground"><span className="mr-1">🎉</span> <strong>Welcome back from Permission Granted™.</strong></p>
-              <p className="text-xs text-muted-foreground mt-1">Your 30-day journey picks up right where the workshop left off. You've already done the hardest part — you began.</p>
+              <p className="text-sm text-foreground"><span className="mr-1">🎉</span> <strong>Welcome back from Permission Granted: Reset Your Mind 1111™ Live Experience.</strong></p>
+              <p className="text-xs text-muted-foreground mt-1">Your 30-day journey picks up right where the live experience left off. You've already done the hardest part — you began.</p>
             </div>
           ) : (
             <div className="mb-6 p-4 rounded-xl bg-[#4A7FA5]/10 border border-[#4A7FA5]/30">

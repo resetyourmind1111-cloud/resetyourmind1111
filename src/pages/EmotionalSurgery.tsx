@@ -115,6 +115,46 @@ export default function EmotionalSurgery() {
             </p>
           </motion.div>
 
+          {/* Pinned: Releasing Resistance */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4"
+          >
+            <button
+              onClick={() => {
+                const unlocked = hasTierAccess(effectiveTier, "expand");
+                navigate(unlocked ? "/releasing-resistance" : "/#pricing");
+              }}
+              className={`w-full text-left rounded-2xl border-2 border-primary/60 transition-all p-5 md:p-6 relative overflow-hidden group bg-primary/[0.04] hover:scale-[1.01]`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-primary font-semibold flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> START HERE
+                    </span>
+                  </div>
+                  <h3 className="font-serif text-lg md:text-xl font-bold text-foreground mb-1">
+                    Releasing Resistance
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    What you fight, you feed. What you feel, you free.
+                  </p>
+                </div>
+                <div className="flex-shrink-0 mt-1">
+                  {hasTierAccess(effectiveTier, "expand") ? (
+                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 font-semibold text-sm px-3" tabIndex={-1}>
+                      Begin <ChevronRight className="w-4 h-4 ml-0.5" />
+                    </Button>
+                  ) : (
+                    <Lock className="w-5 h-5 text-primary/40" />
+                  )}
+                </div>
+              </div>
+            </button>
+          </motion.div>
+
           {/* Module Cards */}
           <div className="space-y-4 mb-12">
             {modules.map((mod, idx) => {
