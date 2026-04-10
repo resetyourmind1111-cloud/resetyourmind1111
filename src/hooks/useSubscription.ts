@@ -18,8 +18,7 @@ export function useSubscription() {
   const { user } = useAuth();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // TODO: TEMP — remove after testing AI chat persistence
-  const [effectiveTier, setEffectiveTier] = useState("expand");
+  const [effectiveTier, setEffectiveTier] = useState("free");
 
   useEffect(() => {
     if (!user) {
