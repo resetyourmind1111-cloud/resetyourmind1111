@@ -1,15 +1,17 @@
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Lock } from "lucide-react";
 import { TRAP_SLUGS } from "@/data/identityTrapData";
 import { useSubscription } from "@/hooks/useSubscription";
+import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
 
 export default function PatternResult() {
   const location = useLocation();
   const navigate = useNavigate();
   const { hasAccess } = useSubscription();
   const { primary, secondary } = (location.state as { primary: string; secondary: string | null }) || {};
+  const [showAiChat, setShowAiChat] = useState(false);
 
   if (!primary) {
     navigate("/patterns");
@@ -62,21 +64,18 @@ export default function PatternResult() {
             Learn About This Pattern
           </Button>
 
-          {hasAccess("expand") ? (
-            <button
-              onClick={() => navigate(`/patterns/${slug}`, { state: { startAt: 10 } })}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Ask AI For Help →
-            </button>
-          ) : (
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground/50">
-              <Lock className="w-3.5 h-3.5" />
-              <span>AI Support — Available on Expand plan</span>
-            </div>
-          )}
+          <PatternAiTriggerButton
+            label="Ask AI For Help →"
+            onClick={() => setShowAiChat(true)}
+          />
         </div>
       </motion.div>
+
+      <PatternAiChatPanel
+        trapName={primary}
+        show={showAiChat}
+        onClose={() => setShowAiChat(false)}
+      />
     </div>
   );
 }

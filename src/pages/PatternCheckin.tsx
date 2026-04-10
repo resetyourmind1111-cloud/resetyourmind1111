@@ -7,12 +7,14 @@ import { BottomNav } from "@/components/BottomNav";
 import { CHECKIN_OPTIONS, CHECKIN_MAPPING, TRAP_SLUGS } from "@/data/identityTrapData";
 import { useSubscription } from "@/hooks/useSubscription";
 import { LockedContent } from "@/components/LockedContent";
+import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
 
 export default function PatternCheckin() {
   const navigate = useNavigate();
   const { effectiveTier } = useSubscription();
   const [selected, setSelected] = useState<string[]>([]);
   const [mappedTrap, setMappedTrap] = useState<string | null>(null);
+  const [showAiChat, setShowAiChat] = useState(false);
 
   const toggleOption = (opt: string) => {
     setSelected((prev) =>
@@ -111,12 +113,24 @@ export default function PatternCheckin() {
                 >
                   Not quite right? Choose a different pattern
                 </button>
+
+                <PatternAiTriggerButton
+                  label="Ask AI For Help →"
+                  onClick={() => setShowAiChat(true)}
+                />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </main>
       <BottomNav />
+      {mappedTrap && (
+        <PatternAiChatPanel
+          trapName={mappedTrap}
+          show={showAiChat}
+          onClose={() => setShowAiChat(false)}
+        />
+      )}
     </div>
   );
 
