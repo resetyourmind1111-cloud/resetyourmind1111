@@ -135,6 +135,7 @@ export default function ThirtyDayExperience() {
   const [showWeekComplete, setShowWeekComplete] = useState<number | null>(null);
   const [showDay30, setShowDay30] = useState(false);
   const [showReflection, setShowReflection] = useState<number | null>(null);
+  const [showTrialDay3, setShowTrialDay3] = useState(false);
   const [lastCompletedDay, setLastCompletedDay] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
