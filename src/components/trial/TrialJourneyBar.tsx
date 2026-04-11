@@ -1,103 +1,89 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { useTrialStatus } from "@/hooks/useTrialStatus";
-import { TRAP_SLUGS } from "@/data/identityTrapData";
-
-interface DayAction {
-  label: string;
-  buttonText: string;
-  route: string;
-  subText?: string;
-}
+import { useTrialStatus, TRIAL_TOOL_NAMES, getTrialAllowedTools } from "@/hooks/useTrialStatus";
+import { Calendar, Headphones, Wrench, ArrowRight } from "lucide-react";
 
 export function TrialJourneyBar() {
-  const { user } = useAuth();
-  const { isTrialActive, trialDay } = useTrialStatus();
+  const { isTrialActive, trialDay, onboardingReason, trialTool1, trialTool2 } = useTrialStatus();
   const navigate = useNavigate();
-  const [primaryTrap, setPrimaryTrap] = useState<string | null>(null);
-  const [hasQuiz, setHasQuiz] = useState(false);
-  const [hasReset, setHasReset] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("identity_trap_results")
-      .select("primary_trap")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          setPrimaryTrap(data[0].primary_trap);
-          setHasQuiz(true);
-        }
-      });
-    supabase
-      .from("pattern_interrupts")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .then(({ count }) => setHasReset((count ?? 0) > 0));
-  }, [user]);
 
   if (!isTrialActive) return null;
 
-  const trapSlug = primaryTrap ? TRAP_SLUGS[primaryTrap] : null;
+  const allowedTools = getTrialAllowedTools(onboardingReason, trialTool1, trialTool2);
+  const tool1Name = TRIAL_TOOL_NAMES[allowedTools[0]] || allowedTools[0];
+  const tool2Name = TRIAL_TOOL_NAMES[allowedTools[1]] || allowedTools[1];
 
-  const getDayAction = (): DayAction => {
-    const day = Math.max(1, Math.min(trialDay, 7));
-    switch (day) {
-      case 1:
-        return { label: "Start here → Take your Worth Thermostat Assessment", buttonText: "Open Assessment", route: "/assessment" };
-      case 2:
-        if (hasQuiz && trapSlug) return { label: "Today → Do Your First Pattern Reset", buttonText: "Start Reset", route: `/patterns/${trapSlug}` };
-        return { label: "Today → Discover your Identity Pattern", buttonText: "Take the Quiz", route: "/patterns/quiz" };
-      case 3:
-        if (hasReset) return { label: "Today → Try a Meditation", buttonText: "Open Meditations", route: "/meditations" };
-        return { label: "Today → Complete your first Pattern Reset", buttonText: "Open My Patterns", route: "/patterns" };
-      case 4:
-        return { label: "Today → Check in with your pattern", buttonText: "Daily Check-In", route: "/patterns/check-in" };
-      case 5:
-        return { label: "Today → Do your second Pattern Reset", buttonText: "Continue Reset", route: trapSlug ? `/patterns/${trapSlug}` : "/patterns" };
-      case 6:
-        return { label: "Tomorrow your preview ends", buttonText: "Use Your Final Free Tool", route: "/patterns/check-in", subText: "Your full reset is one tap away after Day 7." };
-      case 7:
-      default:
-        return { label: "Today is your last free day.", buttonText: "Complete Your Reset Journey", route: trapSlug ? `/patterns/${trapSlug}` : "/patterns", subText: "Don't lose your momentum — continue with full access." };
-    }
-  };
-
-  const action = getDayAction();
   const progressPercent = (Math.min(trialDay, 7) / 7) * 100;
+
+  const sections = [
+    {
+      icon: Calendar,
+      label: "30-Day Experience",
+      sub: "Days 1–3 unlocked",
+      route: "/30-day-experience",
+    },
+    {
+      icon: Headphones,
+      label: "Meditations",
+      sub: "3 sessions unlocked",
+      route: "/meditations",
+    },
+    {
+      icon: Wrench,
+      label: "Healing Tools",
+      sub: `${tool1Name} & ${tool2Name}`,
+      route: "/healing-tools",
+    },
+  ];
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15 }}
-      className="mb-6 p-5 rounded-xl border border-primary/30 bg-card/80"
+      className="mb-6 space-y-3"
     >
-      <p className="text-xs text-primary font-semibold mb-2">
-        Day {Math.min(trialDay, 7)} of 7 — Your Free Reset Experience
-      </p>
-      <Progress value={progressPercent} className="h-1.5 mb-4 bg-muted [&>[data-state]]:bg-primary" />
+      {/* Progress header */}
+      <div className="px-1">
+        <p className="text-xs text-primary font-semibold mb-2">
+          Day {Math.min(trialDay, 7)} of 7 — Your Free Preview
+        </p>
+        <Progress value={progressPercent} className="h-1.5 bg-muted [&>[data-state]]:bg-primary" />
+      </div>
 
-      <p className="text-sm text-foreground mb-3">{action.label}</p>
-      <Button
-        variant="gold"
-        size="sm"
-        className="w-full"
-        onClick={() => navigate(action.route)}
-      >
-        {action.buttonText}
-      </Button>
-      {action.subText && (
-        <p className="text-[11px] text-muted-foreground/60 text-center mt-2">{action.subText}</p>
-      )}
+      {/* Unlocked content cards */}
+      <div className="space-y-2">
+        <p className="text-[11px] uppercase tracking-[0.15em] text-muted-foreground font-medium px-1">
+          Your unlocked content
+        </p>
+        {sections.map((s, i) => (
+          <motion.div
+            key={s.route}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 + i * 0.08 }}
+          >
+            <Card
+              className="p-4 bg-card/80 border-border/50 hover:border-primary/40 transition-all cursor-pointer active:scale-[0.98]"
+              onClick={() => navigate(s.route)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                  <s.icon className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">{s.label}</p>
+                  <p className="text-xs text-muted-foreground truncate">{s.sub}</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+              </div>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
     </motion.div>
   );
 }
