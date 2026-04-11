@@ -611,9 +611,13 @@ export type Database = {
           journey_start_date: string | null
           last_30day_activity: string | null
           last_login: string | null
+          last_thermostat_date: string | null
+          longest_streak: number
+          longterm_cards_shown: Json
           lorie_30day_shown: boolean
           lorie_welcome_shown: boolean
           milestone_cards_shown: Json
+          monthly_ceremonies_completed: Json
           notification_time: string | null
           notifications_enabled: boolean
           onboarding_complete: boolean | null
@@ -625,11 +629,13 @@ export type Database = {
           recognition_deficit_count: number | null
           reset_goal: string | null
           reset_plan_generated: boolean
+          share_milestones: boolean
           shown_day7_modal: boolean
           stripe_customer_id: string | null
           stuck_duration: string | null
           subscription_tier: string | null
           total_points: number | null
+          total_sessions: number
           trial_reflection_saved: boolean
           trial_start_date: string | null
           trial_tool_1: string | null
@@ -639,6 +645,7 @@ export type Database = {
           user_id: string
           user_source: string | null
           welcome_banner_dismissed: boolean
+          whats_next_shown: boolean
           worth_score_after: number | null
           worth_score_before: number | null
           worth_score_day1: number | null
@@ -661,9 +668,13 @@ export type Database = {
           journey_start_date?: string | null
           last_30day_activity?: string | null
           last_login?: string | null
+          last_thermostat_date?: string | null
+          longest_streak?: number
+          longterm_cards_shown?: Json
           lorie_30day_shown?: boolean
           lorie_welcome_shown?: boolean
           milestone_cards_shown?: Json
+          monthly_ceremonies_completed?: Json
           notification_time?: string | null
           notifications_enabled?: boolean
           onboarding_complete?: boolean | null
@@ -675,11 +686,13 @@ export type Database = {
           recognition_deficit_count?: number | null
           reset_goal?: string | null
           reset_plan_generated?: boolean
+          share_milestones?: boolean
           shown_day7_modal?: boolean
           stripe_customer_id?: string | null
           stuck_duration?: string | null
           subscription_tier?: string | null
           total_points?: number | null
+          total_sessions?: number
           trial_reflection_saved?: boolean
           trial_start_date?: string | null
           trial_tool_1?: string | null
@@ -689,6 +702,7 @@ export type Database = {
           user_id: string
           user_source?: string | null
           welcome_banner_dismissed?: boolean
+          whats_next_shown?: boolean
           worth_score_after?: number | null
           worth_score_before?: number | null
           worth_score_day1?: number | null
@@ -711,9 +725,13 @@ export type Database = {
           journey_start_date?: string | null
           last_30day_activity?: string | null
           last_login?: string | null
+          last_thermostat_date?: string | null
+          longest_streak?: number
+          longterm_cards_shown?: Json
           lorie_30day_shown?: boolean
           lorie_welcome_shown?: boolean
           milestone_cards_shown?: Json
+          monthly_ceremonies_completed?: Json
           notification_time?: string | null
           notifications_enabled?: boolean
           onboarding_complete?: boolean | null
@@ -725,11 +743,13 @@ export type Database = {
           recognition_deficit_count?: number | null
           reset_goal?: string | null
           reset_plan_generated?: boolean
+          share_milestones?: boolean
           shown_day7_modal?: boolean
           stripe_customer_id?: string | null
           stuck_duration?: string | null
           subscription_tier?: string | null
           total_points?: number | null
+          total_sessions?: number
           trial_reflection_saved?: boolean
           trial_start_date?: string | null
           trial_tool_1?: string | null
@@ -739,6 +759,7 @@ export type Database = {
           user_id?: string
           user_source?: string | null
           welcome_banner_dismissed?: boolean
+          whats_next_shown?: boolean
           worth_score_after?: number | null
           worth_score_before?: number | null
           worth_score_day1?: number | null

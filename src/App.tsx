@@ -42,6 +42,8 @@ import PatternCheckin from "./pages/PatternCheckin";
 import Onboarding from "./pages/Onboarding";
 import ResetPlan from "./pages/ResetPlan";
 import MyShifts from "./pages/MyShifts";
+import MonthlyReset from "./pages/MonthlyReset";
+import WhatsNext from "./pages/WhatsNext";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -92,6 +94,8 @@ const App = () => (
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/reset-plan" element={<ResetPlan />} />
               <Route path="/my-shifts" element={<MyShifts />} />
+              <Route path="/monthly-reset" element={<MonthlyReset />} />
+              <Route path="/whats-next" element={<WhatsNext />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
