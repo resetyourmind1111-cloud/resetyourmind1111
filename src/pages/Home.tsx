@@ -161,6 +161,9 @@ export default function Home() {
           {/* Reset Plan Widget */}
           <ResetPlanWidget />
 
+          {/* Daily Shift Widget */}
+          <DailyShiftWidget />
+
           {/* Trial Journey Bar (Bridge 2) */}
           <TrialJourneyBar />
 
