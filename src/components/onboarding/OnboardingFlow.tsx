@@ -90,10 +90,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     setIsReframing(true);
     try {
       const { data, error } = await supabase.functions.invoke("reframe-belief", {
-        body: { limiting_belief: limitingBelief },
+        body: { belief: limitingBelief },
       });
       if (error) throw error;
-      setNewBelief(data.new_belief);
+      setNewBelief(data.newBelief || data.new_belief || "I am worthy of everything I desire.");
     } catch {
       setNewBelief("I am worthy of everything I desire, and I give myself permission to receive it now.");
     } finally {
