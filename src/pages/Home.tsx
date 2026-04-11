@@ -33,7 +33,7 @@ import { DailySurpriseCard } from "@/components/home/DailySurpriseCard";
 import { StreakCard } from "@/components/home/StreakCard";
 import { AiCheckinCard } from "@/components/home/AiCheckinCard";
 import { TransformationCard } from "@/components/home/TransformationCard";
-
+import { OraclePreviewCard } from "@/components/home/OraclePreviewCard";
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
   { label: "I feel emotional", emoji: "💧", module: "Release" },
