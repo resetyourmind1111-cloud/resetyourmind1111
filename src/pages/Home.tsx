@@ -54,6 +54,8 @@ export default function Home() {
   const { isTrialActive, trialDay, onboardingReason, isLoading: trialLoading } = useTrialStatus();
   const [firstName, setFirstName] = useState<string | null>(null);
   const [streak, setStreak] = useState(0);
+  const [totalSessions, setTotalSessions] = useState(0);
+  const [longestStreak, setLongestStreak] = useState(0);
   const [lastModule, setLastModule] = useState<string | null>(null);
   const [tapping, setTapping] = useState<number | null>(null);
   const [showWelcomeFlow, setShowWelcomeFlow] = useState(false);
@@ -70,13 +72,23 @@ export default function Home() {
 
     supabase
       .from("profiles")
-      .select("full_name, current_streak, onboarding_reason, onboarding_complete")
+      .select("full_name, current_streak, onboarding_reason, onboarding_complete, total_sessions, longest_streak")
       .eq("user_id", user.id)
       .single()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         if (data) {
           setFirstName((data as any).full_name?.split(" ")[0] || null);
           setStreak((data as any).current_streak || 0);
+          setTotalSessions(((data as any).total_sessions || 0) + 1);
+          setLongestStreak(Math.max((data as any).longest_streak || 0, (data as any).current_streak || 0));
+
+          // Increment total_sessions and update longest_streak
+          const newTotal = ((data as any).total_sessions || 0) + 1;
+          const newLongest = Math.max((data as any).longest_streak || 0, (data as any).current_streak || 0);
+          await supabase.from("profiles").update({
+            total_sessions: newTotal,
+            longest_streak: newLongest,
+          } as any).eq("user_id", user.id);
           // Redirect to personalized onboarding if not complete
           if (!(data as any).onboarding_complete) {
             navigate("/onboarding");
@@ -278,6 +290,10 @@ export default function Home() {
                   <p className="text-sm font-semibold text-foreground">
                     {streak > 0 ? `${streak}-day streak` : "Start your streak today"}
                   </p>
+                  <div className="flex gap-3 text-xs text-muted-foreground">
+                    <span>Total sessions: {totalSessions}</span>
+                    <span>Longest streak: {longestStreak}</span>
+                  </div>
                   {lastModule && (
                     <p className="text-xs text-muted-foreground">
                       Last module: {lastModule}
@@ -285,6 +301,11 @@ export default function Home() {
                   )}
                 </div>
               </div>
+              {streak === 0 && totalSessions > 1 && (
+                <p className="text-xs text-muted-foreground mb-3 italic">
+                  Streak reset — but your {totalSessions} total sessions never go away. Keep going.
+                </p>
+              )}
               <div className="flex items-start gap-2 pt-3 border-t border-border/50">
                 <Sparkles className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                 <p className="text-sm text-muted-foreground italic leading-relaxed">
