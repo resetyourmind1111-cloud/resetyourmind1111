@@ -42,16 +42,6 @@ const stateOptions = [
   { label: "I feel activated", emoji: "⚡", module: "Embodiment" },
 ];
 
-const dailyAffirmations = [
-  "Nothing is wrong. Something is integrating.",
-  "What would someone who feels deeply loved do right now?",
-  "Today is a new chance to choose yourself.",
-  "I am not lost. I am between identities.",
-  "Stop settling for crumbs. Choose celebration.",
-  "I am safe in this space. I am becoming in this space.",
-  "Transformation is what you do consistently.",
-];
-
 export default function Home() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -63,9 +53,6 @@ export default function Home() {
   const [lastModule, setLastModule] = useState<string | null>(null);
   const [tapping, setTapping] = useState<number | null>(null);
   const [showWelcomeFlow, setShowWelcomeFlow] = useState(false);
-
-  const dayOfWeek = new Date().getDay();
-  const affirmation = dailyAffirmations[dayOfWeek];
 
   useEffect(() => {
     if (!isLoading && !user) {
