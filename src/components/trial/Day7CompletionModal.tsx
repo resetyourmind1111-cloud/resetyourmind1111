@@ -192,7 +192,6 @@ export function Day7CompletionModal() {
     </AnimatePresence>
   );
 }
-  const { user } = useAuth();
   const { trialDay, isTrialActive } = useTrialStatus();
   const { effectiveTier } = useSubscription();
   const navigate = useNavigate();
