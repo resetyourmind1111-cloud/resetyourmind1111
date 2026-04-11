@@ -297,7 +297,7 @@ const Oracle = () => {
       <div className="min-h-screen bg-background flex flex-col">
         <Navigation />
         <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
-          {step !== 'deck' && (
+          {step !== 'deck' && step !== 'results' && (
             <Button variant="ghost" size="sm" onClick={() => { resetReading(); setShowTrialEntry(true); }} className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
