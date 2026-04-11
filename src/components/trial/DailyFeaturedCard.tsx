@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Link, useNavigate } from "react-router-dom";
-import { useTrialStatus, TRIAL_TOOL_NAMES } from "@/hooks/useTrialStatus";
+import { useNavigate } from "react-router-dom";
+import { useTrialStatus, TRIAL_TOOL_NAMES, getTrialAllowedTools } from "@/hooks/useTrialStatus";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,18 +16,23 @@ export function DailyFeaturedCard() {
   const [journalText, setJournalText] = useState("");
   const [showJournal, setShowJournal] = useState(false);
   const [journalSaved, setJournalSaved] = useState(false);
+  const [hasAssessment, setHasAssessment] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("assessment_results")
+      .select("id")
+      .eq("user_id", user.id)
+      .limit(1)
+      .then(({ data }) => setHasAssessment((data?.length ?? 0) > 0));
+  }, [user]);
 
   if (!isTrialActive || trialExpired) return null;
 
-  const tool1Name = trialTool1 ? (TRIAL_TOOL_NAMES[trialTool1] || trialTool1) : "Nervous System Reset";
-  const tool2Name = trialTool2 ? (TRIAL_TOOL_NAMES[trialTool2] || trialTool2) : "Limiting Belief Rewriter";
-
-  const toolCopy: Record<string, string> = {
-    stuck: `🛠 Your tools are ready. Try the ${tool1Name} or ${tool2Name} today.`,
-    sabotage: `🛠 Your tools are ready. Try the ${tool1Name} or ${tool2Name} today.`,
-    relationships: `🛠 Your tools are ready. Try the ${tool1Name} or ${tool2Name} today.`,
-    levelup: `🛠 Your tools are ready. Try the ${tool1Name} or ${tool2Name} today.`,
-  };
+  const allowedTools = getTrialAllowedTools(onboardingReason, trialTool1, trialTool2);
+  const tool1Name = TRIAL_TOOL_NAMES[allowedTools[0]] || allowedTools[0];
+  const tool2Name = TRIAL_TOOL_NAMES[allowedTools[1]] || allowedTools[1];
 
   const handleSaveJournal = async () => {
     if (!user || !journalText.trim()) return;
@@ -41,34 +46,44 @@ export function DailyFeaturedCard() {
     toast.success("✨ You wrote your truth. That's not nothing. That's everything.");
   };
 
+  // Day 0: If assessment already done, send to 30-day experience instead
+  const day0Card = hasAssessment
+    ? {
+        emoji: "🌟",
+        copy: "You've already taken your assessment. Now start your 30-Day Experience — Days 1–3 are unlocked for you.",
+        button: "Start Day 1 →",
+        action: () => navigate("/30-day-experience"),
+      }
+    : {
+        emoji: "🌡",
+        copy: "Start here. Take the Worth Thermostat™ — discover exactly where your worth is set.",
+        button: "Take Assessment →",
+        action: () => navigate("/assessment"),
+      };
+
   const cards: Record<number, { emoji: string; copy: string; button: string; action: () => void }> = {
-    0: {
-      emoji: "🌡",
-      copy: "Start here. Take the Worth Thermostat™ — discover exactly where your worth is set.",
-      button: "Take Assessment →",
-      action: () => navigate("/assessment"),
-    },
+    0: day0Card,
     1: {
       emoji: "🧠",
-      copy: "Day 2. Go deeper. You've seen where you are. Now let's start moving.",
-      button: "Start Day 1 of 30-Day Experience →",
+      copy: `Day 2. Your 30-Day Experience (Days 1–3) and two healing tools are ready: ${tool1Name} & ${tool2Name}.`,
+      button: "Open 30-Day Experience →",
       action: () => navigate("/30-day-experience"),
     },
     2: {
       emoji: "💧",
-      copy: "Day 3. Feel the shift. Something is already different. Let's name it.",
-      button: "Open Today's Reset →",
-      action: () => navigate("/30-day-experience"),
+      copy: "Day 3. You have 3 meditations unlocked. Try one — even 5 minutes can shift everything.",
+      button: "Open Meditations →",
+      action: () => navigate("/meditations"),
     },
     3: {
       emoji: "🛠",
-      copy: toolCopy[onboardingReason || "stuck"] || toolCopy.stuck,
+      copy: `Day 4. Try your personalized tools: ${tool1Name} & ${tool2Name}. They're built for exactly where you are.`,
       button: "Open My Tools →",
       action: () => navigate("/healing-tools"),
     },
     4: {
       emoji: "🎧",
-      copy: "Day 5. Your mind is ready. Listen to one of your 3 preview meditations.",
+      copy: "Day 5. Revisit your meditations or continue the 30-Day Experience. Every session builds on the last.",
       button: "Open Meditations →",
       action: () => navigate("/meditations"),
     },
@@ -80,7 +95,7 @@ export function DailyFeaturedCard() {
     },
     6: {
       emoji: "⏳",
-      copy: "Last day of your preview. Make it count.",
+      copy: "Last day of your preview. Make it count — use every tool you have access to.",
       button: "Continue My Reset →",
       action: () => navigate("/30-day-experience"),
     },
@@ -93,7 +108,7 @@ export function DailyFeaturedCard() {
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <Card className="p-5 bg-card/80 border-[#C9A84C]/20 space-y-4">
-          <p className="font-serif text-[#F9F6F0] text-lg font-semibold">
+          <p className="font-serif text-foreground text-lg font-semibold">
             What is different about me compared to 6 days ago?
           </p>
           {!journalSaved ? (
@@ -109,7 +124,7 @@ export function DailyFeaturedCard() {
               </Button>
             </>
           ) : (
-            <p className="text-[#C9A84C] text-sm font-medium">
+            <p className="text-primary text-sm font-medium">
               ✨ You wrote your truth. That's not nothing. That's everything.
             </p>
           )}
@@ -124,9 +139,9 @@ export function DailyFeaturedCard() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <Card className={`p-5 bg-card/80 ${dayIndex === 6 ? "border-2 border-[#C9A84C]" : "border-border/50"}`}>
+      <Card className={`p-5 bg-card/80 ${dayIndex === 6 ? "border-2 border-primary" : "border-border/50"}`}>
         <p className="text-lg mb-1">{card.emoji}</p>
-        <p className="text-[#F9F6F0] font-medium text-sm mb-3">{card.copy}</p>
+        <p className="text-foreground font-medium text-sm mb-3">{card.copy}</p>
         <Button onClick={card.action} variant="gold" size="sm">
           {card.button}
         </Button>
