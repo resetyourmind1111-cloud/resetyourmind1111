@@ -170,6 +170,17 @@ export default function Home() {
             </p>
           </motion.div>
 
+          {/* Trial Journey Bar — show unlocked content prominently for trial users */}
+          <TrialJourneyBar />
+
+          {/* Daily Featured Card (trial) — moved up for visibility */}
+          {isTrialActive && (
+            <div className="mb-6 space-y-4">
+              <DailyFeaturedCard />
+              <DailyPermissionSlipCard />
+            </div>
+          )}
+
           {/* Long-term Milestone Cards (Day 60/90/180) */}
           <LongTermMilestoneCard />
 
@@ -184,9 +195,6 @@ export default function Home() {
 
           {/* Daily Shift Widget */}
           <DailyShiftWidget />
-
-          {/* Trial Journey Bar (Bridge 2) */}
-          <TrialJourneyBar />
 
           {/* Visual Reset Map */}
           <VisualResetMap />
