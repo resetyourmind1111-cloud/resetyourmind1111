@@ -22,13 +22,13 @@ const plansByWound: Record<string, PlanCard[]> = {
       title: "Scarcity Loop Reset",
       description: "Identify the pattern keeping you stuck financially.",
       buttonText: "Start Reset",
-      href: "/patterns",
+      href: "/patterns/quiz",
     },
     {
       title: "Money Story Audit",
       description: "Uncover the story beneath the struggle.",
       buttonText: "Open Tool",
-      href: "/healing-tools",
+      href: "/healing-tools/money-story-audit",
     },
   ],
   love: [
@@ -42,13 +42,13 @@ const plansByWound: Record<string, PlanCard[]> = {
       title: "People Pleaser Reset",
       description: "Break the pattern of giving yourself away.",
       buttonText: "Start Reset",
-      href: "/patterns",
+      href: "/patterns/quiz",
     },
     {
       title: "Attachment Style Analyzer",
       description: "Understand how you love and why.",
       buttonText: "Open Tool",
-      href: "/healing-tools",
+      href: "/healing-tools/attachment-style-analyzer",
     },
   ],
   health: [
@@ -56,13 +56,13 @@ const plansByWound: Record<string, PlanCard[]> = {
       title: "Nervous System Diagnostic",
       description: "Find out how your nervous system is running your body.",
       buttonText: "Start Diagnostic",
-      href: "/wellness",
+      href: "/healing-tools/nervous-system-diagnostic",
     },
     {
       title: "Start-Stop Cycle Reset",
       description: "Break the pattern of starting over.",
       buttonText: "Start Reset",
-      href: "/patterns",
+      href: "/patterns/quiz",
     },
     {
       title: "Releasing Resistance Lesson",
@@ -82,7 +82,7 @@ const plansByWound: Record<string, PlanCard[]> = {
       title: '"I Know But…" Reset',
       description: "Close the gap between who you know you are and how you're actually living.",
       buttonText: "Start Reset",
-      href: "/patterns",
+      href: "/patterns/quiz",
     },
     {
       title: "Emotional Surgery Lessons",
