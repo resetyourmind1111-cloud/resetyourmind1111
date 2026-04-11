@@ -128,6 +128,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_shifts: {
+        Row: {
+          created_at: string
+          entry_date: string
+          id: string
+          prompt: string
+          response: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_date?: string
+          id?: string
+          prompt: string
+          response: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_date?: string
+          id?: string
+          prompt?: string
+          response?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       founding_member_spots: {
         Row: {
           id: string
@@ -344,6 +371,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications_schedule: {
+        Row: {
+          created_at: string
+          day_number: number
+          id: string
+          message_body: string
+          message_title: string
+          scheduled_time: string
+          sent: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          id?: string
+          message_body: string
+          message_title: string
+          scheduled_time: string
+          sent?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          id?: string
+          message_body?: string
+          message_title?: string
+          scheduled_time?: string
+          sent?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       onboarding_responses: {
         Row: {
           abundance_evidence: string | null
@@ -533,6 +593,9 @@ export type Database = {
           body_type_completed_at: string | null
           created_at: string
           current_streak: number | null
+          day3_card_shown: boolean
+          first_moment_complete: boolean
+          first_moment_response: string | null
           founder_banner_dismissed_count: number
           full_name: string | null
           human_design_type: string | null
@@ -540,6 +603,9 @@ export type Database = {
           journey_current_day: number | null
           journey_start_date: string | null
           last_login: string | null
+          lorie_welcome_shown: boolean
+          notification_time: string | null
+          notifications_enabled: boolean
           onboarding_complete: boolean | null
           onboarding_reason: string | null
           phone: string | null
@@ -572,6 +638,9 @@ export type Database = {
           body_type_completed_at?: string | null
           created_at?: string
           current_streak?: number | null
+          day3_card_shown?: boolean
+          first_moment_complete?: boolean
+          first_moment_response?: string | null
           founder_banner_dismissed_count?: number
           full_name?: string | null
           human_design_type?: string | null
@@ -579,6 +648,9 @@ export type Database = {
           journey_current_day?: number | null
           journey_start_date?: string | null
           last_login?: string | null
+          lorie_welcome_shown?: boolean
+          notification_time?: string | null
+          notifications_enabled?: boolean
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
           phone?: string | null
@@ -611,6 +683,9 @@ export type Database = {
           body_type_completed_at?: string | null
           created_at?: string
           current_streak?: number | null
+          day3_card_shown?: boolean
+          first_moment_complete?: boolean
+          first_moment_response?: string | null
           founder_banner_dismissed_count?: number
           full_name?: string | null
           human_design_type?: string | null
@@ -618,6 +693,9 @@ export type Database = {
           journey_current_day?: number | null
           journey_start_date?: string | null
           last_login?: string | null
+          lorie_welcome_shown?: boolean
+          notification_time?: string | null
+          notifications_enabled?: boolean
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
           phone?: string | null
