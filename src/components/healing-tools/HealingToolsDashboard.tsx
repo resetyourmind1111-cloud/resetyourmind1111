@@ -8,7 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { healingTools } from "@/data/healingToolsData";
-import { Sparkles, TrendingUp, Calendar, ArrowRight, CheckCircle2 } from "lucide-react";
+import { TrialLockedContent } from "@/components/TrialLockedContent";
+import { useTrialStatus, getTrialAllowedTools } from "@/hooks/useTrialStatus";
+import { Sparkles, TrendingUp, Calendar, ArrowRight, CheckCircle2, Lock } from "lucide-react";
 
 interface ToolEntry {
   id: string;
@@ -20,6 +22,23 @@ interface ToolEntry {
 export default function HealingToolsDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { isTrialActive, onboardingReason, trialTool1, trialTool2 } = useTrialStatus();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile-dashboard", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("subscription_tier")
+        .eq("user_id", user!.id)
+        .single();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const tier = profile?.subscription_tier || "free";
+  const allowedTools = getTrialAllowedTools(onboardingReason, trialTool1, trialTool2);
 
   const { data: allEntries = [] } = useQuery({
     queryKey: ["all-healing-entries", user?.id],
@@ -155,36 +174,45 @@ export default function HealingToolsDashboard() {
       <div>
         <h3 className="font-serif text-xl font-bold text-foreground mb-4">All Tools</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {toolStats.map((tool, i) => (
-            <motion.div
-              key={tool.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + i * 0.03 }}
-            >
-              <Card
-                className={`glass-card-hover cursor-pointer ${tool.entryCount === 0 ? "opacity-60" : ""}`}
-                onClick={() => navigate(`/healing-tools/${tool.id}`)}
+          {toolStats.map((tool, i) => {
+            const isTrialTool = allowedTools.includes(tool.id);
+            const isLockedDuringTrial = isTrialActive && tier === "free" && !isTrialTool;
+
+            return (
+              <motion.div
+                key={tool.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + i * 0.03 }}
               >
-                <CardContent className="p-4 flex items-center gap-3">
-                  <span className="text-2xl">{tool.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-serif text-sm font-semibold text-foreground truncate">{tool.name}</h4>
-                    <p className="text-xs text-muted-foreground">
-                      {tool.entryCount > 0
-                        ? `${tool.entryCount} entries · Last ${formatRelative(tool.lastUsed!)}`
-                        : "Not started yet"}
-                    </p>
-                  </div>
-                  {tool.entryCount > 0 ? (
-                    <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
-                  ) : (
-                    <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                <TrialLockedContent isLocked={isLockedDuringTrial}>
+                  <Card
+                    className={`glass-card-hover cursor-pointer ${tool.entryCount === 0 ? "opacity-60" : ""} ${isTrialTool && isTrialActive && tier === "free" ? "border-[#C9A84C]/40" : ""}`}
+                    onClick={() => navigate(`/healing-tools/${tool.id}`)}
+                  >
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <span className="text-2xl">{tool.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-serif text-sm font-semibold text-foreground truncate">{tool.name}</h4>
+                        <p className="text-xs text-muted-foreground">
+                          {tool.entryCount > 0
+                            ? `${tool.entryCount} entries · Last ${formatRelative(tool.lastUsed!)}`
+                            : "Not started yet"}
+                        </p>
+                      </div>
+                      {isLockedDuringTrial ? (
+                        <Lock className="w-4 h-4 text-[#C9A84C] shrink-0" />
+                      ) : tool.entryCount > 0 ? (
+                        <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                      ) : (
+                        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      )}
+                    </CardContent>
+                  </Card>
+                </TrialLockedContent>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </div>
