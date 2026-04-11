@@ -6,7 +6,7 @@ import { Heart, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { permissionSlips } from "@/data/permissionSlipsData";
+import { allPermissionSlips } from "@/data/permissionSlipsData";
 import { resetWords } from "@/data/resetWordsData";
 import { useNavigate } from "react-router-dom";
 
@@ -28,8 +28,8 @@ export function DailySurpriseCard() {
 
   const dailyPermission = useMemo(() => {
     if (cycleType !== 0) return null;
-    const index = dayOfYear % permissionSlips.length;
-    return permissionSlips[index];
+    const index = dayOfYear % allPermissionSlips.length;
+    return allPermissionSlips[index];
   }, [cycleType, dayOfYear]);
 
   const dailyWord = useMemo(() => {

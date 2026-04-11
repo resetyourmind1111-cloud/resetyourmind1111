@@ -29,6 +29,10 @@ import { DailyShiftWidget } from "@/components/home/DailyShiftWidget";
 import { LongTermMilestoneCard } from "@/components/home/LongTermMilestoneCard";
 import { MonthlyThermostatNudge } from "@/components/home/MonthlyThermostatNudge";
 import { MonthlyResetNudge } from "@/components/home/MonthlyResetNudge";
+import { DailySurpriseCard } from "@/components/home/DailySurpriseCard";
+import { StreakCard } from "@/components/home/StreakCard";
+import { AiCheckinCard } from "@/components/home/AiCheckinCard";
+import { TransformationCard } from "@/components/home/TransformationCard";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
@@ -152,6 +156,12 @@ export default function Home() {
       <Day7CompletionModal />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+          {/* Daily Surprise Card */}
+          <DailySurpriseCard />
+
+          {/* AI Proactive Check-in */}
+          <AiCheckinCard />
+
           {/* Lorie Welcome Card (Day 1 only) */}
           <LorieWelcomeCard />
 
