@@ -23,6 +23,9 @@ import { TodaysResetToolCard } from "@/components/home/TodaysResetToolCard";
 import { ResetPlanWidget } from "@/components/home/ResetPlanWidget";
 import { TrialJourneyBar } from "@/components/trial/TrialJourneyBar";
 import { Day7CompletionModal } from "@/components/trial/Day7CompletionModal";
+import { Day3AcknowledgmentCard } from "@/components/trial/Day3AcknowledgmentCard";
+import { LorieWelcomeCard } from "@/components/trial/LorieWelcomeCard";
+import { DailyShiftWidget } from "@/components/home/DailyShiftWidget";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
@@ -134,6 +137,11 @@ export default function Home() {
       <Day7CompletionModal />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+          {/* Lorie Welcome Card (Day 1 only) */}
+          <LorieWelcomeCard />
+
+          {/* Day 3 Acknowledgment Card */}
+          <Day3AcknowledgmentCard />
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -152,6 +160,9 @@ export default function Home() {
 
           {/* Reset Plan Widget */}
           <ResetPlanWidget />
+
+          {/* Daily Shift Widget */}
+          <DailyShiftWidget />
 
           {/* Trial Journey Bar (Bridge 2) */}
           <TrialJourneyBar />

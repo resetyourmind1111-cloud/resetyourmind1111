@@ -8,6 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useSubscription } from "@/hooks/useSubscription";
 
+interface ShiftEntry {
+  prompt: string;
+  response: string;
+}
+
 export function Day7CompletionModal() {
   const { user } = useAuth();
   const { trialDay, isTrialActive } = useTrialStatus();
@@ -15,10 +20,10 @@ export function Day7CompletionModal() {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [stats, setStats] = useState({ interrupts: 0, resets: 0, streak: 0 });
+  const [shifts, setShifts] = useState<ShiftEntry[]>([]);
 
   useEffect(() => {
     if (!user || effectiveTier !== "free") return;
-    // Only show on day 7
     if (!isTrialActive || trialDay < 7) return;
 
     const checkModal = async () => {
@@ -29,7 +34,6 @@ export function Day7CompletionModal() {
         .single();
 
       if (profile && !(profile as any).shown_day7_modal) {
-        // Fetch stats
         const { count: interruptCount } = await supabase
           .from("pattern_interrupts")
           .select("id", { count: "exact", head: true })
@@ -46,6 +50,17 @@ export function Day7CompletionModal() {
           resets: (progress as any)?.total_interrupts ?? 1,
           streak: (progress as any)?.self_trust_streak ?? 1,
         });
+
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const { data: shiftData } = await (supabase.from("daily_shifts" as any) as any)
+          .select("prompt, response")
+          .eq("user_id", user.id)
+          .gte("entry_date", weekAgo.toISOString().split("T")[0])
+          .order("entry_date", { ascending: false })
+          .limit(3);
+
+        if (shiftData) setShifts(shiftData);
 
         setShow(true);
       }
@@ -107,6 +122,29 @@ export function Day7CompletionModal() {
                 </span>
               ))}
             </div>
+
+            {/* Day 7 Shift Reveal */}
+            {shifts.length > 0 ? (
+              <div className="text-left space-y-3">
+                <div className="w-16 h-px bg-[#C9A84C]/30 mx-auto" />
+                <h2 className="font-serif text-lg font-bold text-[#F9F6F0] text-center">
+                  Here's what shifted this week.<br />In your own words.
+                </h2>
+                {shifts.map((s, i) => (
+                  <div key={i} className="p-4 rounded-xl bg-[#F9F6F0]/5 border border-[#C9A84C]/15">
+                    <p className="text-[#C9A84C] text-lg leading-none mb-1">❝</p>
+                    <p className="text-[#F9F6F0]/80 text-sm italic">{s.response}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className="w-16 h-px bg-[#C9A84C]/30 mx-auto mb-3" />
+                <p className="text-[#F9F6F0]/50 text-sm italic">
+                  You were here every day.<br />That's the shift that matters most.
+                </p>
+              </div>
+            )}
 
             <div className="w-16 h-px bg-[#C9A84C]/30 mx-auto" />
 

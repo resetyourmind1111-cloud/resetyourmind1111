@@ -41,6 +41,7 @@ import PatternModule from "./pages/PatternModule";
 import PatternCheckin from "./pages/PatternCheckin";
 import Onboarding from "./pages/Onboarding";
 import ResetPlan from "./pages/ResetPlan";
+import MyShifts from "./pages/MyShifts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -90,6 +91,7 @@ const App = () => (
               <Route path="/patterns/:slug" element={<PatternModule />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/reset-plan" element={<ResetPlan />} />
+              <Route path="/my-shifts" element={<MyShifts />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
