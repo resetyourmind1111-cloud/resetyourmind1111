@@ -15,6 +15,11 @@ import { journeyWeeks, allJourneyDays, getWeekForDay, type JourneyDay } from "@/
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useToast } from "@/hooks/use-toast";
 import { PatternBridge3Card } from "@/components/patterns/PatternBridge3Card";
+import { WeeklyMilestoneCard } from "@/components/thirty-day/WeeklyMilestoneCard";
+import { WeeklyReflectionScreen } from "@/components/thirty-day/WeeklyReflectionScreen";
+import { ComebackCard } from "@/components/thirty-day/ComebackCard";
+import { PatternCheckinCard } from "@/components/thirty-day/PatternCheckinCard";
+import { Day30CompletionExperience } from "@/components/thirty-day/Day30CompletionExperience";
 
 interface DayProgress {
   day_number: number;
@@ -76,35 +81,6 @@ function WeekCompletionCard({ weekNum, tagline, onContinue }: { weekNum: number;
   );
 }
 
-// ─── Day 30 Completion Screen ───
-function Day30Screen({ scoreDay1, scoreDay24, onBeginAgain, onContinue }: { scoreDay1?: number | null; scoreDay24?: number | null; onBeginAgain: () => void; onContinue: () => void }) {
-  const hasScores = scoreDay1 != null && scoreDay24 != null;
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex items-center justify-center bg-[#06060e] p-4">
-      <div className="max-w-lg w-full text-center">
-        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="font-serif text-5xl md:text-6xl font-bold text-[#C9A84C] mb-8">30 days.</motion.p>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="space-y-2 mb-8">
-          <p className="text-[#F9F6F0] text-lg">You showed up.</p>
-          <p className="text-[#F9F6F0] text-lg">You did the work.</p>
-          <p className="text-[#F9F6F0] text-lg">You proved it to yourself.</p>
-          <p className="text-[#F9F6F0]/60 text-sm mt-4 italic">This is not the end.<br/>This is who you are now.</p>
-        </motion.div>
-        {hasScores && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }} className="mb-8 p-6 rounded-2xl border border-[#C9A84C]/30 bg-[#C9A84C]/5">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#C9A84C] mb-3">Worth Thermostat™ Progress</p>
-            <p className="text-[#F9F6F0] text-lg">Your score rose from <span className="text-[#C9A84C] font-bold">{scoreDay1}</span> to <span className="text-[#C9A84C] font-bold">{scoreDay24}</span>.</p>
-            <p className="text-[#C9A84C] text-sm mt-1">That's {(scoreDay24! - scoreDay1!)} points of recalibration.</p>
-          </motion.div>
-        )}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }} className="space-y-3">
-          <Button onClick={onBeginAgain} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold text-base py-6">Begin Again →</Button>
-          <Button onClick={onContinue} variant="outline" className="w-full border-[#C9A84C]/30 text-[#C9A84C] hover:bg-[#C9A84C]/10 py-5">Continue with Full App →</Button>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-}
-
 // ─── Day Card ───
 function DayCard({ day, progress, isUnlocked, isCurrent, onSelect, accentHex }: {
   day: JourneyDay; progress?: DayProgress; isUnlocked: boolean; isCurrent: boolean; onSelect: () => void; accentHex: string;
@@ -137,6 +113,10 @@ function DayCard({ day, progress, isUnlocked, isCurrent, onSelect, accentHex }: 
   );
 }
 
+// ─── Reflection milestone days ───
+const REFLECTION_DAYS = [7, 14, 21, 30];
+const PATTERN_CHECKIN_DAYS = [5, 10, 15, 20, 25];
+
 // ─── Main Page ───
 export default function ThirtyDayExperience() {
   const { user } = useAuth();
@@ -154,10 +134,11 @@ export default function ThirtyDayExperience() {
   const [showCelebration, setShowCelebration] = useState<number | null>(null);
   const [showWeekComplete, setShowWeekComplete] = useState<number | null>(null);
   const [showDay30, setShowDay30] = useState(false);
+  const [showReflection, setShowReflection] = useState<number | null>(null);
+  const [lastCompletedDay, setLastCompletedDay] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const completedDays = Object.values(progressMap).filter(p => p.marked_complete).length;
-  // Sequential unlock: day unlocked if previous day complete (day 1 always unlocked)
   const isDayUnlocked = (dayNum: number) => {
     if (dayNum === 1) return true;
     return !!progressMap[dayNum - 1]?.marked_complete;
@@ -189,6 +170,8 @@ export default function ThirtyDayExperience() {
           setProgressMap(map);
         }
       });
+    // Update last_30day_activity
+    supabase.from("profiles").update({ last_30day_activity: new Date().toISOString(), comeback_card_shown: false } as any).eq("user_id", user.id);
   }, [user]);
 
   useEffect(() => {
@@ -231,6 +214,19 @@ export default function ThirtyDayExperience() {
         [selectedDay]: { day_number: selectedDay, phase: `Week ${week.week}`, morning_response: journalText, evening_response: null, marked_complete: true, completed_at: new Date().toISOString() },
       }));
 
+      // Update last activity
+      await supabase.from("profiles").update({ last_30day_activity: new Date().toISOString() } as any).eq("user_id", user.id);
+
+      // Check if this is a reflection day
+      if (REFLECTION_DAYS.includes(selectedDay)) {
+        setShowReflection(selectedDay);
+        setSelectedDay(null);
+        return;
+      }
+
+      // Set last completed for pattern check-in cards
+      setLastCompletedDay(selectedDay);
+
       if (selectedDay === 30) {
         setShowDay30(true);
       } else if (selectedDay === 7 || selectedDay === 14 || selectedDay === 21) {
@@ -239,6 +235,17 @@ export default function ThirtyDayExperience() {
         setShowCelebration(selectedDay);
       }
       setSelectedDay(null);
+    }
+  };
+
+  const handleReflectionContinue = (dayNumber: number) => {
+    setShowReflection(null);
+    setLastCompletedDay(dayNumber);
+    if (dayNumber === 30) {
+      setShowDay30(true);
+    } else if ([7, 14, 21].includes(dayNumber)) {
+      const week = getWeekForDay(dayNumber);
+      setShowWeekComplete(week.week);
     }
   };
 
@@ -256,6 +263,12 @@ export default function ThirtyDayExperience() {
     <AuthenticatedLayout title="30-Day Journey" subtitle="Your path to reclaimed worth">
       <div className="pb-16">
         <div className="max-w-4xl mx-auto">
+
+          {/* Comeback Card */}
+          <ComebackCard currentDay={currentDay} onContinue={(day) => setSelectedDay(day)} />
+
+          {/* Weekly Milestone Card */}
+          <WeeklyMilestoneCard currentDay={currentDay} onNavigateToDay={(day) => setSelectedDay(day)} />
 
           {/* Workshop / Welcome Banner */}
           {userSource === "workshop_april18" ? (
@@ -345,6 +358,11 @@ export default function ThirtyDayExperience() {
                       {selectedDay === 2 && isTrialUser && (
                         <PatternBridge3Card />
                       )}
+
+                      {/* Pattern Check-in Card */}
+                      {PATTERN_CHECKIN_DAYS.includes(selectedDay) && (
+                        <PatternCheckinCard completedDay={selectedDay} />
+                      )}
                     </div>
                   )}
                 </Card>
@@ -392,8 +410,18 @@ export default function ThirtyDayExperience() {
       {showWeekComplete !== null && (
         <WeekCompletionCard weekNum={showWeekComplete} tagline={journeyWeeks[showWeekComplete - 1].tagline} onContinue={() => setShowWeekComplete(null)} />
       )}
+      {showReflection !== null && (
+        <WeeklyReflectionScreen dayNumber={showReflection} onContinue={() => handleReflectionContinue(showReflection)} />
+      )}
       {showDay30 && (
-        <Day30Screen scoreDay1={scoreDay1} scoreDay24={scoreDay24} onBeginAgain={resetJourney} onContinue={() => navigate("/emotional-surgery")} />
+        <Day30CompletionExperience onDismiss={() => { setShowDay30(false); navigate("/home"); }} />
+      )}
+
+      {/* Pattern Check-in Card for just-completed days (shown inline after celebration) */}
+      {lastCompletedDay && PATTERN_CHECKIN_DAYS.includes(lastCompletedDay) && !selectedDay && (
+        <div className="max-w-4xl mx-auto px-4">
+          <PatternCheckinCard completedDay={lastCompletedDay} />
+        </div>
       )}
     </AuthenticatedLayout>
   );
