@@ -959,6 +959,7 @@ export type Database = {
           notifications_enabled: boolean
           onboarding_complete: boolean | null
           onboarding_reason: string | null
+          oracle_preview_pulls_used: number
           pattern_checkin_cards_shown: Json
           phone: string | null
           primary_wound: string | null
@@ -1021,6 +1022,7 @@ export type Database = {
           notifications_enabled?: boolean
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
+          oracle_preview_pulls_used?: number
           pattern_checkin_cards_shown?: Json
           phone?: string | null
           primary_wound?: string | null
@@ -1083,6 +1085,7 @@ export type Database = {
           notifications_enabled?: boolean
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
+          oracle_preview_pulls_used?: number
           pattern_checkin_cards_shown?: Json
           phone?: string | null
           primary_wound?: string | null
