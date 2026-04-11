@@ -135,6 +135,7 @@ export default function ThirtyDayExperience() {
   const [showWeekComplete, setShowWeekComplete] = useState<number | null>(null);
   const [showDay30, setShowDay30] = useState(false);
   const [showReflection, setShowReflection] = useState<number | null>(null);
+  const [showTrialDay3, setShowTrialDay3] = useState(false);
   const [lastCompletedDay, setLastCompletedDay] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -229,6 +230,8 @@ export default function ThirtyDayExperience() {
 
       if (selectedDay === 30) {
         setShowDay30(true);
+      } else if (selectedDay === 3 && isTrialActive && userTier === "free") {
+        setShowTrialDay3(true);
       } else if (selectedDay === 7 || selectedDay === 14 || selectedDay === 21) {
         setShowWeekComplete(week.week);
       } else {
@@ -427,6 +430,41 @@ export default function ThirtyDayExperience() {
       )}
       {showDay30 && (
         <Day30CompletionExperience onDismiss={() => { setShowDay30(false); navigate("/home"); }} />
+      )}
+      {showTrialDay3 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/85 backdrop-blur-sm p-4"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="max-w-md w-full rounded-2xl border border-[#C9A84C]/30 bg-card p-8 text-center shadow-2xl"
+          >
+            <p className="text-4xl mb-4">🔥</p>
+            <h2 className="font-serif text-2xl font-bold text-foreground mb-2">3 days down.</h2>
+            <p className="text-foreground/90 text-sm mb-1">You didn't just read about change — you <em>practiced</em> it.</p>
+            <p className="text-muted-foreground text-sm mb-6">
+              27 more days of recognition, recalibration, and integration are waiting for you. This is where the real shift happens.
+            </p>
+            <Button
+              onClick={() => { setShowTrialDay3(false); navigate("/upgrade"); }}
+              className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-semibold mb-3"
+              size="lg"
+            >
+              <Sparkles className="w-5 h-5 mr-2" /> Unlock the Full 30 Days
+            </Button>
+            <button
+              onClick={() => setShowTrialDay3(false)}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              I'll keep exploring the preview
+            </button>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Pattern Check-in Card for just-completed days (shown inline after celebration) */}
