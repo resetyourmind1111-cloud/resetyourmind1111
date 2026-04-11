@@ -49,18 +49,17 @@ interface Post {
 
 export default function SacredCircle() {
   const { user } = useAuth();
-  const { tier } = useSubscription();
+  const { effectiveTier, hasAccess } = useSubscription();
   const { toast } = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
   const [newPost, setNewPost] = useState("");
   const [posting, setPosting] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
-  const [prefill, setPrefill] = useState("");
 
   const weekNum = getWeekNumber();
   const currentPrompt = weeklyPrompts[weekNum % weeklyPrompts.length];
 
-  const isLocked = !["embody", "founding_full_access"].includes(tier);
+  const isLocked = !hasAccess("embody");
 
   const fetchPosts = useCallback(async () => {
     if (!user) return;
@@ -150,7 +149,12 @@ export default function SacredCircle() {
   if (isLocked) {
     return (
       <AuthenticatedLayout title="Sacred Circle" subtitle="Your reset community">
-        <LockedContent requiredTier="embody" featureName="Sacred Circle Community" />
+        <LockedContent requiredTier="embody" currentTier={effectiveTier}>
+          <div className="text-center py-12">
+            <Sparkles className="w-8 h-8 text-[#C9A84C]/40 mx-auto mb-3" />
+            <p className="text-muted-foreground">Sacred Circle is available on the Embody tier.</p>
+          </div>
+        </LockedContent>
       </AuthenticatedLayout>
     );
   }
