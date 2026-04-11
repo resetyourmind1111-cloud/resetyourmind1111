@@ -59,11 +59,11 @@ export default function HealingToolPage() {
   const { user } = useAuth();
 
   const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
+    queryKey: ["profile-healing-tool", user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("subscription_tier")
+        .select("subscription_tier, trial_tool_1, trial_tool_2")
         .eq("user_id", user!.id)
         .single();
       return data;
@@ -72,6 +72,9 @@ export default function HealingToolPage() {
   });
 
   const tier = profile?.subscription_tier || "free";
+  const isTrialUnlocked = toolId && (
+    profile?.trial_tool_1 === toolId || profile?.trial_tool_2 === toolId
+  );
   const tool = healingTools.find((t) => t.id === toolId);
   const ToolComponent = toolId ? toolComponents[toolId] : null;
 
@@ -97,9 +100,11 @@ export default function HealingToolPage() {
       </Button>
       {(() => {
         const freeTierTools = ["nervous-system-diagnostic"];
-        const requiredTier = freeTierTools.includes(toolId || "") ? "reset" as const : "expand" as const;
+        const isFreeTool = freeTierTools.includes(toolId || "");
+        const effectiveTier = (isTrialUnlocked || isFreeTool) ? "expand" : tier;
+        const requiredTier = isFreeTool ? "reset" as const : "expand" as const;
         return (
-          <LockedContent requiredTier={requiredTier} currentTier={tier}>
+          <LockedContent requiredTier={requiredTier} currentTier={effectiveTier}>
             {ToolComponent ? (
               <ToolComponent />
             ) : (
