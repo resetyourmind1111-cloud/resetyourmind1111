@@ -465,7 +465,7 @@ export default function ThirtyDayExperience() {
             </button>
           </motion.div>
         </motion.div>
-      )
+      )}
 
       {/* Pattern Check-in Card for just-completed days (shown inline after celebration) */}
       {lastCompletedDay && PATTERN_CHECKIN_DAYS.includes(lastCompletedDay) && !selectedDay && (
