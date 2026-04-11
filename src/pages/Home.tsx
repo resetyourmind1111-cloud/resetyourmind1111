@@ -23,6 +23,9 @@ import { TodaysResetToolCard } from "@/components/home/TodaysResetToolCard";
 import { ResetPlanWidget } from "@/components/home/ResetPlanWidget";
 import { TrialJourneyBar } from "@/components/trial/TrialJourneyBar";
 import { Day7CompletionModal } from "@/components/trial/Day7CompletionModal";
+import { Day3AcknowledgmentCard } from "@/components/trial/Day3AcknowledgmentCard";
+import { LorieWelcomeCard } from "@/components/trial/LorieWelcomeCard";
+import { DailyShiftWidget } from "@/components/home/DailyShiftWidget";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },

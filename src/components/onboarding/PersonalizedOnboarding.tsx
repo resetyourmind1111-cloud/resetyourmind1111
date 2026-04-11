@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Diamond, Heart, Flame, Crown } from "lucide-react";
+import { ArrowLeft, Diamond, Heart, Flame, Crown, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ResetPlanCards } from "@/components/onboarding/ResetPlanCards";
+import { MomentOneScreen } from "@/components/trial/MomentOneScreen";
 
-const TOTAL_STEPS = 6; // screens 2–7 have dots
+const TOTAL_STEPS = 8; // screens 1–8 have dots (name through notification)
 
 const woundOptions = [
   {
@@ -62,6 +64,8 @@ const goalOptions = [
   "I feel free from the patterns that have been running my life.",
 ];
 
+const hourOptions = Array.from({ length: 24 }, (_, i) => i);
+
 function ProgressDots({ current, total }: { current: number; total: number }) {
   return (
     <div className="flex items-center justify-center gap-2">
@@ -98,8 +102,11 @@ export function PersonalizedOnboarding() {
   const [stuckDuration, setStuckDuration] = useState<string | null>(null);
   const [triedBefore, setTriedBefore] = useState<string[]>([]);
   const [resetGoal, setResetGoal] = useState<string | null>(null);
+  const [notifHour, setNotifHour] = useState(8);
+  const [notifMinute, setNotifMinute] = useState(0);
+  const [notifEnabled, setNotifEnabled] = useState(true);
+  const [showMomentOne, setShowMomentOne] = useState(false);
 
-  // Pre-populate name from profile
   useEffect(() => {
     if (!user) return;
     supabase
@@ -125,7 +132,6 @@ export function PersonalizedOnboarding() {
 
   const handleProcessing = async () => {
     if (!user) return;
-    // Save all onboarding data
     await supabase
       .from("profiles")
       .update({
@@ -139,12 +145,31 @@ export function PersonalizedOnboarding() {
       } as any)
       .eq("user_id", user.id);
 
-    // Auto-advance after animation
     setTimeout(() => setScreen(7), 2500);
   };
 
-  const handleGoToDashboard = () => {
+  const handleNotificationSave = async () => {
+    if (!user) return;
+    const timeStr = `${notifHour.toString().padStart(2, "0")}:${notifMinute.toString().padStart(2, "0")}:00`;
+    await supabase
+      .from("profiles")
+      .update({
+        notification_time: notifEnabled ? timeStr : null,
+        notifications_enabled: notifEnabled,
+      } as any)
+      .eq("user_id", user.id);
+    // Show Moment One screen
+    setShowMomentOne(true);
+  };
+
+  const handleMomentOneComplete = () => {
+    setShowMomentOne(false);
     navigate("/home");
+  };
+
+  const handleGoToDashboard = () => {
+    // Go to notification screen first (screen 8)
+    setScreen(8);
   };
 
   const slideVariants = {
@@ -152,6 +177,10 @@ export function PersonalizedOnboarding() {
     center: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -40 },
   };
+
+  if (showMomentOne) {
+    return <MomentOneScreen onComplete={handleMomentOneComplete} />;
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -472,37 +501,115 @@ export function PersonalizedOnboarding() {
             className="flex-1 flex flex-col px-6 pt-16 pb-12 overflow-y-auto"
           >
             <div className="max-w-md mx-auto w-full">
+              <ProgressDots current={6} total={TOTAL_STEPS} />
+              <div className="mt-8">
+                <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2 text-center">
+                  {firstName}, here's where you begin.
+                </h1>
+                <p className="text-muted-foreground text-sm text-center mb-8">
+                  Your reset plan is built around your primary focus:{" "}
+                  <span className="text-primary font-semibold">
+                    {woundOptions.find((w) => w.key === primaryWound)?.label}
+                  </span>
+                </p>
+
+                <ResetPlanCards primaryWound={primaryWound || "wealth"} />
+
+                <div className="border-t border-border/30 my-8" />
+
+                <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-semibold text-center mb-2">
+                  Your Full Reset Toolkit
+                </p>
+                <p className="text-muted-foreground text-sm text-center mb-8 leading-relaxed">
+                  Everything else in the app is also available to you. But start here.
+                  One thing at a time. The shift happens in the doing, not the browsing.
+                </p>
+
+                <Button
+                  onClick={handleGoToDashboard}
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base py-6 rounded-xl mb-3"
+                >
+                  Continue →
+                </Button>
+                <p className="text-muted-foreground/50 text-xs text-center">
+                  Your plan is saved. You can find it anytime under "My Reset Plan" in the navigation.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Screen 8: Notification Time */}
+        {screen === 8 && (
+          <motion.div
+            key="notifications"
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.4 }}
+            className="flex-1 flex flex-col px-6 pt-16"
+          >
+            <button onClick={() => setScreen(7)} className="self-start mb-6 text-muted-foreground hover:text-foreground transition-colors">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <ProgressDots current={7} total={TOTAL_STEPS} />
+            <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full">
+              <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mb-6">
+                <Clock className="w-7 h-7 text-primary" />
+              </div>
               <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2 text-center">
-                {firstName}, here's where you begin.
+                When should we check in with you?
               </h1>
-              <p className="text-muted-foreground text-sm text-center mb-8">
-                Your reset plan is built around your primary focus:{" "}
-                <span className="text-primary font-semibold">
-                  {woundOptions.find((w) => w.key === primaryWound)?.label}
-                </span>
+              <p className="text-muted-foreground text-sm mb-8 text-center">
+                One reminder per day. No spam. Ever.
               </p>
 
-              <ResetPlanCards primaryWound={primaryWound || "wealth"} />
+              {notifEnabled && (
+                <div className="flex items-center gap-3 mb-6">
+                  <select
+                    value={notifHour}
+                    onChange={(e) => setNotifHour(Number(e.target.value))}
+                    className="bg-muted border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm"
+                  >
+                    {hourOptions.map((h) => (
+                      <option key={h} value={h}>
+                        {h === 0 ? "12" : h > 12 ? h - 12 : h}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-foreground font-bold">:</span>
+                  <select
+                    value={notifMinute}
+                    onChange={(e) => setNotifMinute(Number(e.target.value))}
+                    className="bg-muted border border-border/50 rounded-lg px-3 py-2 text-foreground text-sm"
+                  >
+                    {[0, 15, 30, 45].map((m) => (
+                      <option key={m} value={m}>
+                        {m.toString().padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-muted-foreground text-sm">
+                    {notifHour < 12 ? "AM" : "PM"}
+                  </span>
+                </div>
+              )}
 
-              <div className="border-t border-border/30 my-8" />
-
-              <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-semibold text-center mb-2">
-                Your Full Reset Toolkit
-              </p>
-              <p className="text-muted-foreground text-sm text-center mb-8 leading-relaxed">
-                Everything else in the app is also available to you. But start here.
-                One thing at a time. The shift happens in the doing, not the browsing.
-              </p>
+              <div className="flex items-center gap-3 mb-8">
+                <Switch
+                  checked={notifEnabled}
+                  onCheckedChange={setNotifEnabled}
+                />
+                <span className="text-sm text-foreground">Yes, remind me daily</span>
+              </div>
 
               <Button
-                onClick={handleGoToDashboard}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base py-6 rounded-xl mb-3"
+                onClick={handleNotificationSave}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base py-6 rounded-xl"
               >
-                Take me to my dashboard
+                Set my reminder →
               </Button>
-              <p className="text-muted-foreground/50 text-xs text-center">
-                Your plan is saved. You can find it anytime under "My Reset Plan" in the navigation.
-              </p>
             </div>
           </motion.div>
         )}
