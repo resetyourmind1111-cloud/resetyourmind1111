@@ -230,6 +230,8 @@ export default function ThirtyDayExperience() {
 
       if (selectedDay === 30) {
         setShowDay30(true);
+      } else if (selectedDay === 3 && isTrialActive && userTier === "free") {
+        setShowTrialDay3(true);
       } else if (selectedDay === 7 || selectedDay === 14 || selectedDay === 21) {
         setShowWeekComplete(week.week);
       } else {
