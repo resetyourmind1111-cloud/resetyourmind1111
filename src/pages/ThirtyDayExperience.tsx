@@ -426,7 +426,8 @@ export default function ThirtyDayExperience() {
     </AuthenticatedLayout>
   );
 
-  if (!["embody", "founding_full_access"].includes(userTier)) {
+  // Allow trial users to access first 3 days (gating handled per-day above)
+  if (!isTrialActive && !["embody", "founding_full_access"].includes(userTier)) {
     return (
       <AuthenticatedLayout title="30-Day Journey">
         <div className="min-h-screen pt-24 pb-16 px-4">
