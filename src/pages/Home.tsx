@@ -173,6 +173,9 @@ export default function Home() {
           {/* Trial Journey Bar — show unlocked content prominently for trial users */}
           <TrialJourneyBar />
 
+          {/* Oracle Preview Card for trial users */}
+          <OraclePreviewCard />
+
           {/* Daily Featured Card (trial) — moved up for visibility */}
           {isTrialActive && (
             <div className="mb-6 space-y-4">
