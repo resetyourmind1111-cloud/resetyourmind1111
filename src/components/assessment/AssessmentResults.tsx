@@ -75,6 +75,43 @@ export function AssessmentResults({
 
   const categoryScores = calculateCategoryScores(answers);
   const shareCardRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+
+  // Auto-save assessment results for logged-in users
+  useEffect(() => {
+    if (!user) return;
+    const saveResults = async () => {
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("user_id", user.id)
+          .single();
+
+        const userName = (profile as any)?.full_name || "User";
+
+        await supabase.from("assessment_results").insert({
+          user_id: user.id,
+          first_name: userName,
+          email: user.email || "",
+          thermostat_type: thermostatType.name,
+          total_score: totalScore,
+          percentage_score: percentage,
+          answers: answers as any,
+          category_scores: categoryScores as any,
+        });
+
+        // Update profile with latest score
+        await supabase.from("profiles").update({
+          last_thermostat_date: new Date().toISOString().split("T")[0],
+          worth_score_day1: totalScore,
+        } as any).eq("user_id", user.id);
+      } catch (err) {
+        console.error("Failed to save assessment results:", err);
+      }
+    };
+    saveResults();
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
