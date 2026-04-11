@@ -77,14 +77,14 @@ export function ResetPlanWidget() {
     >
       <Card className="p-5 bg-card/80 border-primary/30">
         <h3 className="font-serif font-semibold text-foreground mb-1">
-          Build your personal reset plan
+          Your reset plan is waiting.
         </h3>
         <p className="text-muted-foreground text-sm mb-4">
-          3 minutes. Tells you exactly where to start.
+          3 minutes to find out exactly where to start.
         </p>
         <Link to="/onboarding">
           <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-            Start Here
+            Build My Plan →
           </Button>
         </Link>
       </Card>

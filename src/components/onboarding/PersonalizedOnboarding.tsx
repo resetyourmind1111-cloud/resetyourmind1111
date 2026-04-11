@@ -132,18 +132,26 @@ export function PersonalizedOnboarding() {
 
   const handleProcessing = async () => {
     if (!user) return;
-    await supabase
-      .from("profiles")
-      .update({
-        full_name: firstName,
-        primary_wound: primaryWound,
-        stuck_duration: stuckDuration,
-        tried_before: triedBefore as any,
-        reset_goal: resetGoal,
-        onboarding_complete: true,
-        reset_plan_generated: true,
-      } as any)
-      .eq("user_id", user.id);
+    // Save all onboarding data — retry once on failure
+    const doSave = () =>
+      supabase
+        .from("profiles")
+        .update({
+          full_name: firstName,
+          primary_wound: primaryWound,
+          stuck_duration: stuckDuration,
+          tried_before: triedBefore as any,
+          reset_goal: resetGoal,
+          onboarding_complete: true,
+          reset_plan_generated: true,
+        } as any)
+        .eq("user_id", user.id);
+
+    const { error } = await doSave();
+    if (error) {
+      console.error("Onboarding save failed, retrying…", error);
+      await doSave();
+    }
 
     setTimeout(() => setScreen(7), 2500);
   };
