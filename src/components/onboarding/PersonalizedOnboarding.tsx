@@ -132,6 +132,25 @@ export function PersonalizedOnboarding() {
 
   const handleProcessing = async () => {
     if (!user) return;
+
+    // Map primary wound to onboarding reason & trial tools
+    const woundToReason: Record<string, string> = {
+      wealth: "sabotage",
+      love: "relationships",
+      health: "stuck",
+      identity: "levelup",
+    };
+    const reasonKey = woundToReason[primaryWound || ""] || "stuck";
+
+    // Import trial tool map inline
+    const toolMap: Record<string, [string, string]> = {
+      stuck: ["nervous-system-diagnostic", "limiting-belief-rewriter"],
+      sabotage: ["limiting-belief-rewriter", "money-story-audit"],
+      relationships: ["boundary-builder", "limiting-belief-rewriter"],
+      levelup: ["limiting-belief-rewriter", "manifestation-tracker"],
+    };
+    const [tool1, tool2] = toolMap[reasonKey] || toolMap.stuck;
+
     // Save all onboarding data — retry once on failure
     const doSave = () =>
       supabase
@@ -144,6 +163,9 @@ export function PersonalizedOnboarding() {
           reset_goal: resetGoal,
           onboarding_complete: true,
           reset_plan_generated: true,
+          onboarding_reason: reasonKey,
+          trial_tool_1: tool1,
+          trial_tool_2: tool2,
         } as any)
         .eq("user_id", user.id);
 
