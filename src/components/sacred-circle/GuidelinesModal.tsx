@@ -12,6 +12,14 @@ export function GuidelinesModal({ onAccept }: GuidelinesModalProps) {
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    // If content doesn't overflow, enable button immediately
+    const el = scrollRef.current;
+    if (el && el.scrollHeight <= el.clientHeight + 20) {
+      setScrolledToBottom(true);
+    }
+  }, []);
+
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
