@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
-import { Play, Pause } from "lucide-react";
+import { useState } from "react";
+import { Music } from "lucide-react";
 
-const ANTHEM_URL = "https://suno.com/s/wP487osdtsq9Kl4S";
+const SUNO_EMBED_URL = "https://suno.com/embed/wP487osdtsq9Kl4S";
 
 interface AnthemPlayerProps {
   title?: string;
@@ -10,48 +10,51 @@ interface AnthemPlayerProps {
 }
 
 export function AnthemPlayer({ title = "Permission Granted", artist = "Lorie Wu", compact = false }: AnthemPlayerProps) {
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const togglePlay = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio(ANTHEM_URL);
-      audioRef.current.addEventListener("ended", () => setPlaying(false));
-    }
-    if (playing) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setPlaying(!playing);
-  };
+  const [showPlayer, setShowPlayer] = useState(false);
 
   if (compact) {
     return (
-      <button
-        onClick={togglePlay}
-        className="text-sm text-[#C9A84C] hover:text-[#C9A84C]/80 transition-colors flex items-center gap-1.5"
-      >
-        {playing ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-        ▶ Play my reset anthem
-      </button>
+      <div className="space-y-2">
+        <button
+          onClick={() => setShowPlayer(!showPlayer)}
+          className="text-sm text-[#C9A84C] hover:text-[#C9A84C]/80 transition-colors flex items-center gap-1.5"
+        >
+          <Music className="w-3 h-3" />
+          {showPlayer ? "Hide anthem" : "▶ Play my reset anthem"}
+        </button>
+        {showPlayer && (
+          <iframe
+            src={SUNO_EMBED_URL}
+            width="100%"
+            height="120"
+            style={{ border: "none", borderRadius: "12px" }}
+            allow="autoplay"
+            title="Permission Granted - Lorie Wu"
+          />
+        )}
+      </div>
     );
   }
 
   return (
-    <div className="p-4 rounded-xl bg-[#2A1F3D] border border-[#2A1F3D]">
-      <div className="flex items-center gap-4">
-        <button
-          onClick={togglePlay}
-          className="w-12 h-12 rounded-full bg-[#C9A84C] flex items-center justify-center shrink-0 hover:bg-[#C9A84C]/90 transition-colors"
-        >
-          {playing ? <Pause className="w-5 h-5 text-[#06060e]" /> : <Play className="w-5 h-5 text-[#06060e] ml-0.5" />}
-        </button>
+    <div className="rounded-xl bg-[#2A1F3D] border border-[#2A1F3D] overflow-hidden">
+      <div className="p-4 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-[#C9A84C]/20 flex items-center justify-center shrink-0">
+          <Music className="w-5 h-5 text-[#C9A84C]" />
+        </div>
         <div className="text-left">
           <p className="text-[#F9F6F0] text-sm font-semibold">{title}</p>
           {artist && <p className="text-[#F9F6F0]/50 text-xs">{artist}</p>}
         </div>
       </div>
+      <iframe
+        src={SUNO_EMBED_URL}
+        width="100%"
+        height="120"
+        style={{ border: "none" }}
+        allow="autoplay"
+        title="Permission Granted - Lorie Wu"
+      />
     </div>
   );
 }
