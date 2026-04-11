@@ -169,24 +169,43 @@ export function Day7CompletionModal() {
               ))}
             </div>
 
-            <Button
-              size="lg"
-              onClick={() => handleDismiss("/upgrade")}
-              className="w-full bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-bold text-base py-6 rounded-xl"
-            >
-              I'm Ready — Continue My Transformation
-            </Button>
-
-            <p className="text-xs text-[#F9F6F0]/40">
-              Founding rate: $44/month — locked in for life
-            </p>
-
-            <button
-              onClick={() => handleDismiss("/upgrade")}
-              className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline"
-            >
-              See all access options
-            </button>
+            {foundingMode ? (
+              <>
+                <Button
+                  size="lg"
+                  onClick={() => handleDismiss("/upgrade")}
+                  className="w-full bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-bold text-base py-6 rounded-xl"
+                >
+                  Lock In My Founding Rate
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleDismiss("/upgrade")}
+                  className="w-full border-[#C9A84C]/40 text-[#C9A84C] hover:bg-[#C9A84C]/10 rounded-xl"
+                >
+                  Get Lifetime Access — $1,111
+                </Button>
+                <button onClick={() => handleDismiss("/home")} className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline">
+                  I'll decide later
+                </button>
+                <p className="text-xs text-[#F9F6F0]/40">
+                  {spotsRemaining} spots remaining. When they're gone, they're gone.
+                </p>
+              </>
+            ) : (
+              <>
+                <Button
+                  size="lg"
+                  onClick={() => handleDismiss("/upgrade")}
+                  className="w-full bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-bold text-base py-6 rounded-xl"
+                >
+                  I'm Ready — Continue My Transformation
+                </Button>
+                <button onClick={() => handleDismiss("/upgrade")} className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline">
+                  See all access options
+                </button>
+              </>
+            )}
           </motion.div>
         </motion.div>
       )}
