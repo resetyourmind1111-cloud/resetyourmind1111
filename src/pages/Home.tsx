@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Flame, Sparkles, RefreshCw } from "lucide-react";
+import { Flame, RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -285,45 +285,18 @@ export default function Home() {
             <JourneyCheckinCard />
           </motion.div>
 
-          {/* Daily Snapshot Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Card className="p-5 bg-card/80 border-border/50">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-                  <Flame className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {streak > 0 ? `${streak}-day streak` : "Start your streak today"}
-                  </p>
-                  <div className="flex gap-3 text-xs text-muted-foreground">
-                    <span>Total sessions: {totalSessions}</span>
-                    <span>Longest streak: {longestStreak}</span>
-                  </div>
-                  {lastModule && (
-                    <p className="text-xs text-muted-foreground">
-                      Last module: {lastModule}
-                    </p>
-                  )}
-                </div>
-              </div>
-              {streak === 0 && totalSessions > 1 && (
-                <p className="text-xs text-muted-foreground mb-3 italic">
-                  Streak reset — but your {totalSessions} total sessions never go away. Keep going.
-                </p>
-              )}
-              <div className="flex items-start gap-2 pt-3 border-t border-border/50">
-                <Sparkles className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <p className="text-sm text-muted-foreground italic leading-relaxed">
-                  "{affirmation}"
-                </p>
-              </div>
-            </Card>
-          </motion.div>
+          {/* Streak Card */}
+          <StreakCard
+            streak={streak}
+            totalSessions={totalSessions}
+            longestStreak={longestStreak}
+            lastModule={lastModule}
+          />
+
+          {/* Transformation Card */}
+          <div className="mt-6">
+            <TransformationCard />
+          </div>
 
           {/* Upgrade seed (subtle, during trial) */}
           {isTrialActive && trialDay >= 1 && (
