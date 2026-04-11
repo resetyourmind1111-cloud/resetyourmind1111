@@ -26,6 +26,7 @@ import { PatternDiscoveryCard } from "@/components/patterns/PatternDiscoveryCard
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
 
 const emailSchema = z.object({
