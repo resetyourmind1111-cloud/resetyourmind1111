@@ -264,6 +264,18 @@ export default function ThirtyDayExperience() {
       <div className="pb-16">
         <div className="max-w-4xl mx-auto">
 
+          {/* Trial Preview Banner */}
+          {isTrialActive && userTier === "free" && (
+            <div className="mb-6 p-4 rounded-xl bg-[#3D1A6E]/20 border border-[#3D1A6E]/30">
+              <p className="text-[#F9F6F0]/80 text-sm italic">
+                Days 1–3 are yours to experience during your 7-day preview.
+              </p>
+              <p className="text-muted-foreground text-xs mt-1">
+                Upgrade to unlock the full 30-day transformation.
+              </p>
+            </div>
+          )}
+
           {/* Comeback Card */}
           <ComebackCard currentDay={currentDay} onContinue={(day) => setSelectedDay(day)} />
 
