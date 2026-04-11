@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sparkles, ArrowLeft, History } from 'lucide-react';
 import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 
 import { DeckSelector } from '@/components/oracle/DeckSelector';
 import { SpreadSelector } from '@/components/oracle/SpreadSelector';
@@ -37,6 +38,11 @@ const Oracle = () => {
   const [subscriptionTier, setSubscriptionTier] = useState('free');
   const { isTrialActive, trialExpired } = useTrialStatus();
   const isTrialUser = isTrialActive || trialExpired;
+  
+  // Oracle preview state
+  const [oraclePreviewPulls, setOraclePreviewPulls] = useState<number>(0);
+  const [showTrialEntry, setShowTrialEntry] = useState(false);
+  const [trialPullComplete, setTrialPullComplete] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -44,13 +50,19 @@ const Oracle = () => {
     const fetchProfile = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('subscription_tier')
+        .select('subscription_tier, oracle_preview_pulls_used')
         .eq('user_id', user.id)
         .maybeSingle();
       if (data?.subscription_tier) setSubscriptionTier(data.subscription_tier);
+      if (data) setOraclePreviewPulls((data as any).oracle_preview_pulls_used || 0);
     };
     fetchProfile();
   }, [user, isLoading]);
+
+  const isFreeTier = subscriptionTier === 'free';
+  const isTrialOracleUser = isTrialActive && isFreeTier;
+  const pullsRemaining = Math.max(0, 3 - oraclePreviewPulls);
+  const pullsExhausted = oraclePreviewPulls >= 3;
 
   const handleSelectDeck = (deck: DeckName) => {
     setSelectedDeck(deck);
@@ -76,9 +88,46 @@ const Oracle = () => {
     setStep('pulling');
   };
 
+  // Trial single-card pull
+  const handleTrialPull = async () => {
+    if (!user || pullsExhausted) return;
+    const available = getDeckCards('Permission Granted');
+    const shuffled = [...available].sort(() => Math.random() - 0.5);
+    const card = shuffled[0];
+    setPulledCards([card]);
+    setFlippedCards([]);
+    setTrialPullComplete(false);
+    setShowTrialEntry(false);
+    
+    // Create a single-card spread template
+    setSelectedSpread({
+      spread_name: 'Single Card Pull',
+      deck_name: 'Permission Granted',
+      number_of_cards: 1,
+      position_meanings: ['Your Message'],
+      layout_type: 'single',
+      question_prompt: 'What do I need to know right now?',
+      icon: '✨',
+      points: 5,
+      tier_required: 1,
+      description: 'A single card pull for guidance',
+    } as SpreadTemplate);
+    setStep('pulling');
+    
+    // Increment pulls
+    const newPulls = oraclePreviewPulls + 1;
+    setOraclePreviewPulls(newPulls);
+    await supabase.from('profiles').update({
+      oracle_preview_pulls_used: newPulls,
+    } as any).eq('user_id', user.id);
+  };
+
   const handleFlipCard = (index: number) => {
     if (!flippedCards.includes(index)) {
       setFlippedCards(prev => [...prev, index]);
+      if (isTrialOracleUser && pulledCards.length === 1) {
+        setTrialPullComplete(true);
+      }
     }
   };
 
@@ -125,6 +174,10 @@ const Oracle = () => {
     setQuestion('');
     setPulledCards([]);
     setFlippedCards([]);
+    setTrialPullComplete(false);
+    if (isTrialOracleUser) {
+      setShowTrialEntry(true);
+    }
   };
 
   const goBack = () => {
@@ -134,12 +187,213 @@ const Oracle = () => {
     else if (step === 'results') resetReading();
   };
 
+  // Trial user: show special entry/limit screens
+  if (isTrialOracleUser) {
+    // Pull limit reached
+    if (pullsExhausted && step === 'deck') {
+      return (
+        <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+          <Navigation />
+          <main className="flex-1 container mx-auto px-4 py-8 max-w-lg flex flex-col items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full rounded-xl border-t-2 border-[#C9A84C] bg-card p-8 text-center"
+            >
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-3">
+                Your 3 Preview Pulls Are Complete
+              </p>
+              <h2 className="font-serif text-2xl text-foreground mb-4">
+                You've experienced the oracle.
+              </h2>
+              <p className="text-sm text-muted-foreground mb-6">
+                Now unlock the full library:
+              </p>
+              <div className="text-left space-y-2 mb-6 max-w-xs mx-auto">
+                {[
+                  "Permission Granted™ Oracle Deck (52 cards)",
+                  "Abundance Oracle Deck (52 cards)",
+                  "Relationships Oracle Deck (52 cards)",
+                  "All 10 spreads",
+                  "Daily oracle pull on your dashboard",
+                  "Save readings to your healing plan",
+                ].map((item) => (
+                  <p key={item} className="text-sm text-[#C9A84C] flex items-start gap-2">
+                    <span>—</span> {item}
+                  </p>
+                ))}
+              </div>
+              <Link to="/upgrade">
+                <Button variant="gold" size="lg" className="w-full mb-3">
+                  Unlock My Full Oracle →
+                </Button>
+              </Link>
+              <p className="text-xs text-muted-foreground mb-4">Founding rate: $44/month — locked in for life.</p>
+              <Link to="/home" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Back to dashboard
+              </Link>
+            </motion.div>
+          </main>
+          <Footer />
+        </div>
+      );
+    }
+
+    // Trial entry screen (before first pull or returning)
+    if (step === 'deck' || showTrialEntry) {
+      return (
+        <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+          <Navigation />
+          <main className="flex-1 container mx-auto px-4 py-8 max-w-lg flex flex-col items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full rounded-xl border-t-2 border-[#C9A84C] bg-card p-8 text-center"
+            >
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-3">
+                Your Oracle Preview
+              </p>
+              <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-3">
+                3 free pulls from the<br />Permission Granted™ deck.
+              </h2>
+              <p className="text-sm text-muted-foreground mb-6">
+                Experience the oracle before you unlock the full library.
+                You have {pullsRemaining} pull{pullsRemaining !== 1 ? 's' : ''} remaining.
+              </p>
+
+              {/* Pull counter circles */}
+              <div className="flex justify-center gap-3 mb-6">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className={`w-4 h-4 rounded-full border-2 border-[#C9A84C] transition-colors ${
+                      i < oraclePreviewPulls ? 'bg-[#C9A84C]' : 'bg-transparent'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <Button variant="gold" size="lg" className="w-full mb-4" onClick={handleTrialPull}>
+                Pull my card →
+              </Button>
+
+              <p className="text-xs text-muted-foreground">
+                Single pulls only during preview.
+                <br />Full access includes 3 decks, 156 cards, and 10 spreads.
+              </p>
+
+              {oraclePreviewPulls === 0 && (
+                <p className="text-[#C9A84C] text-sm italic mt-4">Your first pull is waiting.</p>
+              )}
+            </motion.div>
+          </main>
+          <Footer />
+        </div>
+      );
+    }
+
+    // Trial user in pulling/results mode - show card with after-pull info
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navigation />
+        <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
+          {step === 'pulling' && (
+            <Button variant="ghost" size="sm" onClick={() => { resetReading(); setShowTrialEntry(true); }} className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          )}
+
+          <AnimatePresence mode="wait">
+            {step === 'pulling' && selectedSpread && (
+              <motion.div key="pulling" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+                <div className="text-center">
+                  <h2 className="font-serif text-xl font-semibold">Your Card</h2>
+                  <p className="text-muted-foreground">
+                    {allCardsFlipped ? 'Card revealed!' : 'Tap the card to reveal'}
+                  </p>
+                </div>
+
+                <CardSpread
+                  spread={selectedSpread}
+                  cards={pulledCards}
+                  flippedCards={flippedCards}
+                  onFlipCard={handleFlipCard}
+                />
+
+                {allCardsFlipped && (
+                  <div className="text-center space-y-4">
+                    <Button size="lg" className="btn-glow" onClick={() => setStep('results')}>
+                      View Full Reading
+                    </Button>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {step === 'results' && selectedSpread && (
+              <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+                <ReadingResults
+                  spread={selectedSpread}
+                  cards={pulledCards}
+                  question={question}
+                  onSaveReading={handleSaveReading}
+                  onNewReading={resetReading}
+                  canSave={Boolean(user)}
+                />
+
+                {/* After-pull info */}
+                {pullsRemaining > 0 ? (
+                  <p className="text-center text-sm text-muted-foreground">
+                    {pullsRemaining} preview pull{pullsRemaining !== 1 ? 's' : ''} remaining.
+                  </p>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl border border-[#C9A84C]/30 bg-card p-6 text-center"
+                  >
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-2">
+                      Your 3 Preview Pulls Are Complete
+                    </p>
+                    <h3 className="font-serif text-lg text-foreground mb-3">
+                      You've experienced the oracle.
+                    </h3>
+                    <div className="text-left space-y-1 mb-4 max-w-xs mx-auto">
+                      {[
+                        "Permission Granted™ Oracle Deck (52 cards)",
+                        "Abundance Oracle Deck (52 cards)",
+                        "Relationships Oracle Deck (52 cards)",
+                        "All 10 spreads",
+                      ].map((item) => (
+                        <p key={item} className="text-xs text-[#C9A84C] flex items-start gap-2">
+                          <span>—</span> {item}
+                        </p>
+                      ))}
+                    </div>
+                    <Link to="/upgrade">
+                      <Button variant="gold" size="lg" className="w-full mb-2">
+                        Unlock My Full Oracle →
+                      </Button>
+                    </Link>
+                    <p className="text-xs text-muted-foreground">Founding rate: $44/month — locked in for life.</p>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // --- Paid user: full oracle experience ---
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
-        <TrialLockedContent isLocked={isTrialUser}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -181,7 +435,6 @@ const Oracle = () => {
         )}
 
         <AnimatePresence mode="wait">
-          {/* Step 1: Deck Selection */}
           {step === 'deck' && (
             <motion.div key="deck" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <h2 className="font-serif text-xl font-semibold text-center mb-6">Choose Your Deck</h2>
@@ -189,7 +442,6 @@ const Oracle = () => {
             </motion.div>
           )}
 
-          {/* Step 2: Spread Selection */}
           {step === 'spread' && (
             <motion.div key="spread" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
               <SpreadSelector
@@ -201,7 +453,6 @@ const Oracle = () => {
             </motion.div>
           )}
 
-          {/* Step 3: Question */}
           {step === 'question' && selectedSpread && (
             <motion.div
               key="question"
@@ -230,7 +481,6 @@ const Oracle = () => {
             </motion.div>
           )}
 
-          {/* Step 4: Card Pulling */}
           {step === 'pulling' && selectedSpread && (
             <motion.div
               key="pulling"
@@ -265,7 +515,6 @@ const Oracle = () => {
             </motion.div>
           )}
 
-          {/* Step 5: Results */}
           {step === 'results' && selectedSpread && (
             <motion.div key="results" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
               <ReadingResults
@@ -279,7 +528,6 @@ const Oracle = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        </TrialLockedContent>
       </main>
 
       <Footer />

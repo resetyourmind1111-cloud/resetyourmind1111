@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AiButton } from "@/components/AiButton";
 import { useUsage } from "@/contexts/UsageContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Loader2 } from "lucide-react";
 
@@ -509,6 +509,35 @@ export default function NervousSystemDiagnostic() {
             </CardContent>
           </Card>
         )}
+
+        {/* Trial upgrade nudge after results */}
+        {(() => {
+          // Check if trial user via localStorage-free method
+          const isTrialFree = !(document.querySelector('[data-paid-user]'));
+          return null; // Placeholder - actual nudge is rendered below
+        })()}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="glass-card p-8 border border-[#C9A84C]/30 text-center"
+        >
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-2">
+            Continue Your Reset
+          </p>
+          <h3 className="font-serif text-xl text-foreground mb-3">
+            Your full reset plan is inside.
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
+            The Wellness Hub has tools designed specifically for your {data.label} pattern — including hormone support, mental health resources, and a full body healing plan.
+          </p>
+          <Link to="/upgrade">
+            <Button variant="gold" size="lg">
+              Unlock My Full Reset →
+            </Button>
+          </Link>
+          <p className="text-xs text-muted-foreground mt-3">Founding rate: $44/month — locked in for life.</p>
+        </motion.div>
 
         <div className="flex justify-center">
           <Button variant="gold" size="lg" onClick={() => setScreen("save")}>
