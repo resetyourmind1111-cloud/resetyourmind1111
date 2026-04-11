@@ -8,7 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { healingTools } from "@/data/healingToolsData";
-import { Sparkles, TrendingUp, Calendar, ArrowRight, CheckCircle2 } from "lucide-react";
+import { TrialLockedContent } from "@/components/TrialLockedContent";
+import { useTrialStatus, getTrialAllowedTools } from "@/hooks/useTrialStatus";
+import { Sparkles, TrendingUp, Calendar, ArrowRight, CheckCircle2, Lock } from "lucide-react";
 
 interface ToolEntry {
   id: string;
