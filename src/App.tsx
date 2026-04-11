@@ -97,6 +97,7 @@ const App = () => (
               <Route path="/my-shifts" element={<MyShifts />} />
               <Route path="/monthly-reset" element={<MonthlyReset />} />
               <Route path="/whats-next" element={<WhatsNext />} />
+              <Route path="/sacred-circle" element={<SacredCircle />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
