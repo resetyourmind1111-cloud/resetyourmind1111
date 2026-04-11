@@ -158,20 +158,32 @@ export default function MyAccount() {
           </Card>
         </motion.div>
 
-        {/* Founding Warning Dialog */}
-        <AlertDialog open={showFoundingWarning} onOpenChange={setShowFoundingWarning}>
-          <AlertDialogContent>
+        {/* Founding Cancel Warning — Non-dismissible */}
+        <AlertDialog open={showFoundingWarning}>
+          <AlertDialogContent className="[&>button]:hidden">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-foreground">Warning: Founding 111 Membership</AlertDialogTitle>
-              <AlertDialogDescription>
-                If you leave your Founding 111 membership, your locked-in rate of $44/month for full access cannot be reinstated. This cannot be undone. Are you sure?
+              <AlertDialogTitle className="font-serif text-xl text-foreground">Before you cancel.</AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <p>You are a Founding Member of Reset Your Mind 1111™.</p>
+                  <p>Your rate of $44/month for full access is locked in for life — but only while you stay active.</p>
+                  <p className="font-semibold text-foreground">If you cancel:</p>
+                  <ul className="space-y-1">
+                    <li>✦ Your founding rate is permanently forfeited</li>
+                    <li>✦ This rate cannot be reinstated under any circumstances</li>
+                    <li>✦ If you rejoin, you will pay the current regular rate</li>
+                  </ul>
+                  <p>Are you sure you want to cancel?</p>
+                </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Keep My Founding Rate</AlertDialogCancel>
-              <AlertDialogAction onClick={openPortal} className="bg-destructive text-destructive-foreground">
-                I Understand, Continue
+              <AlertDialogAction onClick={() => setShowFoundingWarning(false)} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                Keep my founding rate — stay active
               </AlertDialogAction>
+              <AlertDialogCancel onClick={openPortal} className="border-muted-foreground/30 text-muted-foreground">
+                I understand — cancel my membership
+              </AlertDialogCancel>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
