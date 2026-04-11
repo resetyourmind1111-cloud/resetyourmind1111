@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS sound_effects_enabled boolean NOT NULL DEFAULT true;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS ai_checkin_days_shown jsonb NOT NULL DEFAULT '{}'::jsonb;
