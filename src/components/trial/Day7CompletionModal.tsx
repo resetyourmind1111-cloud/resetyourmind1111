@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useFoundingMode } from "@/hooks/useFoundingMode";
 
 interface ShiftEntry {
   prompt: string;
@@ -17,6 +18,7 @@ export function Day7CompletionModal() {
   const { user } = useAuth();
   const { trialDay, isTrialActive } = useTrialStatus();
   const { effectiveTier } = useSubscription();
+  const { foundingMode, spotsRemaining } = useFoundingMode();
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [stats, setStats] = useState({ interrupts: 0, resets: 0, streak: 0 });
