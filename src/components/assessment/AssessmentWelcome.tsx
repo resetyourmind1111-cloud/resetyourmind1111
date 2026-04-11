@@ -80,7 +80,7 @@ export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
           className="text-center mb-8 space-y-2"
         >
           <p className="text-muted-foreground">
-            <span className="font-semibold text-foreground">25 questions</span> • Takes about <span className="font-semibold text-foreground">5 minutes</span>
+            <span className="font-semibold text-foreground">25 questions</span> • Takes about <span className="font-semibold text-foreground">3 minutes</span>
           </p>
           <p className="text-sm text-muted-foreground">
             Answer honestly for the most accurate results

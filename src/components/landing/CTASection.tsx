@@ -56,7 +56,7 @@ export function CTASection() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-6 text-sm text-muted-foreground"
           >
-            Takes only 5 minutes • Get instant personalized results • No credit card required
+            Takes only 3 minutes • Get instant personalized results • No credit card required
           </motion.p>
         </motion.div>
       </div>
