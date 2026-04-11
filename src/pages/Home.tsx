@@ -137,6 +137,11 @@ export default function Home() {
       <Day7CompletionModal />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+          {/* Lorie Welcome Card (Day 1 only) */}
+          <LorieWelcomeCard />
+
+          {/* Day 3 Acknowledgment Card */}
+          <Day3AcknowledgmentCard />
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
