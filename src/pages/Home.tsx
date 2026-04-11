@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Flame, Sparkles, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +29,10 @@ import { DailyShiftWidget } from "@/components/home/DailyShiftWidget";
 import { LongTermMilestoneCard } from "@/components/home/LongTermMilestoneCard";
 import { MonthlyThermostatNudge } from "@/components/home/MonthlyThermostatNudge";
 import { MonthlyResetNudge } from "@/components/home/MonthlyResetNudge";
+import { DailySurpriseCard } from "@/components/home/DailySurpriseCard";
+import { StreakCard } from "@/components/home/StreakCard";
+import { AiCheckinCard } from "@/components/home/AiCheckinCard";
+import { TransformationCard } from "@/components/home/TransformationCard";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
@@ -36,16 +40,6 @@ const stateOptions = [
   { label: "I feel blank", emoji: "🌫️", module: "The Quiet Phase" },
   { label: "I feel clear", emoji: "☀️", module: "Recalibration" },
   { label: "I feel activated", emoji: "⚡", module: "Embodiment" },
-];
-
-const dailyAffirmations = [
-  "Nothing is wrong. Something is integrating.",
-  "What would someone who feels deeply loved do right now?",
-  "Today is a new chance to choose yourself.",
-  "I am not lost. I am between identities.",
-  "Stop settling for crumbs. Choose celebration.",
-  "I am safe in this space. I am becoming in this space.",
-  "Transformation is what you do consistently.",
 ];
 
 export default function Home() {
@@ -59,9 +53,6 @@ export default function Home() {
   const [lastModule, setLastModule] = useState<string | null>(null);
   const [tapping, setTapping] = useState<number | null>(null);
   const [showWelcomeFlow, setShowWelcomeFlow] = useState(false);
-
-  const dayOfWeek = new Date().getDay();
-  const affirmation = dailyAffirmations[dayOfWeek];
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -152,6 +143,12 @@ export default function Home() {
       <Day7CompletionModal />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+          {/* Daily Surprise Card */}
+          <DailySurpriseCard />
+
+          {/* AI Proactive Check-in */}
+          <AiCheckinCard />
+
           {/* Lorie Welcome Card (Day 1 only) */}
           <LorieWelcomeCard />
 
@@ -275,45 +272,18 @@ export default function Home() {
             <JourneyCheckinCard />
           </motion.div>
 
-          {/* Daily Snapshot Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Card className="p-5 bg-card/80 border-border/50">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-                  <Flame className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {streak > 0 ? `${streak}-day streak` : "Start your streak today"}
-                  </p>
-                  <div className="flex gap-3 text-xs text-muted-foreground">
-                    <span>Total sessions: {totalSessions}</span>
-                    <span>Longest streak: {longestStreak}</span>
-                  </div>
-                  {lastModule && (
-                    <p className="text-xs text-muted-foreground">
-                      Last module: {lastModule}
-                    </p>
-                  )}
-                </div>
-              </div>
-              {streak === 0 && totalSessions > 1 && (
-                <p className="text-xs text-muted-foreground mb-3 italic">
-                  Streak reset — but your {totalSessions} total sessions never go away. Keep going.
-                </p>
-              )}
-              <div className="flex items-start gap-2 pt-3 border-t border-border/50">
-                <Sparkles className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <p className="text-sm text-muted-foreground italic leading-relaxed">
-                  "{affirmation}"
-                </p>
-              </div>
-            </Card>
-          </motion.div>
+          {/* Streak Card */}
+          <StreakCard
+            streak={streak}
+            totalSessions={totalSessions}
+            longestStreak={longestStreak}
+            lastModule={lastModule}
+          />
+
+          {/* Transformation Card */}
+          <div className="mt-6">
+            <TransformationCard />
+          </div>
 
           {/* Upgrade seed (subtle, during trial) */}
           {isTrialActive && trialDay >= 1 && (

@@ -928,6 +928,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ai_checkin_days_shown: Json
           body_type: string | null
           body_type_completed_at: string | null
           buddy_requested: boolean
@@ -967,6 +968,7 @@ export type Database = {
           reset_plan_generated: boolean
           share_milestones: boolean
           shown_day7_modal: boolean
+          sound_effects_enabled: boolean
           stripe_customer_id: string | null
           stuck_duration: string | null
           subscription_tier: string | null
@@ -988,6 +990,7 @@ export type Database = {
           worth_score_day24: number | null
         }
         Insert: {
+          ai_checkin_days_shown?: Json
           body_type?: string | null
           body_type_completed_at?: string | null
           buddy_requested?: boolean
@@ -1027,6 +1030,7 @@ export type Database = {
           reset_plan_generated?: boolean
           share_milestones?: boolean
           shown_day7_modal?: boolean
+          sound_effects_enabled?: boolean
           stripe_customer_id?: string | null
           stuck_duration?: string | null
           subscription_tier?: string | null
@@ -1048,6 +1052,7 @@ export type Database = {
           worth_score_day24?: number | null
         }
         Update: {
+          ai_checkin_days_shown?: Json
           body_type?: string | null
           body_type_completed_at?: string | null
           buddy_requested?: boolean
@@ -1087,6 +1092,7 @@ export type Database = {
           reset_plan_generated?: boolean
           share_milestones?: boolean
           shown_day7_modal?: boolean
+          sound_effects_enabled?: boolean
           stripe_customer_id?: string | null
           stuck_duration?: string | null
           subscription_tier?: string | null
