@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useFoundingMode } from "@/hooks/useFoundingMode";
 
 type TierName = "reset" | "expand" | "embody" | "founding_full_access";
 
@@ -35,6 +36,7 @@ const TIER_LEVEL: Record<string, number> = {
 
 export function LockedContent({ children, requiredTier, currentTier }: LockedContentProps) {
   const normalize = (t: string) => TIER_LEVEL[t.toLowerCase()] ?? 0;
+  const { foundingMode } = useFoundingMode();
 
   if (normalize(currentTier) >= normalize(requiredTier)) {
     return <>{children}</>;
@@ -50,17 +52,35 @@ export function LockedContent({ children, requiredTier, currentTier }: LockedCon
           <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
             <Lock className="w-8 h-8 text-accent" />
           </div>
-          <h3 className="font-serif text-xl font-bold text-foreground">
-            Unlock with {tierLabels[requiredTier]} — {tierPrices[requiredTier]}/month
-          </h3>
-          <p className="text-muted-foreground text-sm max-w-xs">
-            This content is available with the {tierLabels[requiredTier]} plan and above.
-          </p>
-          <Link to="/upgrade">
-            <Button variant="gold" size="lg">
-              Upgrade Now
-            </Button>
-          </Link>
+          {foundingMode ? (
+            <>
+              <h3 className="font-serif text-xl font-bold text-foreground">
+                Available inside Founding Access
+              </h3>
+              <p className="text-muted-foreground text-sm max-w-xs">
+                Lock in $44/month for full access — for life.
+              </p>
+              <Link to="/upgrade">
+                <Button variant="gold" size="lg">
+                  Lock In My Founding Rate →
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <h3 className="font-serif text-xl font-bold text-foreground">
+                Unlock with {tierLabels[requiredTier]} — {tierPrices[requiredTier]}/month
+              </h3>
+              <p className="text-muted-foreground text-sm max-w-xs">
+                This content is available with the {tierLabels[requiredTier]} plan and above.
+              </p>
+              <Link to="/upgrade">
+                <Button variant="gold" size="lg">
+                  Upgrade to {tierLabels[requiredTier]} →
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </div>
