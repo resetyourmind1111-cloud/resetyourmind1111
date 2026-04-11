@@ -22,6 +22,23 @@ interface ToolEntry {
 export default function HealingToolsDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { isTrialActive, onboardingReason, trialTool1, trialTool2 } = useTrialStatus();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile-dashboard", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("subscription_tier")
+        .eq("user_id", user!.id)
+        .single();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const tier = profile?.subscription_tier || "free";
+  const allowedTools = getTrialAllowedTools(onboardingReason, trialTool1, trialTool2);
 
   const { data: allEntries = [] } = useQuery({
     queryKey: ["all-healing-entries", user?.id],
