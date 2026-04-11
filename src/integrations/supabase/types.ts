@@ -791,6 +791,65 @@ export type Database = {
         }
         Relationships: []
       }
+      sacred_circle_posts: {
+        Row: {
+          content: string
+          created_at: string
+          display_name: string | null
+          id: string
+          milestone_type: string | null
+          post_type: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          milestone_type?: string | null
+          post_type?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          milestone_type?: string | null
+          post_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sacred_circle_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sacred_circle_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "sacred_circle_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       spread_templates: {
         Row: {
           created_at: string

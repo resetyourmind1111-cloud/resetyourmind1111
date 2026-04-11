@@ -44,6 +44,7 @@ import ResetPlan from "./pages/ResetPlan";
 import MyShifts from "./pages/MyShifts";
 import MonthlyReset from "./pages/MonthlyReset";
 import WhatsNext from "./pages/WhatsNext";
+import SacredCircle from "./pages/SacredCircle";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="/my-shifts" element={<MyShifts />} />
               <Route path="/monthly-reset" element={<MonthlyReset />} />
               <Route path="/whats-next" element={<WhatsNext />} />
+              <Route path="/sacred-circle" element={<SacredCircle />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

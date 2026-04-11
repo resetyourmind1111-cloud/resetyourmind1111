@@ -23,6 +23,7 @@ const navLinks = [
   { name: "Emotional Surgery", href: "/emotional-surgery" },
   { name: "My Patterns", href: "/patterns" },
   { name: "Monthly Reset", href: "/monthly-reset" },
+  { name: "Sacred Circle", href: "/sacred-circle" },
   { name: "Manifesto", href: "/manifesto" },
   { name: "My Progress", href: "/my-progress" },
   { name: "My Account", href: "/my-account" },
