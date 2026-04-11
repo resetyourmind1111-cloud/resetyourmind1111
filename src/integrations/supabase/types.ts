@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      accountability_buddies: {
+        Row: {
+          active: boolean
+          id: string
+          paired_at: string
+          thirty_day_start: string | null
+          user_id_1: string
+          user_id_2: string
+        }
+        Insert: {
+          active?: boolean
+          id?: string
+          paired_at?: string
+          thirty_day_start?: string | null
+          user_id_1: string
+          user_id_2: string
+        }
+        Update: {
+          active?: boolean
+          id?: string
+          paired_at?: string
+          thirty_day_start?: string | null
+          user_id_1?: string
+          user_id_2?: string
+        }
+        Relationships: []
+      }
       ai_chat_sessions: {
         Row: {
           created_at: string
@@ -127,6 +154,288 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      circle_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "circle_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_dms: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          read: boolean
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
+      circle_event_rsvps: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_event_rsvps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "circle_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_date: string
+          event_type: string
+          id: string
+          replay_url: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_type?: string
+          id?: string
+          replay_url?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          replay_url?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      circle_members: {
+        Row: {
+          bio: string | null
+          days_in_circle: number
+          display_name: string
+          hormone_profile: string | null
+          human_design_type: string | null
+          id: string
+          joined_at: string
+          primary_trap: string | null
+          show_human_design: boolean
+          show_in_directory: boolean
+          show_primary_trap: boolean
+          show_thermostat: boolean
+          thermostat_type: string | null
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          days_in_circle?: number
+          display_name: string
+          hormone_profile?: string | null
+          human_design_type?: string | null
+          id?: string
+          joined_at?: string
+          primary_trap?: string | null
+          show_human_design?: boolean
+          show_in_directory?: boolean
+          show_primary_trap?: boolean
+          show_thermostat?: boolean
+          thermostat_type?: string | null
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          days_in_circle?: number
+          display_name?: string
+          hormone_profile?: string | null
+          human_design_type?: string | null
+          id?: string
+          joined_at?: string
+          primary_trap?: string | null
+          show_human_design?: boolean
+          show_in_directory?: boolean
+          show_primary_trap?: boolean
+          show_thermostat?: boolean
+          thermostat_type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      circle_posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_admin_post: boolean
+          is_anonymous: boolean
+          is_pinned: boolean
+          post_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_admin_post?: boolean
+          is_anonymous?: boolean
+          is_pinned?: boolean
+          post_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_admin_post?: boolean
+          is_anonymous?: boolean
+          is_pinned?: boolean
+          post_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      circle_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          reaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          reaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          reaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "circle_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_reports: {
+        Row: {
+          comment_id: string | null
+          created_at: string
+          id: string
+          post_id: string | null
+          reason: string
+          reporter_id: string
+        }
+        Insert: {
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          reason: string
+          reporter_id: string
+        }
+        Update: {
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          reason?: string
+          reporter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_reports_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "circle_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "circle_reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "circle_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       daily_shifts: {
         Row: {
@@ -597,16 +906,19 @@ export type Database = {
         Row: {
           body_type: string | null
           body_type_completed_at: string | null
+          buddy_requested: boolean
           comeback_card_shown: boolean
           created_at: string
           current_streak: number | null
           day3_card_shown: boolean
           first_moment_complete: boolean
           first_moment_response: string | null
+          first_visit_circle: boolean
           founder_banner_dismissed_count: number
           full_name: string | null
           human_design_type: string | null
           id: string
+          is_admin: boolean
           journey_current_day: number | null
           journey_start_date: string | null
           last_30day_activity: string | null
@@ -654,16 +966,19 @@ export type Database = {
         Insert: {
           body_type?: string | null
           body_type_completed_at?: string | null
+          buddy_requested?: boolean
           comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
           day3_card_shown?: boolean
           first_moment_complete?: boolean
           first_moment_response?: string | null
+          first_visit_circle?: boolean
           founder_banner_dismissed_count?: number
           full_name?: string | null
           human_design_type?: string | null
           id?: string
+          is_admin?: boolean
           journey_current_day?: number | null
           journey_start_date?: string | null
           last_30day_activity?: string | null
@@ -711,16 +1026,19 @@ export type Database = {
         Update: {
           body_type?: string | null
           body_type_completed_at?: string | null
+          buddy_requested?: boolean
           comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
           day3_card_shown?: boolean
           first_moment_complete?: boolean
           first_moment_response?: string | null
+          first_visit_circle?: boolean
           founder_banner_dismissed_count?: number
           full_name?: string | null
           human_design_type?: string | null
           id?: string
+          is_admin?: boolean
           journey_current_day?: number | null
           journey_start_date?: string | null
           last_30day_activity?: string | null
