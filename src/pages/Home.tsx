@@ -224,13 +224,6 @@ export default function Home() {
             </Link>
           </motion.div>
 
-          {/* Daily Featured Card (trial) */}
-          {isTrialActive && (
-            <div className="mb-6 space-y-4">
-              <DailyFeaturedCard />
-              <DailyPermissionSlipCard />
-            </div>
-          )}
 
           {/* State Selector */}
           <div className="grid gap-3 mb-8">
