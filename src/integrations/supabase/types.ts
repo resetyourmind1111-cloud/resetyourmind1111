@@ -131,25 +131,31 @@ export type Database = {
       daily_shifts: {
         Row: {
           created_at: string
+          day_number: number | null
           entry_date: string
           id: string
           prompt: string
+          prompt_type: string
           response: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          day_number?: number | null
           entry_date?: string
           id?: string
           prompt: string
+          prompt_type?: string
           response: string
           user_id: string
         }
         Update: {
           created_at?: string
+          day_number?: number | null
           entry_date?: string
           id?: string
           prompt?: string
+          prompt_type?: string
           response?: string
           user_id?: string
         }
@@ -591,6 +597,7 @@ export type Database = {
         Row: {
           body_type: string | null
           body_type_completed_at: string | null
+          comeback_card_shown: boolean
           created_at: string
           current_streak: number | null
           day3_card_shown: boolean
@@ -602,12 +609,16 @@ export type Database = {
           id: string
           journey_current_day: number | null
           journey_start_date: string | null
+          last_30day_activity: string | null
           last_login: string | null
+          lorie_30day_shown: boolean
           lorie_welcome_shown: boolean
+          milestone_cards_shown: Json
           notification_time: string | null
           notifications_enabled: boolean
           onboarding_complete: boolean | null
           onboarding_reason: string | null
+          pattern_checkin_cards_shown: Json
           phone: string | null
           primary_wound: string | null
           profile_photo_url: string | null
@@ -636,6 +647,7 @@ export type Database = {
         Insert: {
           body_type?: string | null
           body_type_completed_at?: string | null
+          comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
           day3_card_shown?: boolean
@@ -647,12 +659,16 @@ export type Database = {
           id?: string
           journey_current_day?: number | null
           journey_start_date?: string | null
+          last_30day_activity?: string | null
           last_login?: string | null
+          lorie_30day_shown?: boolean
           lorie_welcome_shown?: boolean
+          milestone_cards_shown?: Json
           notification_time?: string | null
           notifications_enabled?: boolean
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
+          pattern_checkin_cards_shown?: Json
           phone?: string | null
           primary_wound?: string | null
           profile_photo_url?: string | null
@@ -681,6 +697,7 @@ export type Database = {
         Update: {
           body_type?: string | null
           body_type_completed_at?: string | null
+          comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
           day3_card_shown?: boolean
@@ -692,12 +709,16 @@ export type Database = {
           id?: string
           journey_current_day?: number | null
           journey_start_date?: string | null
+          last_30day_activity?: string | null
           last_login?: string | null
+          lorie_30day_shown?: boolean
           lorie_welcome_shown?: boolean
+          milestone_cards_shown?: Json
           notification_time?: string | null
           notifications_enabled?: boolean
           onboarding_complete?: boolean | null
           onboarding_reason?: string | null
+          pattern_checkin_cards_shown?: Json
           phone?: string | null
           primary_wound?: string | null
           profile_photo_url?: string | null
