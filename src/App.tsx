@@ -44,6 +44,7 @@ import ResetPlan from "./pages/ResetPlan";
 import MyShifts from "./pages/MyShifts";
 import MonthlyReset from "./pages/MonthlyReset";
 import WhatsNext from "./pages/WhatsNext";
+import SacredCircle from "./pages/SacredCircle";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
