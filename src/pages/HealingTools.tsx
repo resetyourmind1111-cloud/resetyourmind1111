@@ -82,7 +82,7 @@ export default function HealingTools() {
   const shouldShowContent = isTrialActive && tier === "free";
 
   return (
-    <AuthenticatedLayout title="Healing Tools" subtitle="20 powerful tools for deep emotional healing and transformation">
+    <AuthenticatedLayout title="Healing Tools" subtitle="21 powerful tools for deep emotional healing and transformation">
       {shouldShowContent ? (
         <>
           {/* Trial banner */}

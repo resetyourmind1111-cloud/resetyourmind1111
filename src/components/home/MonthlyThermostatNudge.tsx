@@ -48,7 +48,7 @@ export function MonthlyThermostatNudge() {
             Take my monthly check-in →
           </Button>
         </Link>
-        <p className="text-muted-foreground text-[10px] mt-2">Takes 5 minutes. Your results are saved.</p>
+        <p className="text-muted-foreground text-[10px] mt-2">Takes 3 minutes. Your results are saved.</p>
       </Card>
     </motion.div>
   );
