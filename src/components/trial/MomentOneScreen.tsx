@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { allPermissionSlips } from "@/data/permissionSlipsData";
+import { AnthemPlayer } from "@/components/anthem/AnthemPlayer";
 
 const bodyResponses = [
   "Something opened",
@@ -112,17 +113,30 @@ export function MomentOneScreen({ onComplete }: MomentOneScreenProps) {
           </div>
         </motion.div>
 
+        {/* Anthem Moment */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.3 }}
+          className="space-y-3"
+        >
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold">YOUR RESET ANTHEM</p>
+          <p className="text-[#F9F6F0]/60 text-sm">This song was written for this moment.<br />For you. Right now.</p>
+          <AnthemPlayer />
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 2.3 }}
+          transition={{ delay: 3.0 }}
+          className="space-y-3"
         >
           <Button
             onClick={handleComplete}
             disabled={saving}
             className="w-full bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-bold text-base py-6 rounded-xl"
           >
-            {saving ? "Saving..." : "Take me to my reset →"}
+            {saving ? "Saving..." : "Take me to my dashboard →"}
           </Button>
         </motion.div>
       </div>

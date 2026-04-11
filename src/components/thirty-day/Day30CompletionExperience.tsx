@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
+import { AnthemPlayer } from "@/components/anthem/AnthemPlayer";
 
 const LORIE_30DAY_AUDIO_URL = "https://cdn.pixabay.com/audio/2022/03/15/audio_115f9bda3a.mp3"; // placeholder
 
@@ -310,8 +311,31 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
         </motion.div>
       )}
 
-      {/* Screen 5: The Upgrade Moment */}
+      {/* Screen 5b: Anthem */}
       {screen === 5 && (
+        <motion.div
+          key="anthem"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[80] bg-[#06060e] flex items-center justify-center p-6 overflow-y-auto"
+        >
+          <div className="max-w-md w-full text-center space-y-6">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold">YOUR ANTHEM</p>
+            <h2 className="font-serif text-2xl font-bold text-[#F9F6F0]">This was written for you.</h2>
+            <p className="text-[#F9F6F0]/60 text-sm">
+              Thirty days ago you gave yourself permission.<br />This is what that sounds like.
+            </p>
+            <AnthemPlayer />
+            <Button onClick={() => setScreen(6)} className="w-full bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-semibold">
+              Continue to my next level →
+            </Button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Screen 6: The Upgrade Moment */}
+      {screen === 6 && (
         <motion.div
           key="upgrade"
           initial={{ opacity: 0 }}

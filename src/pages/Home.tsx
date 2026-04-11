@@ -26,6 +26,9 @@ import { Day7CompletionModal } from "@/components/trial/Day7CompletionModal";
 import { Day3AcknowledgmentCard } from "@/components/trial/Day3AcknowledgmentCard";
 import { LorieWelcomeCard } from "@/components/trial/LorieWelcomeCard";
 import { DailyShiftWidget } from "@/components/home/DailyShiftWidget";
+import { LongTermMilestoneCard } from "@/components/home/LongTermMilestoneCard";
+import { MonthlyThermostatNudge } from "@/components/home/MonthlyThermostatNudge";
+import { MonthlyResetNudge } from "@/components/home/MonthlyResetNudge";
 
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
@@ -157,6 +160,15 @@ export default function Home() {
               Your transformation is not linear. Let's meet you where you are.
             </p>
           </motion.div>
+
+          {/* Long-term Milestone Cards (Day 60/90/180) */}
+          <LongTermMilestoneCard />
+
+          {/* Monthly Reset Nudge */}
+          <MonthlyResetNudge />
+
+          {/* Monthly Thermostat Nudge */}
+          <MonthlyThermostatNudge />
 
           {/* Reset Plan Widget */}
           <ResetPlanWidget />
