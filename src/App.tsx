@@ -64,7 +64,8 @@ const App = () => (
           <BrowserRouter>
             <OnboardingGuard>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<Landing />} />
+                <Route path="/landing" element={<Index />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/assessment" element={<Assessment />} />
                 <Route path="/auth" element={<Auth />} />
