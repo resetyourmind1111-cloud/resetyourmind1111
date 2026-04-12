@@ -1,73 +1,21 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { TrialResumeAction } from "@/hooks/useTrialResume";
 
-export function WelcomeBackCard() {
-  const { user } = useAuth();
+interface WelcomeBackCardProps {
+  loading?: boolean;
+  nextAction?: TrialResumeAction | null;
+}
+
+export function WelcomeBackCard({ loading = false, nextAction = null }: WelcomeBackCardProps) {
   const { isTrialActive, trialDay } = useTrialStatus();
-  const [nextAction, setNextAction] = useState<{ label: string; href: string } | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!user || !isTrialActive) {
-      setLoading(false);
-      return;
-    }
-
-    async function determineNextAction() {
-      // Check assessment (Worth Thermostat)
-      const { data: assessment } = await supabase
-        .from("assessment_results")
-        .select("id")
-        .eq("user_id", user!.id)
-        .limit(1);
-
-      if (!assessment || assessment.length === 0) {
-        setNextAction({ label: "Continue — Worth Thermostat →", href: "/assessment" });
-        setLoading(false);
-        return;
-      }
-
-      // Check Identity Trap quiz
-      const { data: trapResult } = await supabase
-        .from("identity_trap_results")
-        .select("id")
-        .eq("user_id", user!.id)
-        .limit(1);
-
-      if (!trapResult || trapResult.length === 0) {
-        setNextAction({ label: "Continue — Discover Your Pattern →", href: "/patterns/quiz" });
-        setLoading(false);
-        return;
-      }
-
-      // Check nervous system checkin (first reset)
-      const { data: checkins } = await supabase
-        .from("nervous_system_checkins")
-        .select("id")
-        .eq("user_id", user!.id)
-        .limit(1);
-
-      if (!checkins || checkins.length === 0) {
-        setNextAction({ label: "Continue — Your First Reset →", href: "/healing-tools/nervous-system-diagnostic" });
-        setLoading(false);
-        return;
-      }
-
-      setNextAction({ label: `Continue — Day ${trialDay} Check In →`, href: "/patterns/check-in" });
-      setLoading(false);
-    }
-
-    determineNextAction();
-  }, [user, isTrialActive, trialDay]);
+  const dayLabel = Math.min(trialDay + 1, 7);
 
   // Don't show on Day 1 (Lorie welcome shows instead) or if not trial
-  if (!isTrialActive || trialDay <= 1 || loading) return null;
+  if (!isTrialActive || dayLabel <= 1 || loading || !nextAction) return null;
 
   return (
     <motion.div
@@ -83,7 +31,7 @@ export function WelcomeBackCard() {
             Welcome Back
           </p>
           <h3 className="font-serif text-xl text-[#F9F6F0] mb-1">
-            Day {trialDay} of 7. Your reset continues.
+            Day {dayLabel} of 7. Your reset continues.
           </h3>
           <p className="text-[#F9F6F0]/50 text-sm mb-4">
             Pick up where you left off.

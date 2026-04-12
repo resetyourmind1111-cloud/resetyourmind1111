@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { Navigation } from "@/components/Navigation";
 import { PastDueBanner } from "@/components/PastDueBanner";
 import { Footer } from "@/components/landing/Footer";
@@ -31,6 +31,7 @@ interface AssessmentResult {
 
 export default function Dashboard() {
   const { user, isLoading: authLoading } = useAuth();
+  const { isTrialActive, isLoading: trialLoading } = useTrialStatus();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
@@ -74,6 +75,12 @@ export default function Dashboard() {
       navigate("/auth");
     }
   }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (!authLoading && !trialLoading && user && isTrialActive) {
+      navigate("/home", { replace: true });
+    }
+  }, [user, authLoading, trialLoading, isTrialActive, navigate]);
 
   // Check if user needs onboarding
   useEffect(() => {
@@ -150,13 +157,15 @@ export default function Dashboard() {
     },
   });
 
-  if (authLoading) {
+  if (authLoading || trialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
+
+  if (isTrialActive) return null;
 
   if (showOnboarding) {
     return <OnboardingFlow onComplete={() => setShowOnboarding(false)} />;

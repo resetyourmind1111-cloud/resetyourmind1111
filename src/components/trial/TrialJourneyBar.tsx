@@ -1,50 +1,22 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTrialStatus, TRIAL_TOOL_NAMES, getTrialAllowedTools } from "@/hooks/useTrialStatus";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Headphones, Wrench, ArrowRight, Clock } from "lucide-react";
+import { TrialResumeStepInfo } from "@/hooks/useTrialResume";
+import { Clock } from "lucide-react";
 
-interface StepInfo {
-  eyebrow: string;
-  title: string;
-  body: string;
-  time?: string;
-  buttonText: string;
-  route: string;
+interface TrialJourneyBarProps {
+  loading?: boolean;
+  step?: TrialResumeStepInfo | null;
 }
 
-export function TrialJourneyBar() {
+export function TrialJourneyBar({ loading = false, step = null }: TrialJourneyBarProps) {
   const { isTrialActive, trialDay, onboardingReason, trialTool1, trialTool2 } = useTrialStatus();
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [hasAssessment, setHasAssessment] = useState(false);
-  const [hasTrapResult, setHasTrapResult] = useState(false);
-  const [hasPatternInterrupt, setHasPatternInterrupt] = useState(false);
-  const [journeyDay, setJourneyDay] = useState(0);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) { setLoading(false); return; }
-    Promise.all([
-      supabase.from("assessment_results").select("id").eq("user_id", user.id).limit(1),
-      supabase.from("identity_trap_results").select("id").eq("user_id", user.id).limit(1),
-      supabase.from("pattern_interrupts").select("id").eq("user_id", user.id).limit(1),
-      supabase.from("profiles").select("journey_current_day").eq("user_id", user.id).single(),
-    ]).then(([a, t, p, prof]) => {
-      setHasAssessment((a.data?.length ?? 0) > 0);
-      setHasTrapResult((t.data?.length ?? 0) > 0);
-      setHasPatternInterrupt((p.data?.length ?? 0) > 0);
-      setJourneyDay((prof.data as any)?.journey_current_day || 0);
-      setLoading(false);
-    });
-  }, [user]);
-
-  if (!isTrialActive || loading) return null;
+  if (!isTrialActive || loading || !step) return null;
 
   const allowedTools = getTrialAllowedTools(onboardingReason, trialTool1, trialTool2);
   const tool1Name = TRIAL_TOOL_NAMES[allowedTools[0]] || allowedTools[0];
@@ -52,53 +24,6 @@ export function TrialJourneyBar() {
 
   const progressPercent = (Math.min(trialDay + 1, 7) / 7) * 100;
   const dayLabel = Math.min(trialDay + 1, 7);
-
-  // Determine guided step
-  let step: StepInfo;
-  if (!hasAssessment) {
-    step = {
-      eyebrow: `START HERE — DAY ${dayLabel}`,
-      title: "Worth Thermostat™",
-      body: "See exactly where your patterns are set across money, love, health, leadership, and self-worth.",
-      time: "5 minutes",
-      buttonText: "Start my assessment →",
-      route: "/assessment",
-    };
-  } else if (!hasTrapResult) {
-    step = {
-      eyebrow: "YOUR NEXT STEP",
-      title: "Discover Your Identity Pattern",
-      body: "Find out which pattern has been running your life — and get your first 3-minute reset.",
-      time: "2 minutes",
-      buttonText: "Discover my pattern →",
-      route: "/patterns/quiz",
-    };
-  } else if (!hasPatternInterrupt) {
-    step = {
-      eyebrow: "YOUR NEXT STEP",
-      title: "Do Your First Pattern Reset",
-      body: "You know your pattern. Now interrupt it. This is where the shift starts.",
-      time: "3 minutes",
-      buttonText: "Start my reset →",
-      route: "/patterns",
-    };
-  } else if (journeyDay < 3) {
-    step = {
-      eyebrow: "KEEP GOING",
-      title: `Day ${journeyDay + 1} of the 30-Day Experience`,
-      body: "Continue your daily reset journey.",
-      buttonText: `Continue Day ${journeyDay + 1} →`,
-      route: "/30-day-experience",
-    };
-  } else {
-    step = {
-      eyebrow: "TODAY'S RESET",
-      title: "Daily Check-In",
-      body: "What's coming up for you today? Let the app guide you to today's reset.",
-      buttonText: "Check in →",
-      route: "/patterns/check-in",
-    };
-  }
 
   const unlocked = [
     "Worth Thermostat™",
