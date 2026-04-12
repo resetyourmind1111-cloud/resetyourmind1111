@@ -270,38 +270,7 @@ export default function PatternModule() {
           </div>
         );
       case 7: // Do The Reset (Audio)
-        return (
-          <div className="space-y-6">
-            <h2 className="font-serif text-xl font-bold text-foreground">Do The Reset</h2>
-            <Card className="p-6 space-y-4" style={{ background: "linear-gradient(135deg, rgba(61,26,110,0.3), rgba(10,10,10,0.8))" }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-foreground">{trap.audioTitle}</p>
-                  <p className="text-xs text-muted-foreground">{trap.audioDuration}</p>
-                </div>
-                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors">
-                  <Play className="w-5 h-5 text-primary-foreground ml-0.5" />
-                </div>
-              </div>
-              <div className="bg-muted/20 rounded-full h-1.5">
-                <div className="h-full w-0 bg-primary rounded-full" />
-              </div>
-            </Card>
-            <button
-              onClick={() => setShowScript(!showScript)}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {showScript ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              No audio yet? Read the reset instead
-            </button>
-            {showScript && (
-              <Card className="p-5 bg-card/60 border-border/30">
-                <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">{trap.audioScript}</p>
-              </Card>
-            )}
-            <Button variant="gold" onClick={next} className="w-full">Mark Complete →</Button>
-          </div>
-        );
+        return <ResetAudioScreen trap={trap} showScript={showScript} setShowScript={setShowScript} onNext={next} />;
       case 8: // Recode The Identity
         return (
           <div className="space-y-6">
