@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useFoundingMode } from "@/hooks/useFoundingMode";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const TIERS = [
@@ -105,11 +105,13 @@ const FOUNDING_FEATURES = [
 
 export default function Upgrade() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { effectiveTier } = useSubscription();
   const { foundingMode, spotsRemaining } = useFoundingMode();
   const [isAnnual, setIsAnnual] = useState(false);
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
 
   const handleCheckout = async (priceId: string, tierKey: string) => {
     if (!user) {
@@ -135,8 +137,15 @@ export default function Upgrade() {
   };
 
   const handleBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate("/dashboard");
+    if (returnTo) {
+      navigate(returnTo, { replace: true });
+      return;
+    }
+
+    const historyIndex = typeof window !== "undefined" ? window.history.state?.idx ?? 0 : 0;
+
+    if (historyIndex > 0) navigate(-1);
+    else navigate("/dashboard", { replace: true });
   };
 
   // ─── FOUNDING MODE ───

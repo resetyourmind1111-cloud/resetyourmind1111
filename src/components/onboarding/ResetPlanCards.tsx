@@ -82,13 +82,13 @@ const plansByWound: Record<string, PlanCard[]> = {
       title: '"I Know But…" Reset',
       description: "Close the gap between who you know you are and how you're actually living.",
       buttonText: "Start Reset",
-      href: "/patterns/quiz",
+      href: "/patterns/i-know-but",
     },
     {
-      title: "Releasing Resistance",
-      description: "The first thing to dissolve before anything else moves.",
-      buttonText: "Open Lesson",
-      href: "/releasing-resistance",
+      title: "Limiting Belief Rewriter",
+      description: "Rewrite the belief that's been keeping you hidden, hesitant, or stuck in preparation mode.",
+      buttonText: "Open Tool",
+      href: "/healing-tools/limiting-belief-rewriter",
     },
   ],
 };
