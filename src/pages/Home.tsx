@@ -35,6 +35,7 @@ import { AiCheckinCard } from "@/components/home/AiCheckinCard";
 import { TransformationCard } from "@/components/home/TransformationCard";
 import { OraclePreviewCard } from "@/components/home/OraclePreviewCard";
 import { WelcomeBackCard } from "@/components/home/WelcomeBackCard";
+import { useTrialResume } from "@/hooks/useTrialResume";
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
   { label: "I feel emotional", emoji: "💧", module: "Release" },
@@ -46,7 +47,8 @@ const stateOptions = [
 export default function Home() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-  const { isTrialActive, trialDay, onboardingReason, isLoading: trialLoading } = useTrialStatus();
+  const { isTrialActive, trialDay, isLoading: trialLoading } = useTrialStatus();
+  const { nextAction, step: trialStep, loading: resumeLoading } = useTrialResume(isTrialActive, trialDay);
   const [firstName, setFirstName] = useState<string | null>(null);
   const [streak, setStreak] = useState(0);
   const [totalSessions, setTotalSessions] = useState(0);
@@ -128,6 +130,9 @@ export default function Home() {
 
   if (!user) return null;
 
+  const isReturningTrialUser = isTrialActive && Math.min(trialDay + 1, 7) > 1;
+  const shouldHoldTrialContent = isReturningTrialUser && resumeLoading;
+
   if (showWelcomeFlow) {
     return (
       <TrialWelcomeFlow onComplete={() => setShowWelcomeFlow(false)} />
@@ -148,88 +153,112 @@ export default function Home() {
           <LorieWelcomeCard />
 
           {/* Welcome Back Card (Day 2+ trial users) */}
-          <WelcomeBackCard />
+          {shouldHoldTrialContent ? (
+            <Card className="mb-6 p-6 border-primary/20 bg-card/70">
+              <div className="h-3 w-24 rounded-full bg-muted animate-pulse mb-3" />
+              <div className="h-6 w-56 rounded-md bg-muted animate-pulse mb-2" />
+              <div className="h-4 w-40 rounded-md bg-muted animate-pulse mb-4" />
+              <div className="h-10 w-56 rounded-xl bg-muted animate-pulse" />
+            </Card>
+          ) : (
+            <WelcomeBackCard loading={resumeLoading} nextAction={nextAction} />
+          )}
 
           {/* Day 3 Acknowledgment Card */}
-          <Day3AcknowledgmentCard />
+          {!shouldHoldTrialContent && <Day3AcknowledgmentCard />}
 
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8 text-center"
-          >
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Welcome back{firstName ? `, ${firstName}` : ""}.
-              {isTrialActive ? "" : <><br />Where are you today?</>}
-            </h1>
-            {isTrialActive ? (
-              <p className="text-muted-foreground text-base md:text-lg">
-                Pick up where you left off. Your guided reset continues.
-              </p>
-            ) : (
-              <p className="text-muted-foreground text-base md:text-lg">
-                Your transformation is not linear. Let's meet you where you are.
-              </p>
-            )}
-          </motion.div>
+          {!isReturningTrialUser && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-8 text-center"
+            >
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-3">
+                Welcome back{firstName ? `, ${firstName}` : ""}.
+                {isTrialActive ? "" : <><br />Where are you today?</>}
+              </h1>
+              {isTrialActive ? (
+                <p className="text-muted-foreground text-base md:text-lg">
+                  Pick up where you left off. Your guided reset continues.
+                </p>
+              ) : (
+                <p className="text-muted-foreground text-base md:text-lg">
+                  Your transformation is not linear. Let's meet you where you are.
+                </p>
+              )}
+            </motion.div>
+          )}
 
           {/* ===== TRIAL USER: Focused guided experience ===== */}
           {isTrialActive && (
             <>
-              {/* Trial Journey Bar — primary guided action */}
-              <TrialJourneyBar />
-
-              {/* Oracle Preview Card */}
-              <OraclePreviewCard />
-
-              {/* Daily Featured Card */}
-              <div className="mb-6 space-y-4">
-                <DailyFeaturedCard />
-                <DailyPermissionSlipCard />
-              </div>
-
-              {/* Daily Surprise Card */}
-              <DailySurpriseCard />
-
-              {/* AI Proactive Check-in */}
-              <AiCheckinCard />
-
-              {/* Daily Shift Widget */}
-              <DailyShiftWidget />
-
-              {/* Reset Plan Widget */}
-              <ResetPlanWidget />
-
-              {/* Upgrade seed */}
-              {trialDay >= 1 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="mt-6 text-center"
-                >
-                  <p className="text-muted-foreground text-xs">
-                    Want to take this further? Your full reset is one step away.{" "}
-                    <Link to="/upgrade" className="text-primary underline">See options</Link>
-                  </p>
-                </motion.div>
+              {shouldHoldTrialContent ? (
+                <Card className="mb-6 p-5 border-border/50 bg-card/70">
+                  <div className="h-2 w-full rounded-full bg-muted animate-pulse mb-4" />
+                  <div className="h-3 w-28 rounded-full bg-muted animate-pulse mb-3" />
+                  <div className="h-5 w-52 rounded-md bg-muted animate-pulse mb-2" />
+                  <div className="h-4 w-full rounded-md bg-muted animate-pulse mb-2" />
+                  <div className="h-10 w-full rounded-xl bg-muted animate-pulse" />
+                </Card>
+              ) : (
+                <TrialJourneyBar loading={resumeLoading} step={trialStep} />
               )}
 
-              {/* Day 1 bottom guidance text */}
-              {trialDay <= 1 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                  className="mt-8 mb-4 text-center"
-                >
-                  <p className="text-muted-foreground/60 text-xs leading-relaxed">
-                    More tools unlock as your reset progresses.<br />
-                    Start with what's above — it's where the shift begins.
-                  </p>
-                </motion.div>
+              {!shouldHoldTrialContent && (
+                <>
+                  {/* Oracle Preview Card */}
+                  <OraclePreviewCard />
+
+                  {/* Daily Featured Card */}
+                  <div className="mb-6 space-y-4">
+                    <DailyFeaturedCard />
+                    <DailyPermissionSlipCard />
+                  </div>
+
+                  {/* Daily Surprise Card */}
+                  <DailySurpriseCard />
+
+                  {/* AI Proactive Check-in */}
+                  <AiCheckinCard />
+
+                  {/* Daily Shift Widget */}
+                  <DailyShiftWidget />
+
+                  {/* Reset Plan Widget */}
+                  <ResetPlanWidget />
+
+                  {/* Upgrade seed */}
+                  {trialDay >= 1 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.7 }}
+                      className="mt-6 text-center"
+                    >
+                      <p className="text-muted-foreground text-xs">
+                        Want to take this further? Your full reset is one step away.{" "}
+                        <Link to="/upgrade" className="text-primary underline">See options</Link>
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {/* Day 1 bottom guidance text */}
+                  {trialDay <= 1 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.8 }}
+                      className="mt-8 mb-4 text-center"
+                    >
+                      <p className="text-muted-foreground/60 text-xs leading-relaxed">
+                        More tools unlock as your reset progresses.<br />
+                        Start with what's above — it's where the shift begins.
+                      </p>
+                    </motion.div>
+                  )}
+                </>
               )}
             </>
           )}
