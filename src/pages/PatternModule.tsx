@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Lock, Play, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { Lock, Play, ChevronDown, ChevronUp, Check, ChevronLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,7 @@ import { LockedContent } from "@/components/LockedContent";
 import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
 
 const TOTAL_SCREENS = 12;
+const PATTERN_PREVIEW_RETURN_PATH = "/patterns";
 
 export default function PatternModule() {
   const { slug } = useParams<{ slug: string }>();
@@ -59,6 +60,16 @@ export default function PatternModule() {
 
   const next = () => setScreen((s) => Math.min(s + 1, TOTAL_SCREENS - 1));
   const handleSaveExit = () => navigate("/patterns");
+  const exitLockedPreview = () => {
+    const historyIndex = typeof window !== "undefined" ? window.history.state?.idx ?? 0 : 0;
+
+    if (historyIndex > 0) {
+      navigate(-1);
+      return;
+    }
+
+    navigate("/dashboard", { replace: true });
+  };
 
   const handleSaveAction = async () => {
     const action = selectedAction || customAction;
@@ -122,7 +133,13 @@ export default function PatternModule() {
   const renderScreen = () => {
     if (isLockedScreen) {
       return (
-        <div className="space-y-6 text-center py-12">
+        <div className="relative space-y-6 rounded-2xl border border-border/30 bg-card/40 px-6 pt-14 pb-12 text-center">
+          <button
+            onClick={exitLockedPreview}
+            className="absolute left-4 top-4 flex items-center gap-1 text-sm text-foreground/65 transition-colors hover:text-foreground/90"
+          >
+            <ChevronLeft className="h-4 w-4" /> Back
+          </button>
           <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
             <Lock className="w-8 h-8 text-primary" />
           </div>
@@ -132,10 +149,20 @@ export default function PatternModule() {
           <p className="text-muted-foreground max-w-sm mx-auto">
             The first 2 days show you the pattern. The rest of the experience is where you change it. You've already started. Don't stop here.
           </p>
-          <Button variant="gold" size="lg" onClick={() => navigate("/upgrade")}>
+          <Button
+            variant="gold"
+            size="lg"
+            onClick={() => navigate("/upgrade", { state: { returnTo: PATTERN_PREVIEW_RETURN_PATH } })}
+          >
             Continue My Reset — Unlock Full Access
           </Button>
           <p className="text-xs text-muted-foreground">Founding rate: $44/month — locked in for life.</p>
+          <button
+            onClick={exitLockedPreview}
+            className="mt-2 text-[13px] text-foreground/40 transition-colors hover:text-foreground/60"
+          >
+            ← Continue my preview
+          </button>
         </div>
       );
     }
