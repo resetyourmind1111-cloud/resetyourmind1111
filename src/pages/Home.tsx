@@ -144,12 +144,6 @@ export default function Home() {
       <Day7CompletionModal />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
-          {/* Daily Surprise Card */}
-          <DailySurpriseCard />
-
-          {/* AI Proactive Check-in */}
-          <AiCheckinCard />
-
           {/* Lorie Welcome Card (Day 1 only) */}
           <LorieWelcomeCard />
 
@@ -158,6 +152,7 @@ export default function Home() {
 
           {/* Day 3 Acknowledgment Card */}
           <Day3AcknowledgmentCard />
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -166,161 +161,198 @@ export default function Home() {
             className="mb-8 text-center"
           >
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Welcome back{firstName ? `, ${firstName}` : ""}. <br />
-              Where are you today?
+              Welcome back{firstName ? `, ${firstName}` : ""}.
+              {isTrialActive ? "" : <><br />Where are you today?</>}
             </h1>
-            <p className="text-muted-foreground text-base md:text-lg">
-              Your transformation is not linear. Let's meet you where you are.
-            </p>
+            {isTrialActive ? (
+              <p className="text-muted-foreground text-base md:text-lg">
+                Pick up where you left off. Your guided reset continues.
+              </p>
+            ) : (
+              <p className="text-muted-foreground text-base md:text-lg">
+                Your transformation is not linear. Let's meet you where you are.
+              </p>
+            )}
           </motion.div>
 
-          {/* Trial Journey Bar — show unlocked content prominently for trial users */}
-          <TrialJourneyBar />
-
-          {/* Oracle Preview Card for trial users */}
-          <OraclePreviewCard />
-
-          {/* Daily Featured Card (trial) — moved up for visibility */}
+          {/* ===== TRIAL USER: Focused guided experience ===== */}
           {isTrialActive && (
-            <div className="mb-6 space-y-4">
-              <DailyFeaturedCard />
-              <DailyPermissionSlipCard />
-            </div>
+            <>
+              {/* Trial Journey Bar — primary guided action */}
+              <TrialJourneyBar />
+
+              {/* Oracle Preview Card */}
+              <OraclePreviewCard />
+
+              {/* Daily Featured Card */}
+              <div className="mb-6 space-y-4">
+                <DailyFeaturedCard />
+                <DailyPermissionSlipCard />
+              </div>
+
+              {/* Daily Surprise Card */}
+              <DailySurpriseCard />
+
+              {/* AI Proactive Check-in */}
+              <AiCheckinCard />
+
+              {/* Daily Shift Widget */}
+              <DailyShiftWidget />
+
+              {/* Reset Plan Widget */}
+              <ResetPlanWidget />
+
+              {/* Upgrade seed */}
+              {trialDay >= 1 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                  className="mt-6 text-center"
+                >
+                  <p className="text-muted-foreground text-xs">
+                    Want to take this further? Your full reset is one step away.{" "}
+                    <Link to="/upgrade" className="text-primary underline">See options</Link>
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Day 1 bottom guidance text */}
+              {trialDay <= 1 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="mt-8 mb-4 text-center"
+                >
+                  <p className="text-muted-foreground/60 text-xs leading-relaxed">
+                    More tools unlock as your reset progresses.<br />
+                    Start with what's above — it's where the shift begins.
+                  </p>
+                </motion.div>
+              )}
+            </>
           )}
 
-          {/* Long-term Milestone Cards (Day 60/90/180) */}
-          <LongTermMilestoneCard />
+          {/* ===== PAID USER: Full dashboard experience ===== */}
+          {!isTrialActive && (
+            <>
+              {/* Daily Surprise Card */}
+              <DailySurpriseCard />
 
-          {/* Monthly Reset Nudge */}
-          <MonthlyResetNudge />
+              {/* AI Proactive Check-in */}
+              <AiCheckinCard />
 
-          {/* Monthly Thermostat Nudge */}
-          <MonthlyThermostatNudge />
+              {/* Trial Journey Bar */}
+              <TrialJourneyBar />
 
-          {/* Reset Plan Widget */}
-          <ResetPlanWidget />
+              {/* Oracle Preview Card */}
+              <OraclePreviewCard />
 
-          {/* Daily Shift Widget */}
-          <DailyShiftWidget />
+              {/* Long-term Milestone Cards (Day 60/90/180) */}
+              <LongTermMilestoneCard />
 
-          {/* Visual Reset Map */}
-          <VisualResetMap />
+              {/* Monthly Reset Nudge */}
+              <MonthlyResetNudge />
 
-          {/* Today's Reset Tool */}
-          <TodaysResetToolCard />
+              {/* Monthly Thermostat Nudge */}
+              <MonthlyThermostatNudge />
 
-          {/* My Patterns Quick Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-6"
-          >
-            <Link to="/patterns">
-              <Card className="p-5 bg-card/80 border-border/50 hover:border-primary/40 transition-all cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
-                    <RefreshCw className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-semibold">My Patterns</p>
-                    <p className="text-sm text-muted-foreground">Discover your pattern</p>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          </motion.div>
+              {/* Reset Plan Widget */}
+              <ResetPlanWidget />
 
+              {/* Daily Shift Widget */}
+              <DailyShiftWidget />
 
-          {/* State Selector */}
-          <div className="grid gap-3 mb-8">
-            {stateOptions.map((option, i) => (
-              <motion.button
-                key={option.label}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.08 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => handleStateSelect(i)}
-                disabled={tapping !== null}
-                className={`
-                  flex items-center gap-4 w-full p-5 rounded-xl border-2 text-left transition-all duration-200
-                  border-secondary/40 bg-card/60 hover:border-primary/60 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)]
-                  active:border-primary active:shadow-[0_0_30px_hsl(var(--primary)/0.25)]
-                  disabled:opacity-60
-                `}
+              {/* Visual Reset Map */}
+              <VisualResetMap />
+
+              {/* Today's Reset Tool */}
+              <TodaysResetToolCard />
+
+              {/* My Patterns Quick Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mb-6"
               >
-                <span className="text-2xl">{option.emoji}</span>
-                <span className="font-medium text-foreground text-base">{option.label}</span>
-              </motion.button>
-            ))}
-          </div>
+                <Link to="/patterns">
+                  <Card className="p-5 bg-card/80 border-border/50 hover:border-primary/40 transition-all cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
+                        <RefreshCw className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-semibold">My Patterns</p>
+                        <p className="text-sm text-muted-foreground">Discover your pattern</p>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </motion.div>
 
-          {/* Support Flow Entry */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="mb-8"
-          >
-            <Link to="/support-flow">
-              <Button className="w-full bg-[#3D1A6E] text-[#C9A84C] hover:bg-[#3D1A6E]/90 font-serif font-semibold text-base py-6 rounded-xl">
-                What Do You Need Right Now?
-              </Button>
-            </Link>
-          </motion.div>
+              {/* State Selector */}
+              <div className="grid gap-3 mb-8">
+                {stateOptions.map((option, i) => (
+                  <motion.button
+                    key={option.label}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => handleStateSelect(i)}
+                    disabled={tapping !== null}
+                    className={`
+                      flex items-center gap-4 w-full p-5 rounded-xl border-2 text-left transition-all duration-200
+                      border-secondary/40 bg-card/60 hover:border-primary/60 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)]
+                      active:border-primary active:shadow-[0_0_30px_hsl(var(--primary)/0.25)]
+                      disabled:opacity-60
+                    `}
+                  >
+                    <span className="text-2xl">{option.emoji}</span>
+                    <span className="font-medium text-foreground text-base">{option.label}</span>
+                  </motion.button>
+                ))}
+              </div>
 
-          {/* Journey Check-in Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.47 }}
-            className="mb-8"
-          >
-            <JourneyCheckinCard />
-          </motion.div>
+              {/* Support Flow Entry */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 }}
+                className="mb-8"
+              >
+                <Link to="/support-flow">
+                  <Button className="w-full bg-[#3D1A6E] text-primary hover:bg-[#3D1A6E]/90 font-serif font-semibold text-base py-6 rounded-xl">
+                    What Do You Need Right Now?
+                  </Button>
+                </Link>
+              </motion.div>
 
-          {/* Streak Card */}
-          <StreakCard
-            streak={streak}
-            totalSessions={totalSessions}
-            longestStreak={longestStreak}
-            lastModule={lastModule}
-          />
+              {/* Journey Check-in Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.47 }}
+                className="mb-8"
+              >
+                <JourneyCheckinCard />
+              </motion.div>
 
-          {/* Transformation Card */}
-          <div className="mt-6">
-            <TransformationCard />
-          </div>
+              {/* Streak Card */}
+              <StreakCard
+                streak={streak}
+                totalSessions={totalSessions}
+                longestStreak={longestStreak}
+                lastModule={lastModule}
+              />
 
-          {/* Upgrade seed (subtle, during trial) */}
-          {isTrialActive && trialDay >= 1 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="mt-6 text-center"
-            >
-              <p className="text-muted-foreground text-xs">
-                Want to take this further? Your full reset is one step away.{" "}
-                <Link to="/upgrade" className="text-[#C9A84C] underline">See options</Link>
-              </p>
-            </motion.div>
-          )}
-
-          {/* Day 1 bottom guidance text */}
-          {isTrialActive && trialDay <= 1 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="mt-8 mb-4 text-center"
-            >
-              <p className="text-muted-foreground/60 text-xs leading-relaxed">
-                More tools unlock as your reset progresses.<br />
-                Start with what's above — it's where the shift begins.
-              </p>
-            </motion.div>
+              {/* Transformation Card */}
+              <div className="mt-6">
+                <TransformationCard />
+              </div>
+            </>
           )}
         </div>
       </main>
