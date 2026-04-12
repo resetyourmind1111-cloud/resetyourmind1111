@@ -79,10 +79,10 @@ const plansByWound: Record<string, PlanCard[]> = {
       href: "/assessment",
     },
     {
-      title: '"I Know But…" Reset',
-      description: "Close the gap between who you know you are and how you're actually living.",
-      buttonText: "Start Reset",
-      href: "/patterns/i-know-but",
+      title: "Manifestation Tracker",
+      description: "Turn the vision you already carry into visible movement you can track and trust.",
+      buttonText: "Open Tool",
+      href: "/healing-tools/manifestation-tracker",
     },
     {
       title: "Limiting Belief Rewriter",
