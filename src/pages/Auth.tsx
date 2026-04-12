@@ -1,93 +1,85 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Mail, Lock, User, Sparkles, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User, ArrowLeft } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { AuthFormField } from "@/components/auth/AuthFormField";
+import { AuthError } from "@/components/auth/AuthError";
+import { PostSignupTransition } from "@/components/auth/PostSignupTransition";
 
 const signUpSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
-  email: z.string().trim().email("Please enter a valid email address").max(100),
-  password: z.string().min(6, "Password must be at least 6 characters").max(100),
+  email: z.string().trim().email("Please enter a valid email address.").max(100),
+  password: z.string().min(8, "Password must be at least 8 characters.").max(100),
 });
 
 const signInSchema = z.object({
-  email: z.string().trim().email("Please enter a valid email address").max(100),
+  email: z.string().trim().email("Please enter a valid email address.").max(100),
   password: z.string().min(1, "Password is required").max(100),
 });
 
 const resetSchema = z.object({
-  email: z.string().trim().email("Please enter a valid email address").max(100),
+  email: z.string().trim().email("Please enter a valid email address.").max(100),
 });
 
 const newPasswordSchema = z.object({
-  password: z.string().min(6, "Password must be at least 6 characters").max(100),
-  confirmPassword: z.string().min(6, "Password must be at least 6 characters").max(100),
+  password: z.string().min(8, "Password must be at least 8 characters.").max(100),
+  confirmPassword: z.string().min(8, "Password must be at least 8 characters.").max(100),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
-type AuthView = "signIn" | "signUp" | "forgotPassword" | "updatePassword";
+type AuthView = "signIn" | "signUp" | "forgotPassword" | "updatePassword" | "resetSent";
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
-  const [view, setView] = useState<AuthView>("signIn");
+  const initialView = searchParams.get("view") === "signup" ? "signUp" : "signIn";
+  const [view, setView] = useState<AuthView>(initialView);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<{ message: string; linkText?: string; linkTo?: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [showTransition, setShowTransition] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+
   const { signUp, signIn, user, isLoading, updatePassword } = useAuth();
   const navigate = useNavigate();
 
-  // Check for password recovery token in URL
   useEffect(() => {
     const type = searchParams.get("type");
-    if (type === "recovery") {
-      setView("updatePassword");
-    }
+    if (type === "recovery") setView("updatePassword");
 
-    // Also listen for PASSWORD_RECOVERY event from Supabase
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setView("updatePassword");
-      }
+      if (event === "PASSWORD_RECOVERY") setView("updatePassword");
     });
-
     return () => subscription.unsubscribe();
   }, [searchParams]);
 
   useEffect(() => {
-    if (!isLoading && user && view !== "updatePassword") {
+    if (!isLoading && user && view !== "updatePassword" && !showTransition) {
       const redirect = searchParams.get("redirect");
       if (redirect === "checkout") {
         const priceId = searchParams.get("priceId");
         const tier = searchParams.get("tier");
         if (priceId) {
-          // Trigger checkout after login/signup
           supabase.functions.invoke("create-checkout", {
             body: { priceId, tierKey: tier },
           }).then(({ data, error }) => {
             if (error) {
-              toast.error(error.message || "Failed to start checkout. Please try again.");
+              toast.error(error.message || "Failed to start checkout.");
               navigate("/dashboard");
               return;
             }
-
-            if (data?.url) {
-              window.location.assign(data.url);
-              return;
-            }
-
+            if (data?.url) { window.location.assign(data.url); return; }
             navigate("/dashboard");
           });
           return;
@@ -95,11 +87,12 @@ export default function Auth() {
       }
       navigate("/home");
     }
-  }, [user, isLoading, navigate, view, searchParams]);
+  }, [user, isLoading, navigate, view, searchParams, showTransition]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setFormError(null);
 
     const result = resetSchema.safeParse({ email });
     if (!result.success) {
@@ -111,27 +104,23 @@ export default function Auth() {
       return;
     }
 
-    const normalizedEmail = result.data.email.toLowerCase();
-
     setIsSubmitting(true);
-
     try {
       const response = await supabase.functions.invoke("send-password-reset", {
         body: {
-          email: normalizedEmail,
+          email: result.data.email.toLowerCase(),
           redirectUrl: `${window.location.origin}/auth?type=recovery`,
         },
       });
-
       if (response.error) {
-        toast.error("Failed to send reset email. Please try again.");
+        setFormError({ message: "Something went wrong. Check your connection and try again." });
       } else {
-        toast.success("If an account exists with this email, you'll receive a reset link.");
-        setView("signIn");
+        setResetEmail(result.data.email.toLowerCase());
+        setView("resetSent");
         setEmail("");
       }
-    } catch (error) {
-      toast.error("An error occurred. Please try again.");
+    } catch {
+      setFormError({ message: "Something went wrong. Check your connection and try again." });
     } finally {
       setIsSubmitting(false);
     }
@@ -140,6 +129,7 @@ export default function Auth() {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setFormError(null);
 
     const result = newPasswordSchema.safeParse({ password, confirmPassword });
     if (!result.success) {
@@ -152,24 +142,16 @@ export default function Auth() {
     }
 
     setIsSubmitting(true);
-    
     try {
-      // Ensure we have a session before updating password
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast.error("Your reset link has expired. Please request a new one.");
+        setFormError({ message: "Your reset link has expired. Please request a new one.", linkText: "Request new link →", linkTo: "/auth" });
         setView("forgotPassword");
         return;
       }
-
       const { error } = await updatePassword(password);
       if (error) {
-        if (error.message.toLowerCase().includes("session")) {
-          toast.error("Your reset session has expired. Please request a new reset link.");
-          setView("forgotPassword");
-        } else {
-          toast.error(error.message);
-        }
+        setFormError({ message: error.message });
       } else {
         toast.success("Password updated successfully!");
         navigate("/");
@@ -182,14 +164,10 @@ export default function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-
-    let normalizedEmail = "";
-    let normalizedPassword = "";
-    let normalizedFirstName: string | undefined;
+    setFormError(null);
 
     if (view === "signUp") {
       const result = signUpSchema.safeParse({ firstName, email, password });
-
       if (!result.success) {
         const fieldErrors: Record<string, string> = {};
         result.error.errors.forEach((err) => {
@@ -199,303 +177,204 @@ export default function Auth() {
         return;
       }
 
-      normalizedFirstName = result.data.firstName;
-      normalizedEmail = result.data.email.toLowerCase();
-      normalizedPassword = result.data.password;
-    } else {
-      const result = signInSchema.safeParse({ email, password });
-
-      if (!result.success) {
-        const fieldErrors: Record<string, string> = {};
-        result.error.errors.forEach((err) => {
-          if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
-        });
-        setErrors(fieldErrors);
-        return;
-      }
-
-      normalizedEmail = result.data.email.toLowerCase();
-      normalizedPassword = result.data.password;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      if (view === "signUp") {
-        const { error } = await signUp(normalizedEmail, normalizedPassword, normalizedFirstName);
+      setIsSubmitting(true);
+      try {
+        const { error } = await signUp(result.data.email.toLowerCase(), result.data.password, result.data.firstName);
         if (error) {
           if (error.message.includes("already registered")) {
-            toast.error("This email is already registered. Please sign in instead.");
+            setFormError({ message: "An account with this email already exists.", linkText: "Sign in instead →", linkTo: "/auth" });
           } else {
-            toast.error(error.message);
+            setFormError({ message: error.message });
           }
         } else {
-          toast.success("Account created! Welcome to your reset.");
-          setView("signIn");
+          setShowTransition(true);
         }
-      } else {
-        const { error } = await signIn(normalizedEmail, normalizedPassword);
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      const result = signInSchema.safeParse({ email, password });
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.errors.forEach((err) => {
+          if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+
+      setIsSubmitting(true);
+      try {
+        const { error } = await signIn(result.data.email.toLowerCase(), result.data.password);
         if (error) {
           const msg = error.message.toLowerCase();
           if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
-            toast.error("No account found for that email, or the password is wrong. Try 'Forgot your password?' or 'Sign Up'.");
+            setFormError({ message: "That password doesn't match our records. Try again or reset your password.", linkText: "Reset password →", linkTo: "/auth?forgotPassword" });
           } else if (msg.includes("email not confirmed")) {
-            toast.error("Please confirm your email address, then try again.");
+            setFormError({ message: "Please confirm your email address, then try again." });
           } else {
-            toast.error(error.message);
+            setFormError({ message: error.message });
           }
-        } else {
-          toast.success("Welcome back!");
-          navigate("/");
         }
+      } finally {
+        setIsSubmitting(false);
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
+  // Check for forgotPassword param
+  useEffect(() => {
+    if (searchParams.has("forgotPassword")) setView("forgotPassword");
+  }, [searchParams]);
+
+  if (showTransition) {
+    return <PostSignupTransition firstName={firstName || "friend"} />;
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary/20">
-        <Sparkles className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0A0A0A]">
+        <motion.div
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="text-[#C9A84C] font-display text-4xl font-bold tracking-widest"
+        >
+          1111
+        </motion.div>
       </div>
     );
   }
 
-  const renderForgotPassword = () => (
-    <form onSubmit={handleForgotPassword} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="email" className="text-foreground">Email Address</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
-          />
-        </div>
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email}</p>
-        )}
-      </div>
-
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground py-6 text-lg font-semibold rounded-xl"
-      >
-        {isSubmitting ? "Sending..." : "Send Reset Link"}
-      </Button>
-
-      <button
-        type="button"
-        onClick={() => setView("signIn")}
-        className="flex items-center gap-2 text-primary font-semibold hover:underline mx-auto"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Sign In
-      </button>
-    </form>
-  );
-
-  const renderUpdatePassword = () => (
-    <form onSubmit={handleUpdatePassword} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="password" className="text-foreground">New Password</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`pl-10 ${errors.password ? "border-destructive" : ""}`}
-          />
-        </div>
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            id="confirmPassword"
-            type="password"
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className={`pl-10 ${errors.confirmPassword ? "border-destructive" : ""}`}
-          />
-        </div>
-        {errors.confirmPassword && (
-          <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-        )}
-      </div>
-
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground py-6 text-lg font-semibold rounded-xl"
-      >
-        {isSubmitting ? "Updating..." : "Update Password"}
-      </Button>
-    </form>
-  );
-
-  const renderAuthForm = () => (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {view === "signUp" && (
-          <div className="space-y-2">
-            <Label htmlFor="firstName" className="text-foreground">First Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                id="firstName"
-                type="text"
-                placeholder="Your first name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className={`pl-10 ${errors.firstName ? "border-destructive" : ""}`}
-              />
-            </div>
-            {errors.firstName && (
-              <p className="text-sm text-destructive">{errors.firstName}</p>
-            )}
-          </div>
-        )}
-
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-foreground">Email Address</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
-            />
-          </div>
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="password" className="text-foreground">Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={`pl-10 ${errors.password ? "border-destructive" : ""}`}
-            />
-          </div>
-          {errors.password && (
-            <p className="text-sm text-destructive">{errors.password}</p>
-          )}
-        </div>
-
-        {view === "signIn" && (
-          <button
-            type="button"
-            onClick={() => setView("forgotPassword")}
-            className="text-sm text-primary hover:underline"
-          >
-            Forgot your password?
-          </button>
-        )}
-
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground py-6 text-lg font-semibold rounded-xl"
-        >
-          {isSubmitting 
-            ? "Loading..." 
-            : view === "signUp" ? "Create Account" : "Sign In"}
-        </Button>
-      </form>
-
-      <div className="mt-6 text-center">
-        <p className="text-muted-foreground">
-          {view === "signUp" ? "Already have an account?" : "Don't have an account?"}
-          <button
-            type="button"
-            onClick={() => {
-              setView(view === "signUp" ? "signIn" : "signUp");
-              setErrors({});
-            }}
-            className="ml-2 text-primary font-semibold hover:underline"
-          >
-            {view === "signUp" ? "Sign In" : "Sign Up"}
-          </button>
-        </p>
-      </div>
-    </>
-  );
-
-  const getTitle = () => {
-    switch (view) {
-      case "signUp": return "Create Account";
-      case "forgotPassword": return "Reset Password";
-      case "updatePassword": return "Set New Password";
-      default: return "Welcome Back";
-    }
-  };
-
-  const getSubtitle = () => {
-    switch (view) {
-      case "signUp": return "Start your transformation journey today";
-      case "forgotPassword": return "Enter your email to receive a reset link";
-      case "updatePassword": return "Enter your new password below";
-      default: return "Sign in to continue your journey";
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-16 px-4 flex items-center justify-center">
+    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-start px-4 py-8 md:py-16 overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-md w-full"
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-[400px]"
       >
-        <div className="glass-card p-8">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="flex justify-center mb-6"
-          >
-            <img src={logo} alt="Reset Your Mind 1111" className="h-16 w-auto" />
-          </motion.div>
-
-          <div className="text-center mb-8">
-            <h2 className="font-display text-3xl font-bold text-foreground mb-3">
-              {getTitle()}
-            </h2>
-            <p className="text-muted-foreground">
-              {getSubtitle()}
-            </p>
-          </div>
-
-          {view === "forgotPassword" && renderForgotPassword()}
-          {view === "updatePassword" && renderUpdatePassword()}
-          {(view === "signIn" || view === "signUp") && renderAuthForm()}
+        {/* Logo */}
+        <div className="flex justify-center mb-4">
+          <img src={logo} alt="Reset Your Mind 1111" className="h-14 w-auto" />
         </div>
+
+        {/* Gold bar */}
+        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-8" />
+
+        {/* Content by view */}
+        {view === "resetSent" ? (
+          <div className="text-center space-y-4">
+            <h1 className="font-display text-3xl text-[#F9F6F0]">Check your inbox.</h1>
+            <p className="text-[#F9F6F0]/60 font-sans">
+              We sent a password reset link to <span className="text-[#F9F6F0]">{resetEmail}</span>.
+              It expires in 24 hours.
+            </p>
+            <button
+              onClick={() => { setView("signIn"); setFormError(null); }}
+              className="text-[#C9A84C] font-medium hover:underline flex items-center gap-2 mx-auto mt-6"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to sign in
+            </button>
+          </div>
+        ) : view === "updatePassword" ? (
+          <>
+            <div className="text-center mb-8">
+              <h1 className="font-display text-3xl text-[#F9F6F0] mb-2">Set new password.</h1>
+              <p className="text-[#F9F6F0]/60 font-sans">Enter your new password below.</p>
+            </div>
+            <form onSubmit={handleUpdatePassword} className="space-y-4">
+              <AuthFormField id="password" type="password" placeholder="New password" value={password} onChange={setPassword} error={errors.password} icon={<Lock className="w-5 h-5" />} />
+              <AuthFormField id="confirmPassword" type="password" placeholder="Confirm password" value={confirmPassword} onChange={setConfirmPassword} error={errors.confirmPassword} icon={<Lock className="w-5 h-5" />} />
+              {formError && <AuthError message={formError.message} linkText={formError.linkText} linkTo={formError.linkTo} />}
+              <Button type="submit" disabled={isSubmitting} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#0A0A0A] h-14 text-lg font-semibold rounded-xl">
+                {isSubmitting ? "Updating..." : "Update Password →"}
+              </Button>
+            </form>
+          </>
+        ) : view === "forgotPassword" ? (
+          <>
+            <div className="text-center mb-8">
+              <h1 className="font-display text-3xl text-[#F9F6F0] mb-2">Reset your password.</h1>
+              <p className="text-[#F9F6F0]/60 font-sans">Enter your email and we'll send you a link.</p>
+            </div>
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <AuthFormField id="email" type="email" placeholder="Your email address" value={email} onChange={setEmail} error={errors.email} icon={<Mail className="w-5 h-5" />} />
+              {formError && <AuthError message={formError.message} />}
+              <Button type="submit" disabled={isSubmitting} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#0A0A0A] h-14 text-lg font-semibold rounded-xl">
+                {isSubmitting ? "Sending..." : "Send Reset Link →"}
+              </Button>
+            </form>
+            <button
+              onClick={() => { setView("signIn"); setErrors({}); setFormError(null); }}
+              className="flex items-center gap-2 text-[#C9A84C] font-medium hover:underline mx-auto mt-6"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to sign in
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="text-center mb-8">
+              <h1 className="font-display text-3xl text-[#F9F6F0] mb-2">
+                {view === "signUp" ? "Your reset starts here." : "Welcome back."}
+              </h1>
+              <p className="text-[#F9F6F0]/60 font-sans">
+                {view === "signUp" ? (
+                  <>Create your free account.<br />No credit card required.</>
+                ) : (
+                  "Your reset continues here."
+                )}
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {view === "signUp" && (
+                <AuthFormField id="firstName" type="text" placeholder="Your first name" value={firstName} onChange={setFirstName} error={errors.firstName} icon={<User className="w-5 h-5" />} />
+              )}
+              <AuthFormField id="email" type="email" placeholder="Your email address" value={email} onChange={setEmail} error={errors.email} icon={<Mail className="w-5 h-5" />} />
+              <AuthFormField id="password" type="password" placeholder={view === "signUp" ? "Create a password" : "Your password"} value={password} onChange={setPassword} error={errors.password} icon={<Lock className="w-5 h-5" />} />
+
+              {view === "signIn" && (
+                <div className="flex justify-end">
+                  <button type="button" onClick={() => { setView("forgotPassword"); setErrors({}); setFormError(null); }} className="text-sm text-[#C9A84C] hover:underline">
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
+              {formError && <AuthError message={formError.message} linkText={formError.linkText} linkTo={formError.linkTo} />}
+
+              <Button type="submit" disabled={isSubmitting} className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#0A0A0A] h-14 text-lg font-semibold rounded-xl">
+                {isSubmitting ? "Loading..." : view === "signUp" ? "Start My Free Reset →" : "Sign In →"}
+              </Button>
+            </form>
+
+            {view === "signUp" && (
+              <p className="text-center text-[#F9F6F0]/30 text-sm mt-4">
+                7 days free. No credit card needed.<br />Cancel anytime.
+              </p>
+            )}
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-6">
+              <div className="flex-1 h-[1px] bg-[#C9A84C]/20" />
+              <span className="text-[#F9F6F0]/30 text-sm">or</span>
+              <div className="flex-1 h-[1px] bg-[#C9A84C]/20" />
+            </div>
+
+            <div className="text-center">
+              <p className="text-[#F9F6F0]/60">
+                {view === "signUp" ? "Already have an account?" : "Don't have an account?"}
+              </p>
+              <button
+                type="button"
+                onClick={() => { setView(view === "signUp" ? "signIn" : "signUp"); setErrors({}); setFormError(null); }}
+                className="text-[#C9A84C] font-semibold hover:underline mt-1"
+              >
+                {view === "signUp" ? "Sign in →" : "Start your free reset →"}
+              </button>
+            </div>
+          </>
+        )}
       </motion.div>
     </div>
   );

@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { UsageProvider } from "@/contexts/UsageContext";
 import { OnboardingGuard } from "@/components/OnboardingGuard";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Assessment from "./pages/Assessment";
 import Auth from "./pages/Auth";
@@ -63,7 +64,8 @@ const App = () => (
           <BrowserRouter>
             <OnboardingGuard>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<Landing />} />
+                <Route path="/landing" element={<Index />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/assessment" element={<Assessment />} />
                 <Route path="/auth" element={<Auth />} />
