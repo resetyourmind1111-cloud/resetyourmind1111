@@ -90,11 +90,11 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
     };
   }, []);
 
-  const progress = (elapsed / RESET_DURATION_SECONDS) * 100;
-  const remaining = RESET_DURATION_SECONDS - elapsed;
+  const progress = (elapsed / duration) * 100;
+  const remaining = duration - elapsed;
   const mins = Math.floor(remaining / 60);
   const secs = remaining % 60;
-  const isComplete = elapsed >= RESET_DURATION_SECONDS;
+  const isComplete = elapsed >= duration;
 
   return (
     <div className="space-y-6">
