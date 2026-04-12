@@ -57,10 +57,8 @@ export default function PatternModule() {
 
   const progressPercent = ((screen + 1) / TOTAL_SCREENS) * 100;
 
-  // Trial users who arrived via "Start My 3-Min Reset" (startAt=7) can access screens 7+
-  // Otherwise lock screens 3+ for free users
-  const trialResetUnlocked = isTrialActive && startAt >= 7;
-  const isLockedScreen = screen >= 2 && !hasAccess("reset") && !(trialResetUnlocked && screen >= 7);
+  // Trial users get full access to pattern reset — this IS the transformation experience
+  const isLockedScreen = screen >= 2 && !hasAccess("reset") && !isTrialActive;
 
   const next = () => setScreen((s) => Math.min(s + 1, TOTAL_SCREENS - 1));
   const handleSaveExit = () => navigate("/patterns");
