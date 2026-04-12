@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Lock, Play, ChevronDown, ChevronUp, Check, ChevronLeft } from "lucide-react";
+import { Lock, Play, Pause, ChevronDown, ChevronUp, Check, ChevronLeft, Volume2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
@@ -16,6 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import { CelebrationOverlay } from "@/components/trial/CelebrationOverlay";
 import { LockedContent } from "@/components/LockedContent";
 import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
+import { startAmbientTone, stopAmbientTone, isAmbientPlaying, setAmbientVolume } from "@/lib/ambientTones";
+import { Slider } from "@/components/ui/slider";
 
 const TOTAL_SCREENS = 12;
 const PATTERN_PREVIEW_RETURN_PATH = "/patterns";
