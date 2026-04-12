@@ -99,12 +99,12 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
   return (
     <div className="space-y-6">
       <h2 className="font-serif text-xl font-bold text-foreground">Do The Reset</h2>
-      <p className="text-muted-foreground text-sm">Find a quiet space. Close your eyes. Let the healing tones guide you.</p>
+      <p className="text-muted-foreground text-sm">Find a quiet space. Press play and let it move through you.</p>
       <Card className="p-6 space-y-5" style={{ background: "linear-gradient(135deg, rgba(61,26,110,0.3), rgba(10,10,10,0.8))" }}>
         <div className="flex items-center justify-between">
           <div>
             <p className="font-semibold text-foreground">{trap.audioTitle}</p>
-            <p className="text-xs text-muted-foreground">{trap.audioDuration} — Solfeggio Healing Tones</p>
+            <p className="text-xs text-muted-foreground">{trap.audioDuration} — Guided Reset</p>
           </div>
           <button
             onClick={togglePlay}
