@@ -21,6 +21,137 @@ import { Slider } from "@/components/ui/slider";
 
 const TOTAL_SCREENS = 12;
 const PATTERN_PREVIEW_RETURN_PATH = "/patterns";
+const RESET_DURATION_SECONDS = 180; // 3 minutes
+
+function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
+  trap: any;
+  showScript: boolean;
+  setShowScript: (v: boolean) => void;
+  onNext: () => void;
+}) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [volume, setVolume] = useState(0.7);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const togglePlay = useCallback(() => {
+    if (isPlaying) {
+      stopAmbientTone();
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      setIsPlaying(false);
+    } else {
+      startAmbientTone(volume);
+      intervalRef.current = setInterval(() => {
+        setElapsed((prev) => {
+          if (prev + 1 >= RESET_DURATION_SECONDS) {
+            stopAmbientTone();
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            setIsPlaying(false);
+            return RESET_DURATION_SECONDS;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      setIsPlaying(true);
+    }
+  }, [isPlaying, volume]);
+
+  const handleVolumeChange = useCallback((val: number[]) => {
+    const v = val[0];
+    setVolume(v);
+    if (isPlaying) setAmbientVolume(v);
+  }, [isPlaying]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopAmbientTone();
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  const progress = (elapsed / RESET_DURATION_SECONDS) * 100;
+  const remaining = RESET_DURATION_SECONDS - elapsed;
+  const mins = Math.floor(remaining / 60);
+  const secs = remaining % 60;
+  const isComplete = elapsed >= RESET_DURATION_SECONDS;
+
+  return (
+    <div className="space-y-6">
+      <h2 className="font-serif text-xl font-bold text-foreground">Do The Reset</h2>
+      <p className="text-muted-foreground text-sm">Find a quiet space. Close your eyes. Let the healing tones guide you.</p>
+      <Card className="p-6 space-y-5" style={{ background: "linear-gradient(135deg, rgba(61,26,110,0.3), rgba(10,10,10,0.8))" }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-semibold text-foreground">{trap.audioTitle}</p>
+            <p className="text-xs text-muted-foreground">{trap.audioDuration} — Solfeggio Healing Tones</p>
+          </div>
+          <button
+            onClick={togglePlay}
+            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+              isPlaying
+                ? "bg-primary/20 border-2 border-primary"
+                : "bg-primary hover:bg-primary/80"
+            }`}
+          >
+            {isPlaying ? (
+              <Pause className="w-6 h-6 text-primary" />
+            ) : (
+              <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
+            )}
+          </button>
+        </div>
+
+        {/* Progress bar */}
+        <div className="space-y-1">
+          <div className="bg-muted/20 rounded-full h-1.5">
+            <motion.div
+              className="h-full bg-primary rounded-full"
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5, ease: "linear" }}
+            />
+          </div>
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>{isComplete ? "Complete ✨" : isPlaying ? "Playing…" : elapsed > 0 ? "Paused" : "Ready"}</span>
+            <span>{mins}:{secs.toString().padStart(2, "0")}</span>
+          </div>
+        </div>
+
+        {/* Volume control */}
+        {isPlaying && (
+          <div className="flex items-center gap-3">
+            <Volume2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <Slider
+              value={[volume]}
+              onValueChange={handleVolumeChange}
+              min={0}
+              max={1}
+              step={0.05}
+              className="flex-1"
+            />
+          </div>
+        )}
+      </Card>
+
+      <button
+        onClick={() => setShowScript(!showScript)}
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {showScript ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        {showScript ? "Hide the script" : "Prefer to read? View the reset script"}
+      </button>
+      {showScript && (
+        <Card className="p-5 bg-card/60 border-border/30">
+          <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">{trap.audioScript}</p>
+        </Card>
+      )}
+
+      <Button variant="gold" onClick={onNext} className="w-full">
+        {isComplete ? "Continue →" : "Mark Complete →"}
+      </Button>
+    </div>
+  );
+}
 
 export default function PatternModule() {
   const { slug } = useParams<{ slug: string }>();
