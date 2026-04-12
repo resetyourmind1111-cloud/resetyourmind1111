@@ -13,7 +13,7 @@ interface PlanCard {
 const plansByWound: Record<string, PlanCard[]> = {
   wealth: [
     {
-      title: "Worth Thermostat Assessment",
+      title: "Worth Thermostat™",
       description: "See exactly where your money patterns are set.",
       buttonText: "Start Assessment",
       href: "/assessment",
@@ -33,7 +33,7 @@ const plansByWound: Record<string, PlanCard[]> = {
   ],
   love: [
     {
-      title: "Worth Thermostat Assessment",
+      title: "Worth Thermostat™",
       description: "Discover how you're showing up in relationships.",
       buttonText: "Start Assessment",
       href: "/assessment",
@@ -45,10 +45,10 @@ const plansByWound: Record<string, PlanCard[]> = {
       href: "/patterns/quiz",
     },
     {
-      title: "Attachment Style Analyzer",
-      description: "Understand how you love and why.",
+      title: "Nervous System Diagnostic",
+      description: "Find out how your nervous system is running your body.",
       buttonText: "Open Tool",
-      href: "/healing-tools/attachment-style-analyzer",
+      href: "/healing-tools/nervous-system-diagnostic",
     },
   ],
   health: [
@@ -65,7 +65,7 @@ const plansByWound: Record<string, PlanCard[]> = {
       href: "/patterns/quiz",
     },
     {
-      title: "Releasing Resistance Lesson",
+      title: "Releasing Resistance",
       description: "The first thing to dissolve before anything else.",
       buttonText: "Open Lesson",
       href: "/releasing-resistance",
@@ -73,7 +73,7 @@ const plansByWound: Record<string, PlanCard[]> = {
   ],
   identity: [
     {
-      title: "Worth Thermostat Assessment",
+      title: "Worth Thermostat™",
       description: "See where your identity is set right now.",
       buttonText: "Start Assessment",
       href: "/assessment",
@@ -85,10 +85,10 @@ const plansByWound: Record<string, PlanCard[]> = {
       href: "/patterns/quiz",
     },
     {
-      title: "Emotional Surgery Lessons",
-      description: "Go deeper into the identity work.",
-      buttonText: "Open Lessons",
-      href: "/emotional-surgery",
+      title: "Releasing Resistance",
+      description: "The first thing to dissolve before anything else moves.",
+      buttonText: "Open Lesson",
+      href: "/releasing-resistance",
     },
   ],
 };
