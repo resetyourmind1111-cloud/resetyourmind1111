@@ -68,7 +68,7 @@ export default function PatternModule() {
       return;
     }
 
-    navigate("/dashboard", { replace: true });
+    navigate("/patterns", { replace: true });
   };
 
   const handleSaveAction = async () => {
