@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, LogOut } from "lucide-react";
@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { TrialProgressPill } from "@/components/trial/TrialProgressPill";
 import { UsageTracker } from "@/components/UsageTracker";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import logo from "@/assets/logo.png";
 
-const navLinks = [
-  { name: "Home", href: "/" },
+const allNavLinks = [
+  { name: "Home", href: "/home" },
   { name: "My Reset Plan", href: "/reset-plan" },
   { name: "Dashboard", href: "/dashboard" },
   { name: "Worth Thermostat", href: "/assessment" },
@@ -29,9 +30,21 @@ const navLinks = [
   { name: "My Account", href: "/my-account" },
 ];
 
+// Day 1 trial users only see these nav items
+const day1NavLinks = [
+  { name: "Home", href: "/home" },
+  { name: "My Patterns", href: "/patterns" },
+  { name: "Worth Thermostat", href: "/assessment" },
+  { name: "My Account", href: "/my-account" },
+];
+
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { isTrialActive, trialDay } = useTrialStatus();
+
+  const isDay1 = isTrialActive && trialDay <= 1;
+  const navLinks = isDay1 ? day1NavLinks : allNavLinks;
 
   const handleSignOut = async () => {
     await signOut();

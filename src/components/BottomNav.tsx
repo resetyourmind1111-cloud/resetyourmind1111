@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, Brain, LayoutGrid, TrendingUp, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
-const tabs = [
+const allTabs = [
   { label: "Home", icon: Home, href: "/home" },
   { label: "Emotional Surgery™", icon: Brain, href: "/emotional-surgery" },
   { label: "Tools", icon: LayoutGrid, href: "/tools" },
@@ -10,8 +11,17 @@ const tabs = [
   { label: "Profile", icon: User, href: "/my-account" },
 ];
 
+const day1Tabs = [
+  { label: "Home", icon: Home, href: "/home" },
+  { label: "Profile", icon: User, href: "/my-account" },
+];
+
 export function BottomNav() {
   const { pathname } = useLocation();
+  const { isTrialActive, trialDay } = useTrialStatus();
+
+  const isDay1 = isTrialActive && trialDay <= 1;
+  const tabs = isDay1 ? day1Tabs : allTabs;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/30 bg-[#06060e] md:hidden">
