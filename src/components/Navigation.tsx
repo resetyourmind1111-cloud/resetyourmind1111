@@ -43,8 +43,8 @@ export function Navigation() {
   const { user, signOut } = useAuth();
   const { isTrialActive, trialDay } = useTrialStatus();
 
-  const isDay1 = isTrialActive && trialDay <= 1;
-  const navLinks = isDay1 ? day1NavLinks : allNavLinks;
+  // Simplified nav for ALL trial users, not just Day 1
+  const navLinks = isTrialActive ? day1NavLinks : allNavLinks;
 
   const handleSignOut = async () => {
     await signOut();

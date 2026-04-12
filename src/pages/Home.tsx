@@ -34,6 +34,7 @@ import { StreakCard } from "@/components/home/StreakCard";
 import { AiCheckinCard } from "@/components/home/AiCheckinCard";
 import { TransformationCard } from "@/components/home/TransformationCard";
 import { OraclePreviewCard } from "@/components/home/OraclePreviewCard";
+import { WelcomeBackCard } from "@/components/home/WelcomeBackCard";
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
   { label: "I feel emotional", emoji: "💧", module: "Release" },
@@ -151,6 +152,9 @@ export default function Home() {
 
           {/* Lorie Welcome Card (Day 1 only) */}
           <LorieWelcomeCard />
+
+          {/* Welcome Back Card (Day 2+ trial users) */}
+          <WelcomeBackCard />
 
           {/* Day 3 Acknowledgment Card */}
           <Day3AcknowledgmentCard />
