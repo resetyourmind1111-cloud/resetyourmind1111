@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,26 +16,36 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
   const navigate = useNavigate();
   const [checked, setChecked] = useState(false);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
+  const [lastUserId, setLastUserId] = useState<string | null>(null);
 
+  const checkOnboarding = useCallback(async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("onboarding_complete")
+      .eq("user_id", userId)
+      .single();
+    const complete = !!(data as any)?.onboarding_complete;
+    setOnboardingComplete(complete);
+    setChecked(true);
+  }, []);
+
+  // Re-check when user changes or when navigating away from onboarding
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
       setChecked(true);
       setOnboardingComplete(null);
+      setLastUserId(null);
       return;
     }
 
-    supabase
-      .from("profiles")
-      .select("onboarding_complete")
-      .eq("user_id", user.id)
-      .single()
-      .then(({ data }) => {
-        const complete = !!(data as any)?.onboarding_complete;
-        setOnboardingComplete(complete);
-        setChecked(true);
-      });
-  }, [user, authLoading]);
+    // Always re-fetch when user changes or when navigating from /onboarding to another route
+    const needsRefresh = user.id !== lastUserId || location.pathname !== "/onboarding";
+    if (needsRefresh) {
+      setLastUserId(user.id);
+      checkOnboarding(user.id);
+    }
+  }, [user, authLoading, location.pathname, lastUserId, checkOnboarding]);
 
   useEffect(() => {
     if (!checked || authLoading) return;
