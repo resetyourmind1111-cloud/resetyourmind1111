@@ -87,7 +87,7 @@ export default function Patterns() {
               </div>
 
               <div className="grid gap-3">
-                <Link to={`/patterns/${TRAP_SLUGS[primaryTrap!]}`}>
+                <Link to={`/patterns/${TRAP_SLUGS[primaryTrap!]}`} state={{ startAt: 7 }}>
                   <Card className="p-5 bg-card/80 border-primary/30 hover:border-primary/60 transition-all cursor-pointer">
                     <div className="flex items-center gap-3">
                       <Zap className="w-5 h-5 text-primary" />
