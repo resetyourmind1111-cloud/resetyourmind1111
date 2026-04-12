@@ -303,6 +303,21 @@ export default function Home() {
               </p>
             </motion.div>
           )}
+
+          {/* Day 1 bottom guidance text */}
+          {isTrialActive && trialDay <= 1 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="mt-8 mb-4 text-center"
+            >
+              <p className="text-muted-foreground/60 text-xs leading-relaxed">
+                More tools unlock as your reset progresses.<br />
+                Start with what's above — it's where the shift begins.
+              </p>
+            </motion.div>
+          )}
         </div>
       </main>
       <Day7BottomBanner />
