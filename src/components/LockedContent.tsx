@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import { Lock } from "lucide-react";
+import { Lock, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFoundingMode } from "@/hooks/useFoundingMode";
 
 type TierName = "reset" | "expand" | "embody" | "founding_full_access";
@@ -37,10 +37,16 @@ const TIER_LEVEL: Record<string, number> = {
 export function LockedContent({ children, requiredTier, currentTier }: LockedContentProps) {
   const normalize = (t: string) => TIER_LEVEL[t.toLowerCase()] ?? 0;
   const { foundingMode } = useFoundingMode();
+  const navigate = useNavigate();
 
   if (normalize(currentTier) >= normalize(requiredTier)) {
     return <>{children}</>;
   }
+
+  const handleBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/dashboard");
+  };
 
   return (
     <div className="relative rounded-2xl overflow-hidden">
@@ -48,6 +54,9 @@ export function LockedContent({ children, requiredTier, currentTier }: LockedCon
         {children}
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm rounded-2xl">
+        <button onClick={handleBack} className="absolute top-4 left-4 flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors">
+          <ChevronLeft className="w-4 h-4" /> Back
+        </button>
         <div className="flex flex-col items-center gap-4 p-8 text-center">
           <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
             <Lock className="w-8 h-8 text-accent" />
@@ -81,6 +90,9 @@ export function LockedContent({ children, requiredTier, currentTier }: LockedCon
               </Link>
             </>
           )}
+          <button onClick={handleBack} className="text-foreground/40 text-[13px] hover:text-foreground/60 transition-colors mt-2">
+            ← Continue my preview
+          </button>
         </div>
       </div>
     </div>
