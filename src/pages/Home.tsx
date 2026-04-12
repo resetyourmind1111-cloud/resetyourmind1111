@@ -153,6 +153,9 @@ export default function Home() {
           {/* Lorie Welcome Card (Day 1 only) */}
           <LorieWelcomeCard />
 
+          {/* Welcome Back Card (Day 2+ trial users) */}
+          <WelcomeBackCard />
+
           {/* Day 3 Acknowledgment Card */}
           <Day3AcknowledgmentCard />
           {/* Header */}
