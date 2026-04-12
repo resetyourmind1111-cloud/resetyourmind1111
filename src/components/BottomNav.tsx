@@ -20,8 +20,8 @@ export function BottomNav() {
   const { pathname } = useLocation();
   const { isTrialActive, trialDay } = useTrialStatus();
 
-  const isDay1 = isTrialActive && trialDay <= 1;
-  const tabs = isDay1 ? day1Tabs : allTabs;
+  // Simplified nav for ALL trial users, not just Day 1
+  const tabs = isTrialActive ? day1Tabs : allTabs;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/30 bg-[#06060e] md:hidden">
