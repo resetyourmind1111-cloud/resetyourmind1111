@@ -58,6 +58,7 @@ const App = () => (
         <UsageProvider>
           <Toaster />
           <Sonner />
+          <PwaInstallBanner />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
