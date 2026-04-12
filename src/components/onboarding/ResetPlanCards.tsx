@@ -79,10 +79,10 @@ const plansByWound: Record<string, PlanCard[]> = {
       href: "/assessment",
     },
     {
-      title: "Manifestation Tracker",
-      description: "Turn the vision you already carry into visible movement you can track and trust.",
-      buttonText: "Open Tool",
-      href: "/healing-tools/manifestation-tracker",
+      title: "Identity Pattern Quiz",
+      description: "Discover which identity pattern has been running your life — and how to interrupt it.",
+      buttonText: "Take the Quiz",
+      href: "/patterns/quiz",
     },
     {
       title: "Limiting Belief Rewriter",
