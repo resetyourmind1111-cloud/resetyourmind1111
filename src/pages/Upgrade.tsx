@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Crown, Star, Sparkles, Check, Lock, Flame, Shield } from "lucide-react";
+import { Crown, Star, Sparkles, Check, Lock, Flame, Shield, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -134,10 +134,18 @@ export default function Upgrade() {
     }
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/dashboard");
+  };
+
   // ─── FOUNDING MODE ───
   if (foundingMode) {
     return (
       <div className="min-h-screen bg-background">
+        <button onClick={handleBack} className="fixed top-4 left-4 z-50 flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors">
+          <ChevronLeft className="w-4 h-4" /> Back
+        </button>
         <div className="pt-16 pb-8 px-4 text-center">
           <p className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-3">FOUNDING MEMBER ACCESS</p>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-3xl md:text-5xl font-bold text-foreground mb-4">
@@ -210,6 +218,9 @@ export default function Upgrade() {
   // ─── REGULAR MODE ───
   return (
     <div className="min-h-screen bg-background">
+      <button onClick={handleBack} className="fixed top-4 left-4 z-50 flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors">
+        <ChevronLeft className="w-4 h-4" /> Back
+      </button>
       <div className="pt-16 pb-8 px-4 text-center">
         <p className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-3">CHOOSE YOUR RESET</p>
         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-3xl md:text-5xl font-bold text-foreground mb-4">
