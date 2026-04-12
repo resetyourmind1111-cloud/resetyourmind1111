@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Lock, Play, ChevronDown, ChevronUp, Check, ChevronLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { TRAP_MODULES, SLUG_TO_TRAP } from "@/data/identityTrapData";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +27,7 @@ export default function PatternModule() {
   const { user } = useAuth();
   const { effectiveTier, hasAccess } = useSubscription();
   const { toast } = useToast();
+  const { isTrialActive } = useTrialStatus();
 
   const startAt = (location.state as any)?.startAt ?? 0;
   const [screen, setScreen] = useState(startAt);
@@ -55,8 +57,10 @@ export default function PatternModule() {
 
   const progressPercent = ((screen + 1) / TOTAL_SCREENS) * 100;
 
-  // Lock screens 3-12 (index 2-11) for free users
-  const isLockedScreen = screen >= 2 && !hasAccess("reset");
+  // Trial users who arrived via "Start My 3-Min Reset" (startAt=7) can access screens 7+
+  // Otherwise lock screens 3+ for free users
+  const trialResetUnlocked = isTrialActive && startAt >= 7;
+  const isLockedScreen = screen >= 2 && !hasAccess("reset") && !(trialResetUnlocked && screen >= 7);
 
   const next = () => setScreen((s) => Math.min(s + 1, TOTAL_SCREENS - 1));
   const handleSaveExit = () => navigate("/patterns");
