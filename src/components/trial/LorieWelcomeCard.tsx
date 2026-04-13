@@ -1,20 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Pause } from "lucide-react";
+import { Play, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 
-const LORIE_WELCOME_AUDIO_URL = "https://cdn.pixabay.com/audio/2022/03/15/audio_115f9bda3a.mp3"; // placeholder silent/ambient
+const MINDIST_WELCOME_URL = "https://mindist.page.link/Uiar";
 
 export function LorieWelcomeCard() {
   const { user } = useAuth();
   const { trialDay, isTrialActive } = useTrialStatus();
   const [show, setShow] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [duration, setDuration] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [opened, setOpened] = useState(false);
 
   useEffect(() => {
     if (!user || !isTrialActive || trialDay > 1) return;
@@ -32,36 +30,15 @@ export function LorieWelcomeCard() {
     check();
   }, [user, isTrialActive, trialDay]);
 
-  useEffect(() => {
-    const audio = new Audio(LORIE_WELCOME_AUDIO_URL);
-    audioRef.current = audio;
-    audio.addEventListener("loadedmetadata", () => {
-      const mins = Math.floor(audio.duration / 60);
-      const secs = Math.floor(audio.duration % 60);
-      setDuration(`${mins}:${secs.toString().padStart(2, "0")}`);
-    });
-    audio.addEventListener("ended", () => setPlaying(false));
-    return () => {
-      audio.pause();
-      audio.remove();
-    };
-  }, []);
-
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (playing) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setPlaying(!playing);
+  const openMindist = () => {
+    window.open(MINDIST_WELCOME_URL, "_blank", "noopener,noreferrer");
+    setOpened(true);
   };
 
   const handleDismissLater = () => setShow(false);
 
   const handleDismissForever = async () => {
     setShow(false);
-    if (audioRef.current) audioRef.current.pause();
     if (user) {
       await supabase
         .from("profiles")
@@ -85,22 +62,22 @@ export function LorieWelcomeCard() {
 
         <div className="flex items-center gap-4 mb-4">
           <button
-            onClick={togglePlay}
+            onClick={openMindist}
             className="w-12 h-12 rounded-full bg-[#C9A84C] flex items-center justify-center shrink-0 hover:bg-[#C9A84C]/90 transition-colors"
           >
-            {playing ? (
-              <Pause className="w-5 h-5 text-[#06060e]" />
-            ) : (
-              <Play className="w-5 h-5 text-[#06060e] ml-0.5" />
-            )}
+            <Play className="w-5 h-5 text-[#06060e] ml-0.5" />
           </button>
           <div>
             <p className="text-[#F9F6F0] text-sm font-semibold">Welcome to Your Reset</p>
-            {duration && (
-              <p className="text-[#F9F6F0]/40 text-xs">{duration}</p>
-            )}
+            <p className="text-[#F9F6F0]/40 text-xs flex items-center gap-1">
+              3 min — Opens in Mindist <ExternalLink className="w-3 h-3 inline" />
+            </p>
           </div>
         </div>
+
+        {opened && (
+          <p className="text-xs text-[#C9A84C]/80 mb-3">✦ Guided reset opened — listen and come back when you're done</p>
+        )}
 
         <div className="mb-3">
           <p className="text-[#F9F6F0]/80 text-sm font-medium">Lorie Wu</p>
