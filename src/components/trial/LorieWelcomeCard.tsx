@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 
-const MINDIST_WELCOME_URL = "https://mindist.page.link/Uiar";
+const MINDIST_WELCOME_URL = "https://mindist.page.link/eyTV";
 
 export function LorieWelcomeCard() {
   const { user } = useAuth();
