@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { AssessmentQuestion as QuestionType, categoryColors } from "@/data/assessmentQuestions";
 import { cn } from "@/lib/utils";
+import { TrialBackButton } from "@/components/TrialBackButton";
 
 interface AssessmentQuestionProps {
   question: QuestionType;
@@ -22,6 +23,8 @@ export function AssessmentQuestion({
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-8 px-4">
       <div className="max-w-2xl mx-auto">
+        {/* Back button */}
+        <TrialBackButton fallbackPath="/assessment" label="Back" className="mb-4" />
         {/* Progress Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">

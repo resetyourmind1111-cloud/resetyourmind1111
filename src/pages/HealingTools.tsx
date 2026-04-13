@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { healingTools } from "@/data/healingToolsData";
 import HealingToolsDashboard from "@/components/healing-tools/HealingToolsDashboard";
 import { useTrialStatus, getTrialAllowedTools } from "@/hooks/useTrialStatus";
+import { TrialBackButton } from "@/components/TrialBackButton";
 
 export default function HealingTools() {
   const { user } = useAuth();
@@ -83,6 +84,7 @@ export default function HealingTools() {
 
   return (
     <AuthenticatedLayout title="Healing Tools" subtitle="21 powerful tools for deep emotional healing and transformation">
+      <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
       {shouldShowContent ? (
         <>
           {/* Trial banner */}
