@@ -21,7 +21,7 @@ import { Slider } from "@/components/ui/slider";
 
 const TOTAL_SCREENS = 12;
 const PATTERN_PREVIEW_RETURN_PATH = "/patterns";
-const MINDIST_URL = "https://mindist.page.link/Uiar";
+
 const AMBIENT_DURATION = 180; // 3 minutes for ambient tones
 
 function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
@@ -37,7 +37,7 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const openMindist = () => {
-    window.open(MINDIST_URL, "_blank");
+    window.open(trap.audioUrl, "_blank");
     setMindistOpened(true);
   };
 
