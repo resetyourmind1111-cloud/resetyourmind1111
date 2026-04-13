@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Lock, Play, Pause, ChevronDown, ChevronUp, Check, ChevronLeft, Volume2 } from "lucide-react";
+import { Lock, Play, Pause, ChevronDown, ChevronUp, Check, ChevronLeft, Volume2, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
@@ -16,11 +16,13 @@ import { useToast } from "@/hooks/use-toast";
 import { CelebrationOverlay } from "@/components/trial/CelebrationOverlay";
 import { LockedContent } from "@/components/LockedContent";
 import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
+import { startAmbientTone, stopAmbientTone, setAmbientVolume } from "@/lib/ambientTones";
 import { Slider } from "@/components/ui/slider";
 
 const TOTAL_SCREENS = 12;
 const PATTERN_PREVIEW_RETURN_PATH = "/patterns";
-const MINDIST_AUDIO_URL = "https://mindist.page.link/Uiar";
+const MINDIST_URL = "https://mindist.page.link/Uiar";
+const AMBIENT_DURATION = 180; // 3 minutes for ambient tones
 
 function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
   trap: any;
@@ -28,130 +30,131 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
   setShowScript: (v: boolean) => void;
   onNext: () => void;
 }) {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [mindistOpened, setMindistOpened] = useState(false);
+  const [ambientPlaying, setAmbientPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
-  const [duration, setDuration] = useState(180);
   const [volume, setVolume] = useState(0.7);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const getAudio = useCallback(() => {
-    if (!audioRef.current) {
-      const audio = new Audio(MINDIST_AUDIO_URL);
-      audio.volume = volume;
-      audio.addEventListener("loadedmetadata", () => {
-        if (audio.duration && isFinite(audio.duration)) {
-          setDuration(Math.ceil(audio.duration));
-        }
-      });
-      audio.addEventListener("ended", () => {
-        setIsPlaying(false);
-        if (intervalRef.current) clearInterval(intervalRef.current);
-        setElapsed(duration);
-      });
-      audio.addEventListener("error", () => {
-        setIsPlaying(false);
-        window.open(MINDIST_AUDIO_URL, "_blank");
-      });
-      audioRef.current = audio;
-    }
-    return audioRef.current;
-  }, [volume, duration]);
+  const openMindist = () => {
+    window.open(MINDIST_URL, "_blank");
+    setMindistOpened(true);
+  };
 
-  const togglePlay = useCallback(() => {
-    const audio = getAudio();
-    if (isPlaying) {
-      audio.pause();
+  const toggleAmbient = useCallback(() => {
+    if (ambientPlaying) {
+      stopAmbientTone();
       if (intervalRef.current) clearInterval(intervalRef.current);
-      setIsPlaying(false);
+      setAmbientPlaying(false);
     } else {
-      audio.play();
+      startAmbientTone(volume);
       intervalRef.current = setInterval(() => {
-        setElapsed(Math.floor(audio.currentTime));
-      }, 500);
-      setIsPlaying(true);
+        setElapsed((prev) => {
+          if (prev + 1 >= AMBIENT_DURATION) {
+            stopAmbientTone();
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            setAmbientPlaying(false);
+            return AMBIENT_DURATION;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      setAmbientPlaying(true);
     }
-  }, [isPlaying, getAudio]);
+  }, [ambientPlaying, volume]);
 
   const handleVolumeChange = useCallback((val: number[]) => {
     const v = val[0];
     setVolume(v);
-    if (audioRef.current) audioRef.current.volume = v;
-  }, []);
+    if (ambientPlaying) setAmbientVolume(v);
+  }, [ambientPlaying]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
+      stopAmbientTone();
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
-  const progress = (elapsed / duration) * 100;
-  const remaining = duration - elapsed;
+  const progress = (elapsed / AMBIENT_DURATION) * 100;
+  const remaining = AMBIENT_DURATION - elapsed;
   const mins = Math.floor(remaining / 60);
   const secs = remaining % 60;
-  const isComplete = elapsed >= duration;
 
   return (
     <div className="space-y-6">
       <h2 className="font-serif text-xl font-bold text-foreground">Do The Reset</h2>
-      <p className="text-muted-foreground text-sm">Find a quiet space. Press play and let it move through you.</p>
-      <Card className="p-6 space-y-5" style={{ background: "linear-gradient(135deg, rgba(61,26,110,0.3), rgba(10,10,10,0.8))" }}>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-semibold text-foreground">{trap.audioTitle}</p>
-            <p className="text-xs text-muted-foreground">{trap.audioDuration} — Guided Reset</p>
-          </div>
-          <button
-            onClick={togglePlay}
-            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
-              isPlaying
-                ? "bg-primary/20 border-2 border-primary"
-                : "bg-primary hover:bg-primary/80"
-            }`}
-          >
-            {isPlaying ? (
-              <Pause className="w-6 h-6 text-primary" />
-            ) : (
-              <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
-            )}
-          </button>
-        </div>
+      <p className="text-muted-foreground text-sm">Find a quiet space. Press play and let the guided meditation move through you.</p>
 
-        {/* Progress bar */}
-        <div className="space-y-1">
-          <div className="bg-muted/20 rounded-full h-1.5">
-            <motion.div
-              className="h-full bg-primary rounded-full"
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5, ease: "linear" }}
-            />
-          </div>
-          <div className="flex justify-between text-[10px] text-muted-foreground">
-            <span>{isComplete ? "Complete ✨" : isPlaying ? "Playing…" : elapsed > 0 ? "Paused" : "Ready"}</span>
-            <span>{mins}:{secs.toString().padStart(2, "0")}</span>
-          </div>
+      {/* Primary: Mindist guided reset */}
+      <Card className="p-6 space-y-4" style={{ background: "linear-gradient(135deg, rgba(61,26,110,0.4), rgba(10,10,10,0.8))" }}>
+        <div>
+          <p className="font-semibold text-foreground">{trap.audioTitle}</p>
+          <p className="text-xs text-muted-foreground">{trap.audioDuration} — Guided Reset by Lorie Wu</p>
         </div>
-
-        {/* Volume control */}
-        {isPlaying && (
-          <div className="flex items-center gap-3">
-            <Volume2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <Slider
-              value={[volume]}
-              onValueChange={handleVolumeChange}
-              min={0}
-              max={1}
-              step={0.05}
-              className="flex-1"
-            />
-          </div>
+        <Button
+          onClick={openMindist}
+          className="w-full bg-primary hover:bg-primary/80 text-primary-foreground gap-2"
+        >
+          <Play className="w-4 h-4" />
+          {mindistOpened ? "Reopen Guided Reset" : "Play Guided Reset"}
+          <ExternalLink className="w-3.5 h-3.5 ml-1 opacity-60" />
+        </Button>
+        {mindistOpened && (
+          <p className="text-xs text-primary/80 text-center">✦ Guided reset opened — listen and come back when you're done</p>
         )}
       </Card>
+
+      {/* Secondary: In-app ambient tones */}
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground text-center">Or use healing tones right here:</p>
+        <Card className="p-4 space-y-3 bg-card/40 border-border/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Solfeggio Healing Tones</p>
+              <p className="text-[10px] text-muted-foreground">3 min — 396Hz · 285Hz · 528Hz</p>
+            </div>
+            <button
+              onClick={toggleAmbient}
+              className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
+                ambientPlaying
+                  ? "bg-primary/20 border-2 border-primary"
+                  : "bg-primary/60 hover:bg-primary/50"
+              }`}
+            >
+              {ambientPlaying ? (
+                <Pause className="w-4 h-4 text-primary" />
+              ) : (
+                <Play className="w-4 h-4 text-primary-foreground ml-0.5" />
+              )}
+            </button>
+          </div>
+
+          {(ambientPlaying || elapsed > 0) && (
+            <>
+              <div className="space-y-1">
+                <div className="bg-muted/20 rounded-full h-1">
+                  <motion.div
+                    className="h-full bg-primary rounded-full"
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.5, ease: "linear" }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] text-muted-foreground">
+                  <span>{elapsed >= AMBIENT_DURATION ? "Complete ✨" : ambientPlaying ? "Playing…" : "Paused"}</span>
+                  <span>{mins}:{secs.toString().padStart(2, "0")}</span>
+                </div>
+              </div>
+              {ambientPlaying && (
+                <div className="flex items-center gap-3">
+                  <Volume2 className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                  <Slider value={[volume]} onValueChange={handleVolumeChange} min={0} max={1} step={0.05} className="flex-1" />
+                </div>
+              )}
+            </>
+          )}
+        </Card>
+      </div>
 
       <button
         onClick={() => setShowScript(!showScript)}
@@ -167,7 +170,7 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
       )}
 
       <Button variant="gold" onClick={onNext} className="w-full">
-        {isComplete ? "Continue →" : "Mark Complete →"}
+        {mindistOpened || elapsed >= AMBIENT_DURATION ? "Continue →" : "Mark Complete →"}
       </Button>
     </div>
   );
