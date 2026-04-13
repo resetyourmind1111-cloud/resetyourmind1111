@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Lock, Play, Pause, ChevronDown, ChevronUp, Check, ChevronLeft, Volume2 } from "lucide-react";
+import { Lock, Play, Pause, ChevronDown, ChevronUp, Check, ChevronLeft, Volume2, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
