@@ -183,7 +183,7 @@ export default function PatternModule() {
   const { user } = useAuth();
   const { effectiveTier, hasAccess } = useSubscription();
   const { toast } = useToast();
-  const { isTrialActive } = useTrialStatus();
+  const { isTrialActive, isLoading: trialLoading } = useTrialStatus();
 
   const startAt = (location.state as any)?.startAt ?? 0;
   const [screen, setScreen] = useState(startAt);
