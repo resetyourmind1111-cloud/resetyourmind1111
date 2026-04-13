@@ -143,6 +143,7 @@ export interface TrapModule {
   bodyOptions: string[];
   audioTitle: string;
   audioDuration: string;
+  audioUrl: string;
   audioScript: string;
   recodeStatements: string[];
   actions: string[];
@@ -180,6 +181,7 @@ export const TRAP_MODULES: Record<string, TrapModule> = {
     bodyOptions: ["Head", "Chest", "Stomach", "Jaw", "Whole body"],
     audioTitle: "Clarity Through Movement",
     audioDuration: "3 min",
+    audioUrl: "https://mindist.page.link/mYPi",
     audioScript: "Pause for a moment. You do not need to solve everything right now.\nNotice where overthinking is living in your body.\nTake a slow breath in. Now exhale longer than you inhaled.\nAgain. Slow inhale. Longer exhale.\nYour mind is trying to create certainty because something about action feels unsafe.\nThat does not mean you are incapable. It means your body is asking for safety.\nPlace one hand on your heart and one on your belly.\nSay silently: I am safe to take one step without having every answer.\nFeel your body in the chair. Feel your feet on the floor. Let your shoulders drop.\nNow ask yourself: What is one small action that would move me forward today?\nNot the whole plan. Just the next step.\nSay silently: Clarity comes through movement. I trust myself to begin.\nWhen you are ready, open your eyes and take that step.",
     recodeStatements: [
       "I am safe to move before I have every answer.",
@@ -226,6 +228,7 @@ export const TRAP_MODULES: Record<string, TrapModule> = {
     bodyOptions: ["Chest", "Throat", "Stomach", "Shoulders", "Whole body"],
     audioTitle: "Return To Yourself",
     audioDuration: "3 min",
+    audioUrl: "https://mindist.page.link/Nxq3",
     audioScript: "Pause here. Before you respond, before you explain, before you make yourself smaller —\ncome back to your body.\nTake a deep breath in. And slowly exhale.\nAgain. Inhale. Exhale.\nNotice if your body feels tight, guilty, pressured, or afraid.\nThat is not proof you are wrong. It may be proof that you learned to keep peace by leaving yourself.\nPlace both feet on the floor. Relax your jaw. Soften your shoulders.\nSay silently: I am safe to tell the truth. I am safe to choose myself. My needs matter too.\nNow ask yourself: What do I actually want right now?\nLet the answer come without judging it.\nYou do not need to earn the right to be honest.\nTake one more breath. And when you are ready, choose the response that honors you.",
     recodeStatements: [
       "I am allowed to have needs.",
@@ -272,6 +275,7 @@ export const TRAP_MODULES: Record<string, TrapModule> = {
     bodyOptions: ["Chest", "Hands", "Stomach", "Throat", "Whole body"],
     audioTitle: "From Contraction To Receiving",
     audioDuration: "3 min",
+    audioUrl: "https://mindist.page.link/g5f1",
     audioScript: "Pause. Notice if your body is bracing.\nNotice if your hands are tight, your breath is shallow, or your mind is racing ahead.\nTake a slow breath in. And release it gently.\nAgain. Inhale into your chest and belly. Exhale and soften.\nOpen your hands. Relax your shoulders. Lift your heart slightly.\nScarcity often feels urgent. But urgency is not always truth.\nSometimes it is the body trying to protect itself from disappointment or loss.\nSay silently: I am safe in this moment. I do not have to shrink to stay safe.\nIt is safe for me to receive more.\nNow ask yourself: What would one grounded, expansive choice look like right now?\nNot reckless. Not forced. Just open.\nTake one more breath. Let your body soften around possibility.\nWhen you are ready, choose from alignment, not fear.",
     recodeStatements: [
       "It is safe for me to receive.",
@@ -318,6 +322,7 @@ export const TRAP_MODULES: Record<string, TrapModule> = {
     bodyOptions: ["Chest", "Stomach", "Head", "Shoulders", "Whole body"],
     audioTitle: "Sustainable Momentum",
     audioDuration: "3 min",
+    audioUrl: "https://mindist.page.link/phiY",
     audioScript: "Pause. You do not need to start over. You only need to come back.\nTake a breath in. And a slow breath out.\nAgain. Inhale. Exhale longer.\nNotice if there is pressure in your body.\nPressure to catch up. Pressure to do more. Pressure to fix everything at once.\nLet that pressure drop.\nPlace one hand on your chest.\nSay silently: I do not need intensity to make progress.\nI am safe in consistency. One small completion rebuilds trust.\nNow ask yourself: What is the smallest thing I can finish today?\nLet it be simple. Let it be doable. Let it count.\nYou are not failing because you slowed down.\nYou are learning how to move in a way your body can sustain.\nTake one more breath. And return with one small completion.",
     recodeStatements: [
       "I am someone who finishes small things consistently.",
@@ -364,6 +369,7 @@ export const TRAP_MODULES: Record<string, TrapModule> = {
     bodyOptions: ["Head", "Chest", "Stomach", "Whole body", "Numb / disconnected"],
     audioTitle: "Embodiment Begins Now",
     audioDuration: "3 min",
+    audioUrl: "https://mindist.page.link/T6ww",
     audioScript: "Pause. You already know a lot.\nRight now, this is not about learning more. This is about honoring what you already know.\nTake a breath in. And let it out slowly.\nAgain. Inhale. Exhale.\nNotice where frustration is sitting in your body.\nNotice where the gap between knowledge and action feels heavy.\nPlace a hand on your body.\nSay silently: Awareness is not the end.\nI honor what I know through action. I am safe to embody this now.\nAsk yourself: What is one thing I already know is true that I can live today?\nTrust the first answer. Do not make it complicated.\nOne action is enough. One act of integrity is enough. One embodiment is enough.\nTake one more breath. And let your wisdom become movement.",
     recodeStatements: [
       "I am someone who acts on what I know.",
