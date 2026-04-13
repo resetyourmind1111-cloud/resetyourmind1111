@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Headphones, Play, Clock, Sparkles } from "lucide-react";
+import { TrialBackButton } from "@/components/TrialBackButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -100,6 +101,7 @@ export default function MeditationLibrary() {
 
   return (
     <AuthenticatedLayout title="Meditation Library" subtitle="34 guided meditations for mind, soul, and body">
+      <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
       {/* Trial banner */}
       {isTrialActive && tier === "free" && (
         <div className="mb-6 p-4 rounded-xl bg-[#3D1A6E]/20 border border-[#3D1A6E]/30">

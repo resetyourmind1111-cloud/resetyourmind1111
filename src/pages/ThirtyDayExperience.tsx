@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Lock, ChevronLeft, Flame, Award, Sparkles, ArrowRight, ExternalLink } from "lucide-react";
+import { TrialBackButton } from "@/components/TrialBackButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -264,6 +265,7 @@ export default function ThirtyDayExperience() {
 
   const content = (
     <AuthenticatedLayout title="30-Day Journey" subtitle="Your path to reclaimed worth">
+      <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
       <div className="pb-16">
         <div className="max-w-4xl mx-auto">
 

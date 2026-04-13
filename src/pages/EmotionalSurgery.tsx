@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Lock, ChevronRight, Sparkles } from "lucide-react";
+import { TrialBackButton } from "@/components/TrialBackButton";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
@@ -98,6 +99,7 @@ export default function EmotionalSurgery() {
 
   return (
     <AuthenticatedLayout title="Emotional Surgery™">
+      <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
       <TrialLockedContent isLocked={isTrialUser}>
       <div className="min-h-screen pt-24 pb-32 px-4">
         <div className="max-w-2xl mx-auto">
