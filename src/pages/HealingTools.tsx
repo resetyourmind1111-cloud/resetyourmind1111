@@ -85,6 +85,7 @@ export default function HealingTools() {
   return (
     <AuthenticatedLayout title="Healing Tools" subtitle="21 powerful tools for deep emotional healing and transformation">
       <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
+      {shouldShowContent ? (
         <>
           {/* Trial banner */}
           <div className="mb-6 p-4 rounded-xl bg-[#3D1A6E]/20 border border-[#3D1A6E]/30">
