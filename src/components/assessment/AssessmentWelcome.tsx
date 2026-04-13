@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Thermometer, Heart, DollarSign, Briefcase, Shield, Zap } from "lucide-react";
+import { TrialBackButton } from "@/components/TrialBackButton";
 
 interface AssessmentWelcomeProps {
   onStart: () => void;
@@ -17,6 +18,9 @@ const categories = [
 export function AssessmentWelcome({ onStart }: AssessmentWelcomeProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-16 px-4">
+      <div className="max-w-2xl mx-auto mb-4">
+        <TrialBackButton fallbackPath="/home" label="Back" />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

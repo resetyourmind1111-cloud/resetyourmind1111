@@ -192,9 +192,14 @@ const Oracle = () => {
     // Pull limit reached
     if (pullsExhausted && step === 'deck') {
       return (
-        <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+         <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
           <Navigation />
           <main className="flex-1 container mx-auto px-4 py-8 max-w-lg flex flex-col items-center justify-center">
+            <div className="w-full mb-4">
+              <Link to="/home" className="flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Back
+              </Link>
+            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -245,6 +250,11 @@ const Oracle = () => {
         <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
           <Navigation />
           <main className="flex-1 container mx-auto px-4 py-8 max-w-lg flex flex-col items-center justify-center">
+            <div className="w-full mb-4">
+              <Link to="/home" className="flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Back
+              </Link>
+            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TRAP_SLUGS } from "@/data/identityTrapData";
 import { useSubscription } from "@/hooks/useSubscription";
 import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
+import { TrialBackButton } from "@/components/TrialBackButton";
 
 export default function PatternResult() {
   const location = useLocation();
@@ -21,7 +22,9 @@ export default function PatternResult() {
   const slug = TRAP_SLUGS[primary];
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex flex-col p-6">
+      <TrialBackButton fallbackPath="/patterns" label="Back" className="mb-4" />
+      <div className="flex-1 flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -70,6 +73,7 @@ export default function PatternResult() {
           />
         </div>
       </motion.div>
+      </div>
 
       <PatternAiChatPanel
         trapName={primary}

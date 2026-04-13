@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { TRAP_QUESTIONS, scoreTrap } from "@/data/identityTrapData";
+import { TrialBackButton } from "@/components/TrialBackButton";
 
 export default function PatternQuiz() {
   const { user } = useAuth();
@@ -40,9 +41,10 @@ export default function PatternQuiz() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Progress */}
+      {/* Back + Progress */}
       <div className="p-4 space-y-2">
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <TrialBackButton fallbackPath="/patterns" label="Back" />
+        <div className="flex justify-between text-xs text-muted-foreground mt-2">
           <span>{current + 1} of {TRAP_QUESTIONS.length}</span>
         </div>
         <Progress value={progress} className="h-1.5 bg-muted [&>[data-state]]:bg-primary" />
