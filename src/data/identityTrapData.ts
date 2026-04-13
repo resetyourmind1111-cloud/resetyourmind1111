@@ -143,6 +143,7 @@ export interface TrapModule {
   bodyOptions: string[];
   audioTitle: string;
   audioDuration: string;
+  audioUrl: string;
   audioScript: string;
   recodeStatements: string[];
   actions: string[];
