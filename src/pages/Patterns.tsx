@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { RefreshCw, Zap, BarChart3, RotateCcw } from "lucide-react";
+import { TrialBackButton } from "@/components/TrialBackButton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -50,6 +51,7 @@ export default function Patterns() {
       <Navigation />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+          <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
           {!hasTaken ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
