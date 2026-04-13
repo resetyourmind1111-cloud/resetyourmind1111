@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Check, Play, Pause } from "lucide-react";
+import { Check, Play, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { AnthemPlayer } from "@/components/anthem/AnthemPlayer";
 
-const LORIE_30DAY_AUDIO_URL = "https://cdn.pixabay.com/audio/2022/03/15/audio_115f9bda3a.mp3"; // placeholder
+const MINDIST_30DAY_URL = "https://mindist.page.link/rzWi";
 
 interface Day30CompletionProps {
   onDismiss: () => void;
@@ -23,8 +23,7 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
   });
   const [day7Reflection, setDay7Reflection] = useState<string | null>(null);
   const [day30Reflection, setDay30Reflection] = useState<string | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [mindistOpened, setMindistOpened] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,11 +76,6 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
       if (day30) setDay30Reflection(day30.response);
     };
     fetchData();
-
-    const audio = new Audio(LORIE_30DAY_AUDIO_URL);
-    audioRef.current = audio;
-    audio.addEventListener("ended", () => setPlaying(false));
-    return () => { audio.pause(); audio.remove(); };
   }, [user]);
 
   useEffect(() => {
@@ -91,11 +85,9 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
     }
   }, [screen]);
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (playing) audioRef.current.pause();
-    else audioRef.current.play();
-    setPlaying(!playing);
+  const openMindist30 = () => {
+    window.open(MINDIST_30DAY_URL, "_blank", "noopener,noreferrer");
+    setMindistOpened(true);
   };
 
   const handleShare = async () => {
@@ -284,13 +276,16 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
             <div className="p-5 rounded-xl bg-[#2A1F3D] border border-[#2A1F3D]">
               <div className="flex items-center gap-4 mb-3">
                 <button
-                  onClick={togglePlay}
+                  onClick={openMindist30}
                   className="w-12 h-12 rounded-full bg-[#C9A84C] flex items-center justify-center shrink-0 hover:bg-[#C9A84C]/90 transition-colors"
                 >
-                  {playing ? <Pause className="w-5 h-5 text-[#06060e]" /> : <Play className="w-5 h-5 text-[#06060e] ml-0.5" />}
+                  <Play className="w-5 h-5 text-[#06060e] ml-0.5" />
                 </button>
                 <div className="text-left">
                   <p className="text-[#F9F6F0] text-sm font-semibold">You Did The Work</p>
+                  <p className="text-[#F9F6F0]/40 text-xs flex items-center gap-1">
+                    3 min — Opens in Mindist <ExternalLink className="w-3 h-3 inline" />
+                  </p>
                 </div>
               </div>
               <p className="text-[#F9F6F0]/80 text-sm font-medium text-left">Lorie Wu</p>
