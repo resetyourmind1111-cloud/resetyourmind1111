@@ -16,12 +16,11 @@ import { useToast } from "@/hooks/use-toast";
 import { CelebrationOverlay } from "@/components/trial/CelebrationOverlay";
 import { LockedContent } from "@/components/LockedContent";
 import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
-import { startAmbientTone, stopAmbientTone, isAmbientPlaying, setAmbientVolume } from "@/lib/ambientTones";
 import { Slider } from "@/components/ui/slider";
 
 const TOTAL_SCREENS = 12;
 const PATTERN_PREVIEW_RETURN_PATH = "/patterns";
-const RESET_DURATION_SECONDS = 180; // 3 minutes
+const MINDIST_AUDIO_URL = "https://mindist.page.link/Uiar";
 
 function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
   trap: any;
@@ -31,60 +30,81 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [duration, setDuration] = useState(180);
   const [volume, setVolume] = useState(0.7);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const getAudio = useCallback(() => {
+    if (!audioRef.current) {
+      const audio = new Audio(MINDIST_AUDIO_URL);
+      audio.volume = volume;
+      audio.addEventListener("loadedmetadata", () => {
+        if (audio.duration && isFinite(audio.duration)) {
+          setDuration(Math.ceil(audio.duration));
+        }
+      });
+      audio.addEventListener("ended", () => {
+        setIsPlaying(false);
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        setElapsed(duration);
+      });
+      audio.addEventListener("error", () => {
+        setIsPlaying(false);
+        window.open(MINDIST_AUDIO_URL, "_blank");
+      });
+      audioRef.current = audio;
+    }
+    return audioRef.current;
+  }, [volume, duration]);
+
   const togglePlay = useCallback(() => {
+    const audio = getAudio();
     if (isPlaying) {
-      stopAmbientTone();
+      audio.pause();
       if (intervalRef.current) clearInterval(intervalRef.current);
       setIsPlaying(false);
     } else {
-      startAmbientTone(volume);
+      audio.play();
       intervalRef.current = setInterval(() => {
-        setElapsed((prev) => {
-          if (prev + 1 >= RESET_DURATION_SECONDS) {
-            stopAmbientTone();
-            if (intervalRef.current) clearInterval(intervalRef.current);
-            setIsPlaying(false);
-            return RESET_DURATION_SECONDS;
-          }
-          return prev + 1;
-        });
-      }, 1000);
+        setElapsed(Math.floor(audio.currentTime));
+      }, 500);
       setIsPlaying(true);
     }
-  }, [isPlaying, volume]);
+  }, [isPlaying, getAudio]);
 
   const handleVolumeChange = useCallback((val: number[]) => {
     const v = val[0];
     setVolume(v);
-    if (isPlaying) setAmbientVolume(v);
-  }, [isPlaying]);
+    if (audioRef.current) audioRef.current.volume = v;
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      stopAmbientTone();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
-  const progress = (elapsed / RESET_DURATION_SECONDS) * 100;
-  const remaining = RESET_DURATION_SECONDS - elapsed;
+  const progress = (elapsed / duration) * 100;
+  const remaining = duration - elapsed;
   const mins = Math.floor(remaining / 60);
   const secs = remaining % 60;
-  const isComplete = elapsed >= RESET_DURATION_SECONDS;
+  const isComplete = elapsed >= duration;
 
   return (
     <div className="space-y-6">
       <h2 className="font-serif text-xl font-bold text-foreground">Do The Reset</h2>
-      <p className="text-muted-foreground text-sm">Find a quiet space. Close your eyes. Let the healing tones guide you.</p>
+      <p className="text-muted-foreground text-sm">Find a quiet space. Press play and let it move through you.</p>
       <Card className="p-6 space-y-5" style={{ background: "linear-gradient(135deg, rgba(61,26,110,0.3), rgba(10,10,10,0.8))" }}>
         <div className="flex items-center justify-between">
           <div>
             <p className="font-semibold text-foreground">{trap.audioTitle}</p>
-            <p className="text-xs text-muted-foreground">{trap.audioDuration} — Solfeggio Healing Tones</p>
+            <p className="text-xs text-muted-foreground">{trap.audioDuration} — Guided Reset</p>
           </div>
           <button
             onClick={togglePlay}
