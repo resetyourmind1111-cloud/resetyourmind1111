@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import Stripe from "https://esm.sh/stripe@17.5.0?target=denonext";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -50,9 +50,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-      apiVersion: "2023-10-16",
-    });
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!);
 
     const origin = req.headers.get("origin") || "https://id-preview--e0c3104e-89de-46cb-978e-ccf1844a67a2.lovable.app";
 
