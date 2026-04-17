@@ -309,6 +309,51 @@ export default function Upgrade() {
         })}
       </div>
 
+      {/* Testimonials */}
+      <div className="max-w-5xl mx-auto px-4 pb-12">
+        <div className="text-center mb-8">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-2">
+            TRANSFORMATIONS — From Crumbs to Celebration
+          </p>
+          <p className="text-muted-foreground text-sm md:text-base italic">
+            Real stories from women who chose to reset their worth thermostat.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            {
+              quote: "I went from accepting breadcrumbs in every area of my life to demanding the feast. My income doubled within 3 months of doing this work.",
+              name: "Sarah M.",
+              title: "Entrepreneur",
+            },
+            {
+              quote: "The Worth Thermostat Assessment was like looking in a mirror for the first time. I finally understood why I kept settling. Now I choose differently.",
+              name: "Jennifer L.",
+              title: "Creative Director",
+            },
+            {
+              quote: "The oracle cards have become my daily ritual. Every morning I pull a card and it's always exactly what I need to hear. Life-changing.",
+              name: "Amanda R.",
+              title: "Life Coach",
+            },
+          ].map((t, i) => (
+            <motion.div
+              key={t.name}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.1 }}
+              className="rounded-2xl p-6 bg-secondary/20 border-l-4 border-accent"
+            >
+              <p className="text-foreground/85 text-sm leading-relaxed mb-4 italic">
+                "{t.quote}"
+              </p>
+              <p className="text-accent font-serif font-semibold text-sm">— {t.name}</p>
+              <p className="text-muted-foreground text-xs">{t.title}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
       {/* Lifetime text link */}
       <div className="text-center pb-16 px-4">
         <p className="text-sm text-muted-foreground mb-2">Want lifetime access? <strong>$1,111</strong> — one-time, everything, forever.</p>
