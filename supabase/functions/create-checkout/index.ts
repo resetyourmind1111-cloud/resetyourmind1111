@@ -106,8 +106,8 @@ Deno.serve(async (req) => {
       customer: stripeCustomerId,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${origin}/dashboard?checkout=success`,
-      cancel_url: `${origin}/#pricing`,
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/upgrade`,
       metadata: {
         user_id: userId as string,
         tier_requested: tierKey || PRICE_TIER_MAP[priceId],

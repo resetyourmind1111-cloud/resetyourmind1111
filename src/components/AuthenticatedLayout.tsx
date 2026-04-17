@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigation } from "@/components/Navigation";
 import { PastDueBanner } from "@/components/PastDueBanner";
+import { CancelledBanner } from "@/components/CancelledBanner";
 import { BottomNav } from "@/components/BottomNav";
 import { TrialDayBanner } from "@/components/TrialDayBanner";
 import { TrialExpiredOverlay } from "@/components/TrialExpiredOverlay";
@@ -37,6 +38,7 @@ export function AuthenticatedLayout({ children, title, subtitle }: Authenticated
     <div className="min-h-screen bg-background">
       <Navigation />
       <PastDueBanner />
+      <CancelledBanner />
       <TrialDayBanner />
       <TrialExpiredOverlay />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">

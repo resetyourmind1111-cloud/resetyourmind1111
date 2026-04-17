@@ -16,16 +16,16 @@ export function CancelledBanner() {
   }
 
   return (
-    <div className="w-full bg-amber-100 dark:bg-amber-900/30 border-y border-amber-300 dark:border-amber-700/50 px-4 py-3">
+    <div className="w-full bg-accent/15 border-y border-accent/40 px-4 py-3">
       <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
-          <PauseCircle className="w-5 h-5 flex-shrink-0" />
+        <div className="flex items-center gap-2 text-foreground">
+          <PauseCircle className="w-5 h-5 flex-shrink-0 text-accent" />
           <p className="text-sm font-medium">
             Your subscription is paused. Reactivate to continue your reset.
           </p>
         </div>
         <Link to="/upgrade">
-          <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white font-semibold">
+          <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
             Reactivate →
           </Button>
         </Link>
