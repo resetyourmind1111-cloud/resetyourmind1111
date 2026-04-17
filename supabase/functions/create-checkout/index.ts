@@ -73,9 +73,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-      apiVersion: "2023-10-16",
-    });
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!);
 
     // Get or create Stripe customer
     const { data: profile } = await supabaseAdmin
