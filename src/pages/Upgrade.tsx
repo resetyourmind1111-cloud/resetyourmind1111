@@ -88,7 +88,7 @@ const TIERS = [
   },
 ];
 
-const FOUNDING_PRICE_ID = "price_1TAUgeC1ibVojXJKMY9OXfeh";
+const FOUNDING_PRICE_ID = "price_1TAUzKC1ibVojXJKoehSnlnq";
 const FOUNDING_FEATURES = [
   "Full 30-Day Reset Experience",
   "All 5 Identity Trap Modules + AI Support",
