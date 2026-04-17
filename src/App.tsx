@@ -49,6 +49,7 @@ import MonthlyReset from "./pages/MonthlyReset";
 import WhatsNext from "./pages/WhatsNext";
 import SacredCircle from "./pages/SacredCircle";
 import Admin from "./pages/Admin";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -106,6 +107,7 @@ const App = () => (
                 <Route path="/whats-next" element={<WhatsNext />} />
                 <Route path="/sacred-circle" element={<SacredCircle />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
