@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import Stripe from "https://esm.sh/stripe@17.5.0?target=denonext";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   apiVersion: "2023-10-16",
@@ -28,6 +28,14 @@ const ANNUAL_PRICES = new Set([
 
 function getBillingInterval(priceId: string): string {
   return ANNUAL_PRICES.has(priceId) ? "annual" : "monthly";
+}
+
+function periodEndIso(sub: any): string | null {
+  // Newer Stripe API moved current_period_end to items.data[0]
+  const ts = sub?.current_period_end ?? sub?.items?.data?.[0]?.current_period_end;
+  if (!ts || typeof ts !== "number") return null;
+  const d = new Date(ts * 1000);
+  return isNaN(d.getTime()) ? null : d.toISOString();
 }
 
 Deno.serve(async (req) => {
