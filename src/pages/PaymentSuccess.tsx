@@ -125,7 +125,7 @@ export default function PaymentSuccess() {
           <Button
             size="lg"
             className="w-full md:w-auto bg-accent text-accent-foreground hover:bg-accent/90 font-semibold rounded-xl px-8 py-6 text-base"
-            onClick={() => navigate("/home")}
+            onClick={() => navigate(onboardingComplete === false ? "/onboarding" : "/home")}
           >
             Start My Full Reset →
           </Button>
