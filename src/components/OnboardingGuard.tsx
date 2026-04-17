@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 // Routes that don't require onboarding completion
-const PUBLIC_ROUTES = ["/", "/auth", "/assessment", "/onboarding"];
+const PUBLIC_ROUTES = ["/", "/auth", "/assessment", "/onboarding", "/payment-success"];
 
 interface OnboardingGuardProps {
   children: ReactNode;
