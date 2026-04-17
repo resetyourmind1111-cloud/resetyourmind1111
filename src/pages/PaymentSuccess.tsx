@@ -13,6 +13,20 @@ export default function PaymentSuccess() {
   const { subscription, effectiveTier } = useSubscription();
   const [searchParams] = useSearchParams();
   const [polledTier, setPolledTier] = useState<string | null>(null);
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
+
+  // Check onboarding status to route the CTA correctly
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("onboarding_complete")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      setOnboardingComplete(!!(data as any)?.onboarding_complete);
+    })();
+  }, [user]);
 
   // Poll for active subscription up to 10 times (Stripe webhook may lag)
   useEffect(() => {
