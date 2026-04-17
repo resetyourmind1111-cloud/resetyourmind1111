@@ -119,17 +119,26 @@ export default function Upgrade() {
       return;
     }
     setLoadingTier(tierKey);
+
+    // Open new tab synchronously (must happen before any await to survive popup blockers)
+    const newTab = window.open("about:blank", "_blank");
+
     try {
-      const newTab = window.open("about:blank", "_blank");
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: { priceId, tierKey },
       });
       if (error) throw error;
-      if (data?.url) {
-        if (newTab) newTab.location.href = data.url;
-        else window.location.assign(data.url);
+      if (!data?.url) throw new Error("No checkout URL returned");
+
+      if (newTab && !newTab.closed) {
+        newTab.location.href = data.url;
+      } else {
+        // Popup was blocked — fall back to same-window redirect so user can still test
+        toast.message("Opening Stripe checkout…");
+        window.location.assign(data.url);
       }
-    } catch {
+    } catch (err) {
+      if (newTab && !newTab.closed) newTab.close();
       toast.error("Unable to start checkout. Please try again.");
     } finally {
       setLoadingTier(null);
