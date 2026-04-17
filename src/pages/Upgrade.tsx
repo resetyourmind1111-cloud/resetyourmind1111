@@ -342,13 +342,13 @@ export default function Upgrade() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.1 }}
-              className="rounded-2xl p-6 bg-secondary/20 border-l-4 border-accent"
+              className="rounded-2xl pl-7 pr-6 py-6 bg-secondary/20 border-l-4 border-accent overflow-hidden"
             >
-              <p className="text-foreground/85 text-sm leading-relaxed mb-4 italic">
+              <p className="text-foreground/85 text-sm leading-relaxed mb-4 italic break-words">
                 "{t.quote}"
               </p>
-              <p className="text-accent font-serif font-semibold text-sm">— {t.name}</p>
-              <p className="text-muted-foreground text-xs">{t.title}</p>
+              <p className="text-accent font-serif font-semibold text-sm break-words">— {t.name}</p>
+              <p className="text-muted-foreground text-xs break-words">{t.title}</p>
             </motion.div>
           ))}
         </div>
