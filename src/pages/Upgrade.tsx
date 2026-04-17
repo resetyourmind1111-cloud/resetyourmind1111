@@ -296,12 +296,17 @@ export default function Upgrade() {
               {isCurrentTier ? (
                 <Button disabled className="w-full rounded-xl font-semibold" variant="outline">Current Plan</Button>
               ) : (
-                <Button className={`w-full rounded-xl font-semibold ${
+                <Button className={`w-full rounded-xl font-semibold h-auto py-3 px-3 whitespace-normal text-center leading-tight text-sm ${
                   tier.key === "EXPAND" ? "bg-accent text-accent-foreground hover:bg-accent/90" :
                   tier.key === "EMBODY" ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" :
                   "bg-card border border-accent text-accent hover:bg-accent hover:text-accent-foreground"
                 }`} onClick={() => handleCheckout(priceId, tier.key)} disabled={!!loadingTier}>
-                  {loadingTier === tier.key ? "Loading…" : `${tier.cta} — $${displayPrice}/month`}
+                  {loadingTier === tier.key ? "Loading…" : (
+                    <span className="flex flex-col items-center gap-0.5">
+                      <span>{tier.cta}</span>
+                      <span className="text-xs opacity-90">${displayPrice}/month</span>
+                    </span>
+                  )}
                 </Button>
               )}
             </motion.div>
