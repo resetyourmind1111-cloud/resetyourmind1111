@@ -232,9 +232,19 @@ export default function Upgrade() {
       </button>
       <div className="pt-16 pb-8 px-4 text-center">
         <p className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-3">CHOOSE YOUR RESET</p>
-        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-3xl md:text-5xl font-bold text-foreground mb-4">
+        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-3xl md:text-5xl font-bold text-foreground mb-6">
           Start where you are.{" "}<span className="text-accent">Grow from there.</span>
         </motion.h1>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="font-serif text-lg md:text-2xl text-foreground/85 max-w-2xl mx-auto leading-relaxed space-y-1"
+        >
+          <p>Reset your mind.</p>
+          <p>Regulate your nervous system.</p>
+          <p>Break through what's been holding you back.</p>
+        </motion.div>
       </div>
 
       {/* Annual toggle */}
