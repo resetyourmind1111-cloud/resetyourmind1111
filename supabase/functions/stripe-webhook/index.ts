@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
             tier: mapping.tier,
             status: "active",
             billing_interval: getBillingInterval(priceId!),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            current_period_end: periodEndIso(subscription),
             cancel_at_period_end: subscription.cancel_at_period_end,
             founding_member: isFounding,
             lifetime_locked_price: isFounding,
@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
 
         const updateData: Record<string, any> = {
           status: subscription.status === "active" ? "active" : subscription.status === "past_due" ? "past_due" : subscription.status,
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          current_period_end: periodEndIso(subscription),
           cancel_at_period_end: subscription.cancel_at_period_end,
           updated_at: new Date().toISOString(),
         };
@@ -192,7 +192,7 @@ Deno.serve(async (req) => {
           .from("subscriptions")
           .update({
             status: "active",
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            current_period_end: periodEndIso(subscription),
             updated_at: new Date().toISOString(),
           })
           .eq("user_id", userId);
