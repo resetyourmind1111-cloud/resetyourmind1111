@@ -211,7 +211,13 @@ export default function EmotionalSurgeryModule() {
     );
   }
 
-  const completedCount = trackLessons.filter((tl) => completions[completionKey(tl.trackName)]?.completed_at).length;
+  const completedCount = visibleTrackLessonsCompletedCount();
+
+  function visibleTrackLessonsCompletedCount() {
+    return visibleTrackLessons.filter(
+      (tl) => completions[completionKey(tl.trackName)]?.completed_at,
+    ).length;
+  }
 
   // Filter the visible tracks for trial users:
   //  - Phase 1 (Foundation): show all 4 tracks.
