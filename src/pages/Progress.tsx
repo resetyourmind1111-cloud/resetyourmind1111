@@ -180,6 +180,17 @@ export default function Progress() {
             <p className="text-muted-foreground text-sm italic">You are not starting over. You are evolving.</p>
           </motion.div>
 
+          {profileLoading ? (
+            <SkeletonCardList count={3} />
+          ) : (
+          <>
+          </>
+          )}
+
+          {!profileLoading && (
+          <></>
+          )}
+
           {/* SECTION 1 — Current Phase Card */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-8">
             <div className="rounded-2xl p-6 md:p-8 bg-secondary text-secondary-foreground relative overflow-hidden">
