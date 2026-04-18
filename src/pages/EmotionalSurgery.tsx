@@ -9,8 +9,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { useSubscription } from "@/hooks/useSubscription";
-import { TrialLockedContent } from "@/components/TrialLockedContent";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { useRecommendedTrack } from "@/hooks/useRecommendedTrack";
 
 interface ModuleInfo {
   phase: number;
@@ -55,6 +55,7 @@ export default function EmotionalSurgery() {
   const { effectiveTier, isLoading: tierLoading } = useSubscription();
   const { isTrialActive, trialExpired } = useTrialStatus();
   const isTrialUser = isTrialActive || trialExpired;
+  const { recommendedTrack } = useRecommendedTrack();
   const navigate = useNavigate();
 
   // Track completions per lesson_number across all tracks (4 tracks total)
@@ -90,7 +91,11 @@ export default function EmotionalSurgery() {
 
   const handleModuleClick = (mod: ModuleInfo) => {
     const required = MODULE_TIER_REQUIRED[mod.phase];
-    if (!hasTierAccess(effectiveTier, required)) {
+    const tierUnlocked = hasTierAccess(effectiveTier, required);
+    // Trial users get Phase 1 (Foundation) — and the deep module is rendered
+    // inside EmotionalSurgeryModule with per-track gating.
+    const trialUnlocked = isTrialUser && mod.phase === 1;
+    if (!tierUnlocked && !trialUnlocked) {
       navigate("/#pricing");
       return;
     }
@@ -100,7 +105,6 @@ export default function EmotionalSurgery() {
   return (
     <AuthenticatedLayout title="Emotional Surgery™">
       <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
-      <TrialLockedContent isLocked={isTrialUser}>
       <div className="min-h-screen pt-24 pb-32 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
@@ -163,7 +167,11 @@ export default function EmotionalSurgery() {
               const completed = phaseCompletions[mod.phase] || 0;
               const progress = Math.round((completed / totalTracks) * 100);
               const required = MODULE_TIER_REQUIRED[mod.phase];
-              const unlocked = hasTierAccess(effectiveTier, required);
+              const tierUnlocked = hasTierAccess(effectiveTier, required);
+              // Trial users get Phase 1 (Foundation) unlocked. The deep
+              // module screen further restricts to recommended track only.
+              const trialUnlocked = isTrialUser && mod.phase === 1;
+              const unlocked = tierUnlocked || trialUnlocked;
               const isActive = mod.phase === activePhase;
 
               return (
@@ -299,7 +307,6 @@ export default function EmotionalSurgery() {
           </motion.div>
         </div>
       </div>
-      </TrialLockedContent>
     </AuthenticatedLayout>
   );
 }

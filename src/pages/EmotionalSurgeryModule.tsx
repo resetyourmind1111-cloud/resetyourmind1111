@@ -16,6 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import { moduleScreens } from "@/data/emotionalSurgeryModules";
 import ModuleScreen from "@/components/emotional-surgery/ModuleScreen";
 import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { useRecommendedTrack, isTrialPhaseUnlocked } from "@/hooks/useRecommendedTrack";
 
 const QUIET_PHASE_AUDIO_URL =
   "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Modules/The%20Quiet%20Phase%204f0i7mmu3pviIoFd26Uv.mp3";
@@ -76,10 +78,24 @@ export default function EmotionalSurgeryModule() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { effectiveTier } = useSubscription();
+  const { isTrialActive, trialExpired } = useTrialStatus();
+  const { recommendedTrack } = useRecommendedTrack();
+  const isTrialUser = isTrialActive || trialExpired;
   const { toast } = useToast();
 
   const moduleInfo = slug ? MODULE_SLUG_MAP[slug] : null;
   const requiredTier = slug ? MODULE_TIER_REQUIRED[slug] : "reset";
+
+  // For trial users:
+  //   - Phase 1 (Recognition) is unlocked across all tracks (Foundation).
+  //   - Phases 2–5 are unlocked only on the user's recommended track.
+  // We treat "unlocked for trial" as bypassing the LockedContent paywall.
+  const phaseNumber = moduleInfo?.lessonNumber ?? 0;
+  const trialBypassPaywall =
+    isTrialUser &&
+    (phaseNumber === 1 || (recommendedTrack !== null && phaseNumber >= 2));
+  // When tier already grants access, just use it. Otherwise, trial bypass.
+  const effectiveTierForGate = trialBypassPaywall ? "embody" : effectiveTier;
 
   const [completions, setCompletions] = useState<Record<string, LessonCompletion>>({});
   const [selectedTrackLesson, setSelectedTrackLesson] = useState<TrackLesson | null>(null);
@@ -187,7 +203,7 @@ export default function EmotionalSurgeryModule() {
     return (
       <AuthenticatedLayout title={`${moduleInfo.title} — Emotional Surgery™`}>
         <div className="min-h-screen pt-24 pb-32 px-4">
-          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTier}>
+          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTierForGate}>
             <ModuleScreen module={newModuleContent} />
           </LockedContent>
         </div>
@@ -195,13 +211,24 @@ export default function EmotionalSurgeryModule() {
     );
   }
 
-  const completedCount = trackLessons.filter((tl) => completions[completionKey(tl.trackName)]?.completed_at).length;
+  // Filter the visible tracks for trial users:
+  //  - Phase 1 (Foundation): show all 4 tracks.
+  //  - Phases 2–5: show ONLY the user's recommended track.
+  const visibleTrackLessons = isTrialUser
+    ? trackLessons.filter((tl) =>
+        isTrialPhaseUnlocked(moduleInfo.lessonNumber, tl.trackName, recommendedTrack),
+      )
+    : trackLessons;
+
+  const completedCount = visibleTrackLessons.filter(
+    (tl) => completions[completionKey(tl.trackName)]?.completed_at,
+  ).length;
 
   return (
     <AuthenticatedLayout title={`${moduleInfo.title} — Emotional Surgery™`}>
       <div className="min-h-screen pt-24 pb-32 px-4">
         <div className="max-w-3xl mx-auto">
-          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTier}>
+          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTierForGate}>
             <AnimatePresence mode="wait">
               {selectedTrackLesson ? (
                 /* Lesson Detail */
@@ -282,12 +309,12 @@ export default function EmotionalSurgeryModule() {
 
                   <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
                     <span>Module Progress</span>
-                    <span className="font-semibold text-foreground">{completedCount} / {trackLessons.length}</span>
+                    <span className="font-semibold text-foreground">{completedCount} / {visibleTrackLessons.length}</span>
                   </div>
-                  <Progress value={(completedCount / trackLessons.length) * 100} className="h-2 mb-6" />
+                  <Progress value={(completedCount / Math.max(visibleTrackLessons.length, 1)) * 100} className="h-2 mb-6" />
 
                   <div className="space-y-3">
-                    {trackLessons.map((tl) => {
+                    {visibleTrackLessons.map((tl) => {
                       const key = completionKey(tl.trackName);
                       const isComplete = !!completions[key]?.completed_at;
 
