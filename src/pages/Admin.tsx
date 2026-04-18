@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Shield, ToggleLeft, ToggleRight, Users, CreditCard, Sparkles } from "lucide-react";
+import { Shield, ToggleLeft, ToggleRight, Users, CreditCard, Sparkles, FastForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +30,29 @@ export default function Admin() {
   const [pendingValue, setPendingValue] = useState(false);
   const [stats, setStats] = useState({ total: 0, active: 0, trial: 0, founding: 0, spotsTaken: 0 });
   const [loading, setLoading] = useState(true);
+  const [jumpEmail, setJumpEmail] = useState("");
+  const [jumpDay, setJumpDay] = useState(1);
+  const [jumping, setJumping] = useState(false);
+
+  const handleTrialJump = async () => {
+    if (!jumpEmail.trim()) {
+      toast.error("Enter a user email");
+      return;
+    }
+    setJumping(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-set-trial-day", {
+        body: { email: jumpEmail.trim().toLowerCase(), day: jumpDay },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success(`${jumpEmail} is now on Day ${jumpDay}. Refresh their session.`);
+    } catch (e: any) {
+      toast.error(e.message || "Failed to set trial day");
+    } finally {
+      setJumping(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
