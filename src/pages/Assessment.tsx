@@ -138,6 +138,8 @@ export default function Assessment() {
       thermostatType={thermostatType}
       answers={answers}
       onRetake={handleRetake}
+      retakeType={retakeMode === "day7" ? "day7" : "initial"}
+      onSavedRedirect={retakeMode === "day7" ? "/assessment?compare=true" : undefined}
     />
   );
 }
