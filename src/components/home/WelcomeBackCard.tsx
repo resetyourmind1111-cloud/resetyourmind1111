@@ -28,13 +28,13 @@ export function WelcomeBackCard({ loading = false, nextAction = null }: WelcomeB
         <div className="h-1 bg-gradient-to-r from-[#C9A84C] to-[#C9A84C]/60" />
         <div className="p-6">
           <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-2">
-            Welcome Back
+            {dayLabel === 7 ? `Day 7 of 7` : `Welcome Back`}
           </p>
           <h3 className="font-serif text-xl text-[#F9F6F0] mb-1">
-            Day {dayLabel} of 7. Your reset continues.
+            {dayLabel === 7 ? `Your preview ends today.` : `Day ${dayLabel} of 7. Your reset continues.`}
           </h3>
           <p className="text-[#F9F6F0]/50 text-sm mb-4">
-            Pick up where you left off.
+            {dayLabel === 7 ? `Make it permanent before midnight.` : `Pick up where you left off.`}
           </p>
           {nextAction && (
             <Link to={nextAction.href}>
