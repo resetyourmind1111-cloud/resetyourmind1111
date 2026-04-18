@@ -223,6 +223,18 @@
     100% { background-position: 200% 0; }
   }
 
+  /* Lorie welcome card — gentle gold pulse to draw the eye to the play button */
+  @keyframes lorie-welcome-glow {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(43 52% 54% / 0); }
+    50% { box-shadow: 0 0 28px 2px hsl(43 52% 54% / 0.25); }
+  }
+  .lorie-welcome-pulse {
+    animation: lorie-welcome-glow 2.8s ease-in-out infinite;
+  }
+  .lorie-welcome-pulse button[aria-label="Play"] {
+    animation: lorie-welcome-glow 2.2s ease-in-out infinite;
+  }
+
   .text-balance {
     text-wrap: balance;
   }
