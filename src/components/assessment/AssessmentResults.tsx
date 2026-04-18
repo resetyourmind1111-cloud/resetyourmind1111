@@ -86,6 +86,11 @@ export function AssessmentResults({
   const categoryScores = calculateCategoryScores(answers);
   const shareCardRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const { isTrialActive } = useTrialStatus();
+  // Filter recommendations: trial users see only unlocked content
+  const showTrialMode = !!user && isTrialActive;
+  const visibleSteps = showTrialMode ? TRIAL_UNLOCKED_STEPS : thermostatType.nextSteps;
+  const lockedPreviewSteps = showTrialMode ? thermostatType.nextSteps : [];
 
   // Auto-save assessment results for logged-in users
   useEffect(() => {
