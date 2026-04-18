@@ -309,12 +309,12 @@ export default function EmotionalSurgeryModule() {
 
                   <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
                     <span>Module Progress</span>
-                    <span className="font-semibold text-foreground">{completedCount} / {trackLessons.length}</span>
+                    <span className="font-semibold text-foreground">{completedCount} / {visibleTrackLessons.length}</span>
                   </div>
-                  <Progress value={(completedCount / trackLessons.length) * 100} className="h-2 mb-6" />
+                  <Progress value={(completedCount / Math.max(visibleTrackLessons.length, 1)) * 100} className="h-2 mb-6" />
 
                   <div className="space-y-3">
-                    {trackLessons.map((tl) => {
+                    {visibleTrackLessons.map((tl) => {
                       const key = completionKey(tl.trackName);
                       const isComplete = !!completions[key]?.completed_at;
 
