@@ -203,7 +203,7 @@ export default function EmotionalSurgeryModule() {
     return (
       <AuthenticatedLayout title={`${moduleInfo.title} — Emotional Surgery™`}>
         <div className="min-h-screen pt-24 pb-32 px-4">
-          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTier}>
+          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTierForGate}>
             <ModuleScreen module={newModuleContent} />
           </LockedContent>
         </div>
