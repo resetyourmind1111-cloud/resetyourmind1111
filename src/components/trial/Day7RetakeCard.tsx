@@ -34,11 +34,11 @@ export function Day7RetakeCard() {
       if (cancelled) return;
       if (!profile || !(profile as any).shown_day7_modal) return;
 
-      const { count } = await supabase
+      const { count } = await (supabase as any)
         .from("assessment_results")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id)
-        .eq("retake_type" as any, "day7");
+        .eq("retake_type", "day7");
       if (cancelled) return;
 
       if ((count ?? 0) === 0) setShow(true);

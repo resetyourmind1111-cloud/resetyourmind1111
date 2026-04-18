@@ -51,11 +51,11 @@ export function AssessmentComparison() {
       const initialRow = initialRows?.find((r: any) => r.retake_type === "initial") ?? initialRows?.[0];
 
       // Day 7: most recent 'day7'
-      const { data: day7Rows } = await supabase
+      const { data: day7Rows } = await (supabase as any)
         .from("assessment_results")
         .select("total_score, percentage_score, category_scores, answers")
         .eq("user_id", user.id)
-        .eq("retake_type" as any, "day7")
+        .eq("retake_type", "day7")
         .order("completed_at", { ascending: false })
         .limit(1);
 
