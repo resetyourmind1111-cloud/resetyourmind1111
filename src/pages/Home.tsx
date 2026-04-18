@@ -12,6 +12,7 @@ import { PastDueBanner } from "@/components/PastDueBanner";
 import { TrialWelcomeFlow } from "@/components/trial/TrialWelcomeFlow";
 import { TrialWelcomeBanner } from "@/components/trial/TrialWelcomeBanner";
 import { DailyFeaturedCard } from "@/components/trial/DailyFeaturedCard";
+import { TrialDayCurriculumCard } from "@/components/trial/TrialDayCurriculumCard";
 import { DailyPermissionSlipCard } from "@/components/trial/DailyPermissionSlipCard";
 import { Day7BottomBanner } from "@/components/trial/Day7BottomBanner";
 import { TrialDayBanner } from "@/components/TrialDayBanner";
@@ -245,10 +246,8 @@ export default function Home() {
 
               {!shouldHoldTrialContent && (
                 <>
-                  {/* 2. The ONE thing to do today */}
-                  <div className="mb-6">
-                    <DailyFeaturedCard />
-                  </div>
+                  {/* 2. Day-specific themed curriculum card (Days 1–7) */}
+                  <TrialDayCurriculumCard />
 
                   {/* 3. Daily Permission Slip */}
                   <div className="mb-6">
