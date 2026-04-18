@@ -29,8 +29,8 @@ const tiers = [
     icon: Sparkles,
     popular: false,
     color: "primary" as const,
-    monthlyPriceId: "price_1TAUgeC1ibVojXJKMY9OXfeh",
-    annualPriceId: "price_1TAUl6C1ibVojXJKGipOvp36",
+    monthlyPriceId: "price_1TNYPhC1ibVojXJK3CB5eX7T",
+    annualPriceId: "price_1TNYQoC1ibVojXJK9f7YhF3n",
     tierKey: "RESET",
   },
   {
@@ -56,8 +56,8 @@ const tiers = [
     icon: Star,
     popular: true,
     color: "accent" as const,
-    monthlyPriceId: "price_1TAUqnC1ibVojXJKtXzr7iOc",
-    annualPriceId: "price_1TAUs8C1ibVojXJKk9KaIU2z",
+    monthlyPriceId: "price_1TNYTnC1ibVojXJKpUwoZSLk",
+    annualPriceId: "price_1TNYVPC1ibVojXJKlJKQkFZX",
     tierKey: "EXPAND",
   },
   {
@@ -82,8 +82,8 @@ const tiers = [
     icon: Crown,
     popular: false,
     color: "brand-pink" as const,
-    monthlyPriceId: "price_1TAUuwC1ibVojXJKW8fcj8Hc",
-    annualPriceId: "price_1TAUwUC1ibVojXJKqMHhdeJE",
+    monthlyPriceId: "price_1TNYdXC1ibVojXJKPkHDKXgL",
+    annualPriceId: "price_1TNYeNC1ibVojXJKlvFsGuhA",
     tierKey: "EMBODY",
   },
 ];
@@ -250,7 +250,7 @@ function FoundingCard({ spotsRemaining, onCheckout }: { spotsRemaining: number; 
                 variant="hero"
                 size="lg"
                 disabled={isSoldOut}
-                onClick={() => onCheckout("price_1TAUzKC1ibVojXJKoehSnlnq", "FOUNDING")}
+                onClick={() => onCheckout("price_1TNYgqC1ibVojXJKdUQ9Wa7W", "FOUNDING")}
               >
                 {isSoldOut ? "Sold Out" : "Claim Your Founding Spot"}
               </Button>

@@ -9,19 +9,19 @@ const supabaseAdmin = createClient(
 );
 
 const PRICE_TIER_MAP: Record<string, { tier: string; plan: string }> = {
-  "price_1TAUgeC1ibVojXJKMY9OXfeh": { tier: "RESET", plan: "RESET" },
-  "price_1TAUl6C1ibVojXJKGipOvp36": { tier: "RESET", plan: "RESET" },
-  "price_1TAUqnC1ibVojXJKtXzr7iOc": { tier: "EXPAND", plan: "EXPAND" },
-  "price_1TAUs8C1ibVojXJKk9KaIU2z": { tier: "EXPAND", plan: "EXPAND" },
-  "price_1TAUuwC1ibVojXJKW8fcj8Hc": { tier: "EMBODY", plan: "EMBODY" },
-  "price_1TAUwUC1ibVojXJKqMHhdeJE": { tier: "EMBODY", plan: "EMBODY" },
-  "price_1TAUzKC1ibVojXJKoehSnlnq": { tier: "FOUNDING_FULL_ACCESS", plan: "FOUNDING_111" },
+  "price_1TNYPhC1ibVojXJK3CB5eX7T": { tier: "RESET", plan: "RESET" },
+  "price_1TNYQoC1ibVojXJK9f7YhF3n": { tier: "RESET", plan: "RESET" },
+  "price_1TNYTnC1ibVojXJKpUwoZSLk": { tier: "EXPAND", plan: "EXPAND" },
+  "price_1TNYVPC1ibVojXJKlJKQkFZX": { tier: "EXPAND", plan: "EXPAND" },
+  "price_1TNYdXC1ibVojXJKPkHDKXgL": { tier: "EMBODY", plan: "EMBODY" },
+  "price_1TNYeNC1ibVojXJKlvFsGuhA": { tier: "EMBODY", plan: "EMBODY" },
+  "price_1TNYgqC1ibVojXJKdUQ9Wa7W": { tier: "FOUNDING_FULL_ACCESS", plan: "FOUNDING_111" },
 };
 
 const ANNUAL_PRICES = new Set([
-  "price_1TAUl6C1ibVojXJKGipOvp36",
-  "price_1TAUs8C1ibVojXJKk9KaIU2z",
-  "price_1TAUwUC1ibVojXJKqMHhdeJE",
+  "price_1TNYQoC1ibVojXJK9f7YhF3n",
+  "price_1TNYVPC1ibVojXJKlJKQkFZX",
+  "price_1TNYeNC1ibVojXJKlvFsGuhA",
 ]);
 
 function getBillingInterval(priceId: string): string {
