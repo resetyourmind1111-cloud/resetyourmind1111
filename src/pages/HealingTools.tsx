@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { healingTools } from "@/data/healingToolsData";
 import HealingToolsDashboard from "@/components/healing-tools/HealingToolsDashboard";
-import { useTrialStatus, getTrialAllowedTools } from "@/hooks/useTrialStatus";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { TrialBackButton } from "@/components/TrialBackButton";
 
 export default function HealingTools() {
@@ -33,11 +33,27 @@ export default function HealingTools() {
   });
 
   const tier = profile?.subscription_tier || "free";
-  const allowedTools = getTrialAllowedTools(onboardingReason, trialTool1, trialTool2);
+  // During trial: all 21 unlocked. allowedTools is now the full list — but we
+  // still want to highlight the 2 personalized recommendations.
+  const recommendedToolIds = (() => {
+    if (trialTool1 && trialTool2) return [trialTool1, trialTool2];
+    if (onboardingReason) {
+      // Mirror the TRIAL_TOOL_MAP logic to highlight the recommended pair.
+      const map: Record<string, [string, string]> = {
+        stuck: ["nervous-system-diagnostic", "limiting-belief-rewriter"],
+        sabotage: ["limiting-belief-rewriter", "money-story-audit"],
+        relationships: ["boundary-builder", "limiting-belief-rewriter"],
+        levelup: ["limiting-belief-rewriter", "manifestation-tracker"],
+      };
+      return map[onboardingReason] || [];
+    }
+    return [];
+  })();
 
   const renderToolCard = (tool: typeof healingTools[0], index: number) => {
-    const isTrialTool = allowedTools.includes(tool.id);
-    const isLockedDuringTrial = isTrialActive && tier === "free" && !isTrialTool;
+    const isRecommended = recommendedToolIds.includes(tool.id);
+    // No trial locking — all 21 tools are accessible during the 7-day preview.
+    const isLockedDuringTrial = false;
 
     return (
       <motion.div
@@ -47,13 +63,20 @@ export default function HealingTools() {
         transition={{ delay: index * 0.04 }}
       >
         <TrialLockedContent isLocked={isLockedDuringTrial}>
-          <Card className={`glass-card-hover h-full flex flex-col ${isTrialTool && isTrialActive && tier === "free" ? "border-[#C9A84C]/40" : ""}`}>
+          <Card className={`glass-card-hover h-full flex flex-col ${isRecommended && isTrialActive && tier === "free" ? "border-[#C9A84C]/60 ring-1 ring-[#C9A84C]/30" : ""}`}>
             <CardContent className="p-6 flex flex-col flex-1">
               <div className="flex items-start justify-between mb-3">
                 <span className="text-3xl">{tool.icon}</span>
-                <Badge variant="outline" className="text-xs border-accent/30 text-accent">
-                  {tool.category}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  {isRecommended && isTrialActive && tier === "free" && (
+                    <Badge className="text-[10px] bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C] uppercase tracking-wider">
+                      Recommended
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className="text-xs border-accent/30 text-accent">
+                    {tool.category}
+                  </Badge>
+                </div>
               </div>
               <h3 className="font-serif text-lg font-semibold text-foreground mb-2">{tool.name}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">{tool.description}</p>
@@ -71,12 +94,12 @@ export default function HealingTools() {
     );
   };
 
-  // Sort: unlocked tools first during trial
+  // Sort: recommended tools first during trial
   const sortedTools = isTrialActive && tier === "free"
     ? [...healingTools].sort((a, b) => {
-        const aAllowed = allowedTools.includes(a.id) ? 0 : 1;
-        const bAllowed = allowedTools.includes(b.id) ? 0 : 1;
-        return aAllowed - bAllowed;
+        const aRec = recommendedToolIds.includes(a.id) ? 0 : 1;
+        const bRec = recommendedToolIds.includes(b.id) ? 0 : 1;
+        return aRec - bRec;
       })
     : healingTools;
 
@@ -87,13 +110,15 @@ export default function HealingTools() {
       <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
       {shouldShowContent ? (
         <>
-          {/* Trial banner — full toolkit unlocked during the 7-day preview */}
+          {/* Trial banner — full toolkit unlocked, 2 personalized recommendations */}
           <div className="mb-6 p-4 rounded-xl bg-[#3D1A6E]/20 border border-[#3D1A6E]/30">
             <p className="text-[#F9F6F0]/80 text-sm italic">
               All 21 healing tools are unlocked for your 7-day preview.
             </p>
             <p className="text-muted-foreground text-xs mt-1">
-              Explore freely. Upgrade to keep them after Day 7.
+              {recommendedToolIds.length === 2
+                ? "We've highlighted 2 starting points based on what you shared. Explore any of them freely."
+                : "Explore any tool freely. Upgrade to keep them after Day 7."}
             </p>
           </div>
           <Tabs defaultValue="tools" className="w-full">
