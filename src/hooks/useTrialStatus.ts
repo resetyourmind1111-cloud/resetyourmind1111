@@ -135,8 +135,34 @@ export function useTrialStatus(): TrialStatus {
   };
 }
 
-export function getTrialAllowedTools(reason: string | null, tool1: string | null, tool2: string | null): string[] {
-  if (tool1 && tool2) return [tool1, tool2];
-  if (reason && TRIAL_TOOL_MAP[reason]) return [...TRIAL_TOOL_MAP[reason]];
-  return TRIAL_ALLOWED_TOOLS;
+// All 21 healing tools are open during the 7-day trial.
+// Trial users get full preview access — no per-tool gating.
+const ALL_HEALING_TOOL_IDS = [
+  "limiting-belief-rewriter",
+  "emotional-trigger-tracker",
+  "inner-child-healing",
+  "shadow-work-library",
+  "money-story-audit",
+  "abundance-evidence-log",
+  "income-frequency-tracker",
+  "manifestation-tracker",
+  "boundary-builder",
+  "attachment-style-analyzer",
+  "moon-phase-tracker",
+  "angel-number-journal",
+  "somatic-breathing",
+  "body-map-journal",
+  "affirmation-builder",
+  "visibility-challenge",
+  "ceo-self-assessment",
+  "values-clarity-tool",
+  "chakra-balancing",
+  "energy-cord-cutting",
+  "nervous-system-diagnostic",
+];
+
+export function getTrialAllowedTools(_reason: string | null, _tool1: string | null, _tool2: string | null): string[] {
+  // Trial users get all 21 tools unlocked. The previous 2-tool restriction
+  // created too many recommendation variations and confused new users.
+  return ALL_HEALING_TOOL_IDS;
 }
