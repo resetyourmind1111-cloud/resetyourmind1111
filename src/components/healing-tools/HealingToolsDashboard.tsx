@@ -175,8 +175,10 @@ export default function HealingToolsDashboard() {
         <h3 className="font-serif text-xl font-bold text-foreground mb-4">All Tools</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {toolStats.map((tool, i) => {
-            const isTrialTool = allowedTools.includes(tool.id);
-            const isLockedDuringTrial = isTrialActive && tier === "free" && !isTrialTool;
+            const isRecommendedTrialTool = allowedTools.includes(tool.id);
+            // During the 7-day trial, ALL tools are unlocked. The 2 recommended
+            // ones are simply highlighted in gold so users know where to start.
+            const isLockedDuringTrial = false;
 
             return (
               <motion.div
@@ -187,7 +189,7 @@ export default function HealingToolsDashboard() {
               >
                 <TrialLockedContent isLocked={isLockedDuringTrial}>
                   <Card
-                    className={`glass-card-hover cursor-pointer ${tool.entryCount === 0 ? "opacity-60" : ""} ${isTrialTool && isTrialActive && tier === "free" ? "border-[#C9A84C]/40" : ""}`}
+                    className={`glass-card-hover cursor-pointer ${tool.entryCount === 0 ? "opacity-60" : ""} ${isRecommendedTrialTool && isTrialActive && tier === "free" ? "border-[#C9A84C]/40" : ""}`}
                     onClick={() => navigate(`/healing-tools/${tool.id}`)}
                   >
                     <CardContent className="p-4 flex items-center gap-3">
@@ -200,8 +202,8 @@ export default function HealingToolsDashboard() {
                             : "Not started yet"}
                         </p>
                       </div>
-                      {isLockedDuringTrial ? (
-                        <Lock className="w-4 h-4 text-[#C9A84C] shrink-0" />
+                      {isRecommendedTrialTool && isTrialActive && tier === "free" ? (
+                        <Sparkles className="w-4 h-4 text-[#C9A84C] shrink-0" />
                       ) : tool.entryCount > 0 ? (
                         <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
                       ) : (
