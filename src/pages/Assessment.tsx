@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AssessmentWelcome } from "@/components/assessment/AssessmentWelcome";
 import { AssessmentQuestion } from "@/components/assessment/AssessmentQuestion";
 import { AssessmentResults } from "@/components/assessment/AssessmentResults";
+import { AssessmentComparison } from "@/components/assessment/AssessmentComparison";
 import { assessmentQuestions } from "@/data/assessmentQuestions";
 import { getThermostatType, calculateTotalScore, calculatePercentage, calculateCategoryScores } from "@/data/thermostatTypes";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,16 +11,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, CheckCircle } from "lucide-react";
 
-type AssessmentStep = "loading" | "already-done" | "welcome" | "questions" | "results";
+type AssessmentStep = "loading" | "already-done" | "welcome" | "questions" | "results" | "comparison";
 
 export default function Assessment() {
   const [step, setStep] = useState<AssessmentStep>("loading");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [existingResult, setExistingResult] = useState<any>(null);
-  
+
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const retakeMode = searchParams.get("retake"); // 'day7' triggers Day 7 retake flow
+  const compareMode = searchParams.get("compare") === "true";
 
   // Check if user already has assessment results
   useEffect(() => {
@@ -62,6 +66,10 @@ export default function Assessment() {
   const totalScore = calculateTotalScore(answers);
   const percentage = calculatePercentage(totalScore);
   const thermostatType = getThermostatType(totalScore);
+
+  if (step === "comparison") {
+    return <AssessmentComparison />;
+  }
 
   if (step === "loading") {
     return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Loading…</p></div>;

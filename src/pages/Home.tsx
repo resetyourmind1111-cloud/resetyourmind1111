@@ -24,6 +24,8 @@ import { TodaysResetToolCard } from "@/components/home/TodaysResetToolCard";
 import { ResetPlanWidget } from "@/components/home/ResetPlanWidget";
 import { TrialJourneyBar } from "@/components/trial/TrialJourneyBar";
 import { Day7CompletionModal } from "@/components/trial/Day7CompletionModal";
+import { Day7RetakeCard } from "@/components/trial/Day7RetakeCard";
+import { Day65CliffhangerCard } from "@/components/trial/Day65CliffhangerCard";
 import { Day3AcknowledgmentCard } from "@/components/trial/Day3AcknowledgmentCard";
 import { LorieWelcomeCard } from "@/components/trial/LorieWelcomeCard";
 import { TrialAnthemCard } from "@/components/trial/TrialAnthemCard";
@@ -243,6 +245,12 @@ export default function Home() {
                 /* 1. Day X of 7 progress bar */
                 <TrialJourneyBar loading={resumeLoading} step={trialStep} />
               )}
+
+              {/* Day 7 retake invitation — first card under the journey bar on Day 7 */}
+              {!shouldHoldTrialContent && <Day7RetakeCard />}
+
+              {/* Day 6.5 cliffhanger — between Day 6 gift and Day 7 reveal */}
+              {!shouldHoldTrialContent && <Day65CliffhangerCard />}
 
               {!shouldHoldTrialContent && (
                 <>
