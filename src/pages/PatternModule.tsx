@@ -154,7 +154,7 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
       )}
 
       <Button variant="gold" onClick={onNext} className="w-full">
-        {mindistOpened || elapsed >= AMBIENT_DURATION ? "Continue →" : "Mark Complete →"}
+        {audioCompleted || elapsed >= AMBIENT_DURATION ? "Continue →" : "Mark Complete →"}
       </Button>
     </div>
   );
