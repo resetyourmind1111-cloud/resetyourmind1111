@@ -178,29 +178,29 @@ export default function Home() {
           <StreakGraceBanner show={graceActivated} onDismiss={dismissGrace} />
           <StreakResetCard show={streakWasReset} onDismiss={dismissReset} />
 
-          {/* Lorie Welcome Card (Day 1 only) */}
-          <LorieWelcomeCard />
-
-          {/* Day 6 Surprise Unlock (trial users only, fires once) */}
+          {/* Day 6 Surprise Unlock (trial users only, fires once) — conversion-critical */}
           <Day6GiftCard trialDay={trialDay} isTrialActive={isTrialActive} />
 
-          {/* Welcome Back Card (Day 2+ trial users) */}
-          {shouldHoldTrialContent ? (
-            <Card className="mb-6 p-6 border-primary/20 bg-card/70">
-              <div className="h-3 w-24 rounded-full bg-muted animate-pulse mb-3" />
-              <div className="h-6 w-56 rounded-md bg-muted animate-pulse mb-2" />
-              <div className="h-4 w-40 rounded-md bg-muted animate-pulse mb-4" />
-              <div className="h-10 w-56 rounded-xl bg-muted animate-pulse" />
-            </Card>
-          ) : (
-            <WelcomeBackCard loading={resumeLoading} nextAction={nextAction} />
-          )}
-
-          {/* Personalized "For You Today" recommendation */}
-          {!shouldHoldTrialContent && <RecommendedForYouCard />}
-
-          {/* Day 3 Acknowledgment Card */}
+          {/* Day 3 Acknowledgment Card — conversion-critical (always show during trial) */}
           {!shouldHoldTrialContent && <Day3AcknowledgmentCard />}
+
+          {/* Paid-only: Lorie Welcome, Welcome Back, Recommended For You */}
+          {!isTrialActive && (
+            <>
+              <LorieWelcomeCard />
+              {shouldHoldTrialContent ? (
+                <Card className="mb-6 p-6 border-primary/20 bg-card/70">
+                  <div className="h-3 w-24 rounded-full bg-muted animate-pulse mb-3" />
+                  <div className="h-6 w-56 rounded-md bg-muted animate-pulse mb-2" />
+                  <div className="h-4 w-40 rounded-md bg-muted animate-pulse mb-4" />
+                  <div className="h-10 w-56 rounded-xl bg-muted animate-pulse" />
+                </Card>
+              ) : (
+                <WelcomeBackCard loading={resumeLoading} nextAction={nextAction} />
+              )}
+              {!shouldHoldTrialContent && <RecommendedForYouCard />}
+            </>
+          )}
 
           {/* Header */}
           {!isReturningTrialUser && (
@@ -226,7 +226,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          {/* ===== TRIAL USER: Focused guided experience ===== */}
+          {/* ===== TRIAL USER: Focused 5-card experience (conversion-optimized) ===== */}
           {isTrialActive && (
             <>
               {shouldHoldTrialContent ? (
@@ -238,46 +238,47 @@ export default function Home() {
                   <div className="h-10 w-full rounded-xl bg-muted animate-pulse" />
                 </Card>
               ) : (
+                /* 1. Day X of 7 progress bar */
                 <TrialJourneyBar loading={resumeLoading} step={trialStep} />
               )}
 
               {!shouldHoldTrialContent && (
                 <>
-                  {/* Oracle Preview Card */}
-                  <OraclePreviewCard />
-
-                  {/* Daily Featured Card */}
-                  <div className="mb-6 space-y-4">
+                  {/* 2. The ONE thing to do today */}
+                  <div className="mb-6">
                     <DailyFeaturedCard />
+                  </div>
+
+                  {/* 3. Daily Permission Slip */}
+                  <div className="mb-6">
                     <DailyPermissionSlipCard />
                   </div>
 
-                  {/* Daily Surprise Card */}
-                  <DailySurpriseCard />
+                  {/* 4. Visual Reset Map — proof of progress */}
+                  <div className="mb-6">
+                    <VisualResetMap />
+                  </div>
 
-                  {/* AI Proactive Check-in */}
-                  <AiCheckinCard />
-
-                  {/* Daily Shift Widget */}
-                  <DailyShiftWidget />
-
-                  {/* Reset Plan Widget */}
-                  <ResetPlanWidget />
-
-                  {/* Upgrade seed */}
-                  {trialDay >= 1 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.7 }}
-                      className="mt-6 text-center"
-                    >
-                      <p className="text-muted-foreground text-xs">
-                        Want to take this further? Your full reset is one step away.{" "}
-                        <Link to="/upgrade" className="text-primary underline">See options</Link>
-                      </p>
-                    </motion.div>
-                  )}
+                  {/* 5. Single soft upgrade CTA */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="mb-6"
+                  >
+                    <Link to="/upgrade">
+                      <Card className="p-6 bg-[#06060e] border-2 border-[#C9A84C]/40 hover:border-[#C9A84C]/70 transition-all cursor-pointer text-center">
+                        <p className="font-serif text-lg md:text-xl font-bold text-[#F9F6F0] mb-3">
+                          Your full reset is one step away.
+                        </p>
+                        <Button
+                          className="bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-semibold rounded-xl"
+                        >
+                          See what's waiting →
+                        </Button>
+                      </Card>
+                    </Link>
+                  </motion.div>
 
                   {/* Day 1 bottom guidance text */}
                   {trialDay <= 1 && (

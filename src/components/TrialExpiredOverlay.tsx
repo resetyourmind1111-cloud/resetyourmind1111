@@ -1,16 +1,69 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Lock, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+const REMIND_HOURS = 24;
 
 export function TrialExpiredOverlay() {
   const { trialExpired, isLoading: trialLoading } = useTrialStatus();
   const { effectiveTier, isLoading: subLoading } = useSubscription();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [snoozed, setSnoozed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!user || trialLoading || subLoading) return;
+    if (!trialExpired || effectiveTier !== "free") {
+      setSnoozed(false);
+      return;
+    }
+
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("upgrade_reminder_timestamp")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      const ts = (data as any)?.upgrade_reminder_timestamp;
+      if (!ts) {
+        setSnoozed(false);
+        return;
+      }
+      const elapsedMs = Date.now() - new Date(ts).getTime();
+      const remindMs = REMIND_HOURS * 60 * 60 * 1000;
+      if (elapsedMs >= remindMs) {
+        // Reset & show
+        await supabase
+          .from("profiles")
+          .update({ upgrade_reminder_timestamp: null } as any)
+          .eq("user_id", user.id);
+        setSnoozed(false);
+      } else {
+        setSnoozed(true);
+      }
+    })();
+  }, [user, trialExpired, effectiveTier, trialLoading, subLoading]);
 
   if (trialLoading || subLoading) return null;
   if (!trialExpired || effectiveTier !== "free") return null;
+  if (snoozed === null || snoozed) return null;
+
+  const handleRemind = async () => {
+    if (!user) return;
+    await supabase
+      .from("profiles")
+      .update({ upgrade_reminder_timestamp: new Date().toISOString() } as any)
+      .eq("user_id", user.id);
+    setSnoozed(true);
+    toast("We'll remind you tomorrow.");
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#06060e]/90 backdrop-blur-sm p-6 overflow-y-auto">
@@ -35,7 +88,7 @@ export function TrialExpiredOverlay() {
         {/* What they unlocked */}
         <div className="space-y-2 text-left">
           <p className="text-[#C9A84C] text-xs uppercase tracking-wider font-semibold">What you unlocked</p>
-          {["Worth Thermostat™", "Days 1–3", "3 Meditations", "2 Tools"].map((item) => (
+          {["Worth Thermostat™", "3 days of your reset journey", "3 Meditations", "2 Tools"].map((item) => (
             <div key={item} className="flex items-center gap-2">
               <Check className="w-3.5 h-3.5 text-[#C9A84C]" />
               <span className="text-[#F9F6F0]/70 text-sm">{item}</span>
@@ -59,15 +112,14 @@ export function TrialExpiredOverlay() {
           Continue My Reset →
         </Button>
 
-        <button
-          onClick={() => {
-            const overlay = document.getElementById("trial-expired-overlay");
-            if (overlay) overlay.style.display = "none";
-          }}
-          className="text-[#F9F6F0]/30 text-xs hover:text-[#F9F6F0]/50 transition-colors"
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRemind}
+          className="border-[#F9F6F0]/20 bg-transparent text-[#F9F6F0]/60 hover:bg-[#F9F6F0]/5 hover:text-[#F9F6F0]/80"
         >
-          Not right now
-        </button>
+          Remind me in 24 hours
+        </Button>
       </div>
     </div>
   );

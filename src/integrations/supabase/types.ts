@@ -1082,6 +1082,7 @@ export type Database = {
           trial_tool_2: string | null
           tried_before: Json | null
           updated_at: string
+          upgrade_reminder_timestamp: string | null
           user_id: string
           user_source: string | null
           welcome_banner_dismissed: boolean
@@ -1151,6 +1152,7 @@ export type Database = {
           trial_tool_2?: string | null
           tried_before?: Json | null
           updated_at?: string
+          upgrade_reminder_timestamp?: string | null
           user_id: string
           user_source?: string | null
           welcome_banner_dismissed?: boolean
@@ -1220,6 +1222,7 @@ export type Database = {
           trial_tool_2?: string | null
           tried_before?: Json | null
           updated_at?: string
+          upgrade_reminder_timestamp?: string | null
           user_id?: string
           user_source?: string | null
           welcome_banner_dismissed?: boolean
