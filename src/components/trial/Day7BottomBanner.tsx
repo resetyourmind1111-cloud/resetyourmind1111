@@ -14,7 +14,7 @@ export function Day7BottomBanner() {
         to="/upgrade"
         className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#06060e] font-bold text-base shadow-lg transition-colors"
       >
-        Make This Permanent
+        Start My Full Reset
         <ArrowRight className="w-5 h-5" />
       </Link>
     </div>

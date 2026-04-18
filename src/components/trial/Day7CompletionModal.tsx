@@ -105,8 +105,12 @@ export function Day7CompletionModal() {
             </p>
 
             <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#F9F6F0] leading-relaxed">
-              You showed up for 7 days.<br />Look what you did:
+              You did 7 days of seeing<br />yourself clearly.
             </h1>
+
+            <p className="font-serif text-xl md:text-2xl text-[#C9A84C] italic leading-relaxed">
+              The next 30 are where you become her.
+            </p>
 
             <div className="w-16 h-px bg-[#C9A84C]/30 mx-auto" />
 
@@ -140,23 +144,19 @@ export function Day7CompletionModal() {
 
             <div className="w-16 h-px bg-[#C9A84C]/30 mx-auto" />
 
-            <h2 className="font-serif text-xl md:text-2xl font-bold text-[#F9F6F0] leading-snug">
-              Don't let this be the best week you had and then go back.
-            </h2>
-
             <Button
               size="lg"
               onClick={handleUpgrade}
               className="w-full bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-bold text-base py-6 rounded-xl"
             >
-              Make This Permanent →
+              Start My Full Reset →
             </Button>
 
             <button
               onClick={handleDecideLater}
               className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline"
             >
-              I'll decide later
+              Remind me in 24 hours
             </button>
           </motion.div>
         </motion.div>

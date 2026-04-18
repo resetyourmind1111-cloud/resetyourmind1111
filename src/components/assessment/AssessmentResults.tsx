@@ -51,6 +51,8 @@ interface AssessmentResultsProps {
   thermostatType: ThermostatType;
   answers: Record<number, number>;
   onRetake?: () => void;
+  retakeType?: "initial" | "day7";
+  onSavedRedirect?: string;
 }
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -76,6 +78,8 @@ export function AssessmentResults({
   thermostatType,
   answers,
   onRetake,
+  retakeType = "initial",
+  onSavedRedirect,
 }: AssessmentResultsProps) {
   const [emailFormName, setEmailFormName] = useState("");
   const [emailFormEmail, setEmailFormEmail] = useState("");
@@ -105,7 +109,7 @@ export function AssessmentResults({
 
         const userName = (profile as any)?.full_name || "User";
 
-        await supabase.from("assessment_results").insert({
+        await (supabase as any).from("assessment_results").insert({
           user_id: user.id,
           first_name: userName,
           email: user.email || "",
@@ -114,13 +118,21 @@ export function AssessmentResults({
           percentage_score: percentage,
           answers: answers as any,
           category_scores: categoryScores as any,
+          retake_type: retakeType,
         });
 
         // Update profile with latest score
-        await supabase.from("profiles").update({
+        const profileUpdate: any = {
           last_thermostat_date: new Date().toISOString().split("T")[0],
-          worth_score_day1: totalScore,
-        } as any).eq("user_id", user.id);
+        };
+        if (retakeType === "initial") profileUpdate.worth_score_day1 = totalScore;
+        if (retakeType === "day7") profileUpdate.worth_score_day24 = totalScore;
+        await supabase.from("profiles").update(profileUpdate).eq("user_id", user.id);
+
+        // Redirect after save (e.g. Day 7 → comparison view)
+        if (onSavedRedirect) {
+          window.location.href = onSavedRedirect;
+        }
       } catch (err) {
         console.error("Failed to save assessment results:", err);
       }
