@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { TRAP_SLUGS } from "@/data/identityTrapData";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
 import { PatternShareCard } from "@/components/patterns/PatternShareCard";
 import { TrialBackButton } from "@/components/TrialBackButton";
@@ -12,13 +14,45 @@ export default function PatternResult() {
   const location = useLocation();
   const navigate = useNavigate();
   const { hasAccess } = useSubscription();
-  const { primary, secondary } = (location.state as { primary: string; secondary: string | null }) || {};
+  const { user } = useAuth();
+  const stateData = (location.state as { primary?: string; secondary?: string | null }) || {};
+  const [primary, setPrimary] = useState<string | null>(stateData.primary ?? null);
+  const [secondary, setSecondary] = useState<string | null>(stateData.secondary ?? null);
+  const [loading, setLoading] = useState(!stateData.primary);
   const [showAiChat, setShowAiChat] = useState(false);
 
-  if (!primary) {
-    navigate("/patterns");
-    return null;
+  // If no state was passed (deep link / refresh), pull the latest saved result.
+  useEffect(() => {
+    if (primary || !user) return;
+    let cancelled = false;
+    supabase
+      .from("identity_trap_results")
+      .select("primary_trap, secondary_trap")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (data && data.length > 0) {
+          setPrimary(data[0].primary_trap);
+          setSecondary(data[0].secondary_trap);
+        } else {
+          navigate("/patterns/quiz", { replace: true });
+        }
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [primary, user, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
+
+  if (!primary) return null;
 
   const slug = TRAP_SLUGS[primary];
 

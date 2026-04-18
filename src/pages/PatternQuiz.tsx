@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,8 +10,41 @@ import { TrialBackButton } from "@/components/TrialBackButton";
 export default function PatternQuiz() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isRetake = searchParams.get("retake") === "true";
+
+  const [checking, setChecking] = useState(true);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
+
+  // Guard: if a saved result already exists and they didn't ask to retake,
+  // route them to /patterns (which shows their saved pattern + progress).
+  useEffect(() => {
+    let cancelled = false;
+    const check = async () => {
+      if (!user || isRetake) {
+        setChecking(false);
+        return;
+      }
+      const { data } = await supabase
+        .from("identity_trap_results")
+        .select("primary_trap, secondary_trap")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (cancelled) return;
+      if (data && data.length > 0) {
+        navigate("/patterns/result", {
+          replace: true,
+          state: { primary: data[0].primary_trap, secondary: data[0].secondary_trap },
+        });
+        return;
+      }
+      setChecking(false);
+    };
+    check();
+    return () => { cancelled = true; };
+  }, [user, isRetake, navigate]);
 
   const question = TRAP_QUESTIONS[current];
   const progress = ((current) / TRAP_QUESTIONS.length) * 100;
@@ -23,7 +56,7 @@ export default function PatternQuiz() {
     if (current < TRAP_QUESTIONS.length - 1) {
       setCurrent(current + 1);
     } else {
-      // Score and save
+      // Score and save (upsert latest result for this user)
       const { primary, secondary } = scoreTrap(newAnswers);
 
       if (user) {
@@ -35,9 +68,17 @@ export default function PatternQuiz() {
         });
       }
 
-      navigate("/patterns/result", { state: { primary, secondary } });
+      navigate("/patterns/result", { replace: true, state: { primary, secondary } });
     }
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
