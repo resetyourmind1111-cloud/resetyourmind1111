@@ -52,11 +52,22 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Find target user by email
-    const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    const target = list.users.find(u => u.email?.toLowerCase() === email);
+    // Find target user by email — paginate through all pages, case-insensitive
+    let target: { id: string; email?: string } | undefined;
+    const perPage = 1000;
+    for (let page = 1; page <= 20; page++) {
+      const { data: list, error: listErr } = await admin.auth.admin.listUsers({ page, perPage });
+      if (listErr) {
+        console.error("listUsers error:", listErr);
+        break;
+      }
+      target = list.users.find(u => (u.email || "").toLowerCase().trim() === email);
+      if (target) break;
+      if (!list.users.length || list.users.length < perPage) break;
+    }
     if (!target) {
-      return new Response(JSON.stringify({ error: "User not found" }), {
+      console.error("User not found for email:", email);
+      return new Response(JSON.stringify({ error: `User not found for email: ${email}` }), {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
