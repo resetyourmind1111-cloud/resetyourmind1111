@@ -37,6 +37,12 @@ import { OraclePreviewCard } from "@/components/home/OraclePreviewCard";
 import { WelcomeBackCard } from "@/components/home/WelcomeBackCard";
 import { useTrialResume } from "@/hooks/useTrialResume";
 import { SkeletonCard } from "@/components/ui/brand-skeleton";
+import { useStreakActivity } from "@/hooks/useStreakActivity";
+import { StreakGraceBanner } from "@/components/home/StreakGraceBanner";
+import { StreakResetCard } from "@/components/home/StreakResetCard";
+import { StreakMilestoneOverlay } from "@/components/home/StreakMilestoneOverlay";
+import { Day6GiftCard } from "@/components/home/Day6GiftCard";
+import { RecommendedForYouCard } from "@/components/home/RecommendedForYouCard";
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
   { label: "I feel emotional", emoji: "💧", module: "Release" },
@@ -57,6 +63,14 @@ export default function Home() {
   const [lastModule, setLastModule] = useState<string | null>(null);
   const [tapping, setTapping] = useState<number | null>(null);
   const [showWelcomeFlow, setShowWelcomeFlow] = useState(false);
+  // Retention: streak grace day + reset detection
+  const {
+    streak: liveStreak,
+    graceActivated,
+    streakReset: streakWasReset,
+    dismissGrace,
+    dismissReset,
+  } = useStreakActivity();
 
   useEffect(() => {
     if (!isLoading && !user) {
