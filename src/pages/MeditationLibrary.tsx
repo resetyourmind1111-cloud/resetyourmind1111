@@ -160,7 +160,7 @@ export default function MeditationLibrary() {
         .from("meditations" as any)
         .select("*")
         .order("sort_order", { ascending: true });
-      return (data || []) as Meditation[];
+      return ((data || []) as unknown) as Meditation[];
     },
   });
 
