@@ -16,7 +16,9 @@ export function LorieWelcomeCard() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (!user || !isTrialActive || trialDay > 1) return;
+    // Show on Day 1 of trial OR for paid/post-trial users — until dismissed forever
+    if (!user) return;
+    if (isTrialActive && trialDay > 1) return;
 
     const check = async () => {
       const { data } = await supabase
@@ -51,9 +53,16 @@ export function LorieWelcomeCard() {
       animate={{ opacity: 1, y: 0 }}
       className="mb-6"
     >
-      <Card className="p-5 bg-[#2A1F3D] border-t-2 border-t-[#C9A84C] border-[#2A1F3D]">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-3">
+      <Card className="p-5 bg-[#2A1F3D] border-t-2 border-t-[#C9A84C] border-[#2A1F3D] lorie-welcome-pulse">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-2">
           A Message From Lorie
+        </p>
+
+        <p className="font-serif text-[#F9F6F0] text-base sm:text-lg leading-snug mb-1">
+          Lorie recorded this for you. Press play when you're ready.
+        </p>
+        <p className="text-[#F9F6F0]/50 text-xs mb-4">
+          2 min · Listen with headphones if you can.
         </p>
 
         <div className="mb-4">

@@ -188,10 +188,12 @@ export default function Home() {
           {/* Day 3 Acknowledgment Card — conversion-critical (always show during trial) */}
           {!shouldHoldTrialContent && <Day3AcknowledgmentCard />}
 
-          {/* Paid-only: Lorie Welcome, Welcome Back, Recommended For You */}
+          {/* Lorie's personal welcome — shows on Day 1 of trial AND for paid users until dismissed */}
+          <LorieWelcomeCard />
+
+          {/* Paid-only: Welcome Back, Recommended For You */}
           {!isTrialActive && (
             <>
-              <LorieWelcomeCard />
               {shouldHoldTrialContent ? (
                 <Card className="mb-6 p-6 border-primary/20 bg-card/70">
                   <div className="h-3 w-24 rounded-full bg-muted animate-pulse mb-3" />
