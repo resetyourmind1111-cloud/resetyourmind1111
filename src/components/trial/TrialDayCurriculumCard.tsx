@@ -70,7 +70,9 @@ export function TrialDayCurriculumCard() {
 
   if (!isTrialActive) return null;
 
-  const day = Math.min(Math.max(trialDay, 1), 7);
+  // useTrialStatus returns trialDay 0-indexed (Day 1 = 0, Day 7 = 6).
+  // Convert to 1-indexed display day, clamp to 1–7.
+  const day = Math.min(Math.max(trialDay + 1, 1), 7);
   const content = CURRICULUM[day];
   if (!content) return null;
 
