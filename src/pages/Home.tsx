@@ -226,7 +226,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          {/* ===== TRIAL USER: Focused guided experience ===== */}
+          {/* ===== TRIAL USER: Focused 5-card experience (conversion-optimized) ===== */}
           {isTrialActive && (
             <>
               {shouldHoldTrialContent ? (
@@ -238,46 +238,47 @@ export default function Home() {
                   <div className="h-10 w-full rounded-xl bg-muted animate-pulse" />
                 </Card>
               ) : (
+                /* 1. Day X of 7 progress bar */
                 <TrialJourneyBar loading={resumeLoading} step={trialStep} />
               )}
 
               {!shouldHoldTrialContent && (
                 <>
-                  {/* Oracle Preview Card */}
-                  <OraclePreviewCard />
-
-                  {/* Daily Featured Card */}
-                  <div className="mb-6 space-y-4">
+                  {/* 2. The ONE thing to do today */}
+                  <div className="mb-6">
                     <DailyFeaturedCard />
+                  </div>
+
+                  {/* 3. Daily Permission Slip */}
+                  <div className="mb-6">
                     <DailyPermissionSlipCard />
                   </div>
 
-                  {/* Daily Surprise Card */}
-                  <DailySurpriseCard />
+                  {/* 4. Visual Reset Map — proof of progress */}
+                  <div className="mb-6">
+                    <VisualResetMap />
+                  </div>
 
-                  {/* AI Proactive Check-in */}
-                  <AiCheckinCard />
-
-                  {/* Daily Shift Widget */}
-                  <DailyShiftWidget />
-
-                  {/* Reset Plan Widget */}
-                  <ResetPlanWidget />
-
-                  {/* Upgrade seed */}
-                  {trialDay >= 1 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.7 }}
-                      className="mt-6 text-center"
-                    >
-                      <p className="text-muted-foreground text-xs">
-                        Want to take this further? Your full reset is one step away.{" "}
-                        <Link to="/upgrade" className="text-primary underline">See options</Link>
-                      </p>
-                    </motion.div>
-                  )}
+                  {/* 5. Single soft upgrade CTA */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="mb-6"
+                  >
+                    <Link to="/upgrade">
+                      <Card className="p-6 bg-[#06060e] border-2 border-[#C9A84C]/40 hover:border-[#C9A84C]/70 transition-all cursor-pointer text-center">
+                        <p className="font-serif text-lg md:text-xl font-bold text-[#F9F6F0] mb-3">
+                          Your full reset is one step away.
+                        </p>
+                        <Button
+                          className="bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-semibold rounded-xl"
+                        >
+                          See what's waiting →
+                        </Button>
+                      </Card>
+                    </Link>
+                  </motion.div>
 
                   {/* Day 1 bottom guidance text */}
                   {trialDay <= 1 && (
