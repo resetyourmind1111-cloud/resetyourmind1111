@@ -104,6 +104,7 @@ export type Database = {
           first_name: string
           id: string
           percentage_score: number
+          retake_type: string
           thermostat_type: string
           total_score: number
           user_id: string | null
@@ -116,6 +117,7 @@ export type Database = {
           first_name: string
           id?: string
           percentage_score: number
+          retake_type?: string
           thermostat_type: string
           total_score: number
           user_id?: string | null
@@ -128,6 +130,7 @@ export type Database = {
           first_name?: string
           id?: string
           percentage_score?: number
+          retake_type?: string
           thermostat_type?: string
           total_score?: number
           user_id?: string | null
@@ -1031,7 +1034,9 @@ export type Database = {
           created_at: string
           current_streak: number | null
           day3_card_shown: boolean
+          day5_emotional_peak_completed: boolean
           day6_bonus_oracle_used: boolean
+          day6_cliffhanger_shown: boolean
           day6_gift_shown: boolean
           first_moment_complete: boolean
           first_moment_response: string | null
@@ -1101,7 +1106,9 @@ export type Database = {
           created_at?: string
           current_streak?: number | null
           day3_card_shown?: boolean
+          day5_emotional_peak_completed?: boolean
           day6_bonus_oracle_used?: boolean
+          day6_cliffhanger_shown?: boolean
           day6_gift_shown?: boolean
           first_moment_complete?: boolean
           first_moment_response?: string | null
@@ -1171,7 +1178,9 @@ export type Database = {
           created_at?: string
           current_streak?: number | null
           day3_card_shown?: boolean
+          day5_emotional_peak_completed?: boolean
           day6_bonus_oracle_used?: boolean
+          day6_cliffhanger_shown?: boolean
           day6_gift_shown?: boolean
           first_moment_complete?: boolean
           first_moment_response?: string | null
