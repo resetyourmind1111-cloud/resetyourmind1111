@@ -87,13 +87,13 @@ export default function HealingTools() {
       <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
       {shouldShowContent ? (
         <>
-          {/* Trial banner */}
+          {/* Trial banner — full toolkit unlocked during the 7-day preview */}
           <div className="mb-6 p-4 rounded-xl bg-[#3D1A6E]/20 border border-[#3D1A6E]/30">
             <p className="text-[#F9F6F0]/80 text-sm italic">
-              Your 2 preview tools are selected based on where you are right now.
+              All 21 healing tools are unlocked for your 7-day preview.
             </p>
             <p className="text-muted-foreground text-xs mt-1">
-              Upgrade to unlock the full toolkit.
+              Explore freely. Upgrade to keep them after Day 7.
             </p>
           </div>
           <Tabs defaultValue="tools" className="w-full">
