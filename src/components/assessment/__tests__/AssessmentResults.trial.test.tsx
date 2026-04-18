@@ -28,11 +28,8 @@ vi.mock("@/hooks/useTrialStatus", async () => {
   };
 });
 
-// Supabase: only the calls AssessmentResults makes during render.
-//   - profiles select (full_name) — for auto-save
-//   - profiles select (onboarding_reason, trial_tool_1, trial_tool_2) — for recs
-//   - assessment_results insert — auto-save
-//   - profiles update — last_thermostat_date / worth scores
+// Supabase: a flexible chainable mock that resolves to the trial profile row
+// for any select() chain — covers .eq().single(), .eq().limit(), etc.
 vi.mock("@/integrations/supabase/client", () => {
   const profileRow = {
     full_name: "Test User",
@@ -40,19 +37,45 @@ vi.mock("@/integrations/supabase/client", () => {
     trial_tool_1: "boundary-builder",
     trial_tool_2: "limiting-belief-rewriter",
   };
-  const single = vi.fn().mockResolvedValue({ data: profileRow, error: null });
-  const eq = vi.fn(() => ({ single }));
-  const select = vi.fn(() => ({ eq }));
-  const insert = vi.fn().mockResolvedValue({ data: null, error: null });
-  const updateEq = vi.fn().mockResolvedValue({ data: null, error: null });
-  const update = vi.fn(() => ({ eq: updateEq }));
+  const result = { data: profileRow, error: null };
+  const arrayResult = { data: [], error: null };
+
+  // Build a thenable chain: every method returns `chain`, and `chain` itself
+  // is awaitable (resolves to arrayResult). `.single()` resolves to a row.
+  const makeChain = (): any => {
+    const chain: any = {
+      select: () => chain,
+      insert: () => Promise.resolve(result),
+      update: () => chain,
+      upsert: () => Promise.resolve(result),
+      delete: () => chain,
+      eq: () => chain,
+      neq: () => chain,
+      in: () => chain,
+      order: () => chain,
+      limit: () => chain,
+      range: () => chain,
+      maybeSingle: () => Promise.resolve(result),
+      single: () => Promise.resolve(result),
+      then: (onFulfilled: any) => Promise.resolve(arrayResult).then(onFulfilled),
+    };
+    return chain;
+  };
+
   return {
     supabase: {
-      from: vi.fn(() => ({ select, insert, update })),
+      from: vi.fn(() => makeChain()),
       functions: { invoke: vi.fn().mockResolvedValue({ error: null }) },
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null } }) },
     },
   };
 });
+
+// Stub out PatternDiscoveryCard — it makes its own unrelated DB calls and
+// isn't part of the recommendation surface we're validating.
+vi.mock("@/components/patterns/PatternDiscoveryCard", () => ({
+  PatternDiscoveryCard: () => null,
+}));
 
 vi.mock("html2canvas", () => ({ default: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
