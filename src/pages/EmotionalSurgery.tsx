@@ -105,7 +105,6 @@ export default function EmotionalSurgery() {
   return (
     <AuthenticatedLayout title="Emotional Surgery™">
       <TrialBackButton fallbackPath="/home" label="Back to Home" className="mb-4" />
-      <TrialLockedContent isLocked={isTrialUser}>
       <div className="min-h-screen pt-24 pb-32 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
@@ -304,7 +303,6 @@ export default function EmotionalSurgery() {
           </motion.div>
         </div>
       </div>
-      </TrialLockedContent>
     </AuthenticatedLayout>
   );
 }
