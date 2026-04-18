@@ -12,6 +12,8 @@ import { PastDueBanner } from "@/components/PastDueBanner";
 import { TrialWelcomeFlow } from "@/components/trial/TrialWelcomeFlow";
 import { TrialWelcomeBanner } from "@/components/trial/TrialWelcomeBanner";
 import { DailyFeaturedCard } from "@/components/trial/DailyFeaturedCard";
+import { MirrorCard } from "@/components/trial/MirrorCard";
+import { LossFrameCard } from "@/components/trial/LossFrameCard";
 import { TrialDayCurriculumCard } from "@/components/trial/TrialDayCurriculumCard";
 import { DailyPermissionSlipCard } from "@/components/trial/DailyPermissionSlipCard";
 import { Day7BottomBanner } from "@/components/trial/Day7BottomBanner";
@@ -254,10 +256,16 @@ export default function Home() {
               {/* Day 6.5 cliffhanger — between Day 6 gift and Day 7 reveal */}
               {!shouldHoldTrialContent && <Day65CliffhangerCard />}
 
+              {/* Day 6 Loss Frame — after the cliffhanger, before tomorrow */}
+              {!shouldHoldTrialContent && <LossFrameCard />}
+
               {!shouldHoldTrialContent && (
                 <>
                   {/* 2. Day-specific themed curriculum card (Days 1–7) */}
                   <TrialDayCurriculumCard />
+
+                  {/* Day 4/5 Mirror Card — their own words back at them */}
+                  <MirrorCard />
 
                   {/* 3. Daily Permission Slip */}
                   <div className="mb-6">
