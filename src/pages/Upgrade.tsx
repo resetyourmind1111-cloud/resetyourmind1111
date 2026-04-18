@@ -177,7 +177,7 @@ export default function Upgrade() {
           </motion.p>
         </div>
 
-        <div className="max-w-3xl mx-auto px-4 grid md:grid-cols-2 gap-6 mb-12">
+        <div className="max-w-xl mx-auto px-4 mb-12">
           {/* Founding Member Card */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="relative rounded-2xl p-6 md:p-8 border-2 border-accent bg-secondary/20">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent text-accent-foreground">
@@ -203,23 +203,6 @@ export default function Upgrade() {
               {loadingTier === "FOUNDING" ? "Loading…" : "Lock In My Founding Rate"}
             </Button>
             <p className="text-[10px] text-muted-foreground text-center mt-2">111 spots total. {spotsRemaining} remaining.</p>
-          </motion.div>
-
-          {/* Lifetime Card */}
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="rounded-2xl p-6 md:p-8 border border-border/40 bg-card">
-            <div className="text-center mb-6">
-              <h3 className="font-serif text-2xl font-bold text-foreground">Lifetime Access</h3>
-              <div className="mt-2">
-                <span className="font-serif text-4xl font-bold text-foreground">$1,111</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">One-time. Never pay again. Full access forever.</p>
-            </div>
-            <p className="text-sm text-foreground/70 mb-6 leading-relaxed">
-              Everything in Founding Member — paid once, yours for life. No monthly commitment. No renewals. Ever.
-            </p>
-            <Button variant="outline" className="w-full border-accent text-accent hover:bg-accent/10 font-semibold rounded-xl" onClick={() => handleCheckout(FOUNDING_PRICE_ID, "LIFETIME")} disabled={!!loadingTier}>
-              {loadingTier === "LIFETIME" ? "Loading…" : "Get Lifetime Access"}
-            </Button>
           </motion.div>
         </div>
 
