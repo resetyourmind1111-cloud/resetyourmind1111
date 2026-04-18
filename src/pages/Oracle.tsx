@@ -43,6 +43,8 @@ const Oracle = () => {
   const [oraclePreviewPulls, setOraclePreviewPulls] = useState<number>(0);
   const [showTrialEntry, setShowTrialEntry] = useState(false);
   const [trialPullComplete, setTrialPullComplete] = useState(false);
+  // Day-6 surprise gift: one bonus pull on top of the trial cap.
+  const [day6BonusAvailable, setDay6BonusAvailable] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -50,19 +52,29 @@ const Oracle = () => {
     const fetchProfile = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('subscription_tier, oracle_preview_pulls_used')
+        .select('subscription_tier, oracle_preview_pulls_used, day6_gift_shown, day6_bonus_oracle_used')
         .eq('user_id', user.id)
         .maybeSingle();
       if (data?.subscription_tier) setSubscriptionTier(data.subscription_tier);
       if (data) setOraclePreviewPulls((data as any).oracle_preview_pulls_used || 0);
+      // Bonus pull is available if Day 6 gift has been opened but bonus not yet redeemed.
+      if (
+        data &&
+        (data as any).day6_gift_shown === true &&
+        (data as any).day6_bonus_oracle_used === false
+      ) {
+        setDay6BonusAvailable(true);
+      }
     };
     fetchProfile();
   }, [user, isLoading]);
 
   const isFreeTier = subscriptionTier === 'free';
   const isTrialOracleUser = isTrialActive && isFreeTier;
-  const pullsRemaining = Math.max(0, 3 - oraclePreviewPulls);
-  const pullsExhausted = oraclePreviewPulls >= 3;
+  // Effective cap = 3 + (1 if Day 6 bonus active)
+  const effectiveCap = 3 + (day6BonusAvailable ? 1 : 0);
+  const pullsRemaining = Math.max(0, effectiveCap - oraclePreviewPulls);
+  const pullsExhausted = oraclePreviewPulls >= effectiveCap;
 
   const handleSelectDeck = (deck: DeckName) => {
     setSelectedDeck(deck);
@@ -117,9 +129,14 @@ const Oracle = () => {
     // Increment pulls
     const newPulls = oraclePreviewPulls + 1;
     setOraclePreviewPulls(newPulls);
-    await supabase.from('profiles').update({
-      oracle_preview_pulls_used: newPulls,
-    } as any).eq('user_id', user.id);
+    const updates: Record<string, any> = { oracle_preview_pulls_used: newPulls };
+    // If this pull consumes the Day-6 bonus (i.e. the 4th pull), mark it used
+    // so we don't keep granting an extra pull forever.
+    if (day6BonusAvailable && newPulls > 3) {
+      updates.day6_bonus_oracle_used = true;
+      setDay6BonusAvailable(false);
+    }
+    await supabase.from('profiles').update(updates as any).eq('user_id', user.id);
   };
 
   const handleFlipCard = (index: number) => {

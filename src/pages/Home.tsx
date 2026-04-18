@@ -37,6 +37,12 @@ import { OraclePreviewCard } from "@/components/home/OraclePreviewCard";
 import { WelcomeBackCard } from "@/components/home/WelcomeBackCard";
 import { useTrialResume } from "@/hooks/useTrialResume";
 import { SkeletonCard } from "@/components/ui/brand-skeleton";
+import { useStreakActivity } from "@/hooks/useStreakActivity";
+import { StreakGraceBanner } from "@/components/home/StreakGraceBanner";
+import { StreakResetCard } from "@/components/home/StreakResetCard";
+import { StreakMilestoneOverlay } from "@/components/home/StreakMilestoneOverlay";
+import { Day6GiftCard } from "@/components/home/Day6GiftCard";
+import { RecommendedForYouCard } from "@/components/home/RecommendedForYouCard";
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
   { label: "I feel emotional", emoji: "💧", module: "Release" },
@@ -57,6 +63,14 @@ export default function Home() {
   const [lastModule, setLastModule] = useState<string | null>(null);
   const [tapping, setTapping] = useState<number | null>(null);
   const [showWelcomeFlow, setShowWelcomeFlow] = useState(false);
+  // Retention: streak grace day + reset detection
+  const {
+    streak: liveStreak,
+    graceActivated,
+    streakReset: streakWasReset,
+    dismissGrace,
+    dismissReset,
+  } = useStreakActivity();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -160,8 +174,15 @@ export default function Home() {
       <Day7CompletionModal />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+          {/* Retention: streak grace + reset notices (top of dashboard) */}
+          <StreakGraceBanner show={graceActivated} onDismiss={dismissGrace} />
+          <StreakResetCard show={streakWasReset} onDismiss={dismissReset} />
+
           {/* Lorie Welcome Card (Day 1 only) */}
           <LorieWelcomeCard />
+
+          {/* Day 6 Surprise Unlock (trial users only, fires once) */}
+          <Day6GiftCard trialDay={trialDay} isTrialActive={isTrialActive} />
 
           {/* Welcome Back Card (Day 2+ trial users) */}
           {shouldHoldTrialContent ? (
@@ -174,6 +195,9 @@ export default function Home() {
           ) : (
             <WelcomeBackCard loading={resumeLoading} nextAction={nextAction} />
           )}
+
+          {/* Personalized "For You Today" recommendation */}
+          {!shouldHoldTrialContent && <RecommendedForYouCard />}
 
           {/* Day 3 Acknowledgment Card */}
           {!shouldHoldTrialContent && <Day3AcknowledgmentCard />}
@@ -289,8 +313,7 @@ export default function Home() {
               {/* Oracle Preview Card */}
               <OraclePreviewCard />
 
-              {/* Long-term Milestone Cards (Day 60/90/180) */}
-              <LongTermMilestoneCard />
+              {/* Long-term milestone cards replaced by StreakMilestoneOverlay (mounted at root) */}
 
               {/* Monthly Reset Nudge */}
               <MonthlyResetNudge />
@@ -380,11 +403,11 @@ export default function Home() {
                 <JourneyCheckinCard />
               </motion.div>
 
-              {/* Streak Card */}
+              {/* Streak Card — uses live streak from grace-aware hook */}
               <StreakCard
-                streak={streak}
+                streak={liveStreak || streak}
                 totalSessions={totalSessions}
-                longestStreak={longestStreak}
+                longestStreak={Math.max(longestStreak, liveStreak || 0)}
                 lastModule={lastModule}
               />
 
@@ -398,6 +421,8 @@ export default function Home() {
       </main>
       <Day7BottomBanner />
       <BottomNav />
+      {/* Streak milestone full-screen celebration (7/14/21/30/60/90/111) */}
+      <StreakMilestoneOverlay streak={liveStreak || streak} />
     </div>
   );
 }

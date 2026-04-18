@@ -1031,6 +1031,8 @@ export type Database = {
           created_at: string
           current_streak: number | null
           day3_card_shown: boolean
+          day6_bonus_oracle_used: boolean
+          day6_gift_shown: boolean
           first_moment_complete: boolean
           first_moment_response: string | null
           first_visit_circle: boolean
@@ -1042,6 +1044,7 @@ export type Database = {
           journey_current_day: number | null
           journey_start_date: string | null
           last_30day_activity: string | null
+          last_active_date: string | null
           last_login: string | null
           last_thermostat_date: string | null
           longest_streak: number
@@ -1065,9 +1068,12 @@ export type Database = {
           share_milestones: boolean
           shown_day7_modal: boolean
           sound_effects_enabled: boolean
+          streak_grace_used_date: string | null
+          streak_milestones_shown: Json
           stripe_customer_id: string | null
           stuck_duration: string | null
           subscription_tier: string | null
+          today_recommendation_used_date: string | null
           total_points: number | null
           total_sessions: number
           trial_reflection_saved: boolean
@@ -1094,6 +1100,8 @@ export type Database = {
           created_at?: string
           current_streak?: number | null
           day3_card_shown?: boolean
+          day6_bonus_oracle_used?: boolean
+          day6_gift_shown?: boolean
           first_moment_complete?: boolean
           first_moment_response?: string | null
           first_visit_circle?: boolean
@@ -1105,6 +1113,7 @@ export type Database = {
           journey_current_day?: number | null
           journey_start_date?: string | null
           last_30day_activity?: string | null
+          last_active_date?: string | null
           last_login?: string | null
           last_thermostat_date?: string | null
           longest_streak?: number
@@ -1128,9 +1137,12 @@ export type Database = {
           share_milestones?: boolean
           shown_day7_modal?: boolean
           sound_effects_enabled?: boolean
+          streak_grace_used_date?: string | null
+          streak_milestones_shown?: Json
           stripe_customer_id?: string | null
           stuck_duration?: string | null
           subscription_tier?: string | null
+          today_recommendation_used_date?: string | null
           total_points?: number | null
           total_sessions?: number
           trial_reflection_saved?: boolean
@@ -1157,6 +1169,8 @@ export type Database = {
           created_at?: string
           current_streak?: number | null
           day3_card_shown?: boolean
+          day6_bonus_oracle_used?: boolean
+          day6_gift_shown?: boolean
           first_moment_complete?: boolean
           first_moment_response?: string | null
           first_visit_circle?: boolean
@@ -1168,6 +1182,7 @@ export type Database = {
           journey_current_day?: number | null
           journey_start_date?: string | null
           last_30day_activity?: string | null
+          last_active_date?: string | null
           last_login?: string | null
           last_thermostat_date?: string | null
           longest_streak?: number
@@ -1191,9 +1206,12 @@ export type Database = {
           share_milestones?: boolean
           shown_day7_modal?: boolean
           sound_effects_enabled?: boolean
+          streak_grace_used_date?: string | null
+          streak_milestones_shown?: Json
           stripe_customer_id?: string | null
           stuck_duration?: string | null
           subscription_tier?: string | null
+          today_recommendation_used_date?: string | null
           total_points?: number | null
           total_sessions?: number
           trial_reflection_saved?: boolean
