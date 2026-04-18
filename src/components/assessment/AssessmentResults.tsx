@@ -537,7 +537,7 @@ export function AssessmentResults({
             ))}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/auth?redirect=checkout&priceId=price_1TAUgeC1ibVojXJKMY9OXfeh&tier=RESET">
+            <Link to="/auth?redirect=checkout&priceId=price_1TNYPhC1ibVojXJK3CB5eX7T&tier=RESET">
               <Button variant="hero" size="lg" className="w-full">
                 Start Your Reset — $44/month
               </Button>

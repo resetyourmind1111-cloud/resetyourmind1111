@@ -31,8 +31,8 @@ const TIERS = [
     ],
     icon: Sparkles,
     badge: null,
-    monthlyPriceId: "price_1TAUgeC1ibVojXJKMY9OXfeh",
-    annualPriceId: "price_1TAUl6C1ibVojXJKGipOvp36",
+    monthlyPriceId: "price_1TNYPhC1ibVojXJK3CB5eX7T",
+    annualPriceId: "price_1TNYQoC1ibVojXJK9f7YhF3n",
     style: "border-border/40 bg-card",
     cta: "Start My Reset",
   },
@@ -56,8 +56,8 @@ const TIERS = [
     ],
     icon: Star,
     badge: "MOST POPULAR",
-    monthlyPriceId: "price_1TAUqnC1ibVojXJKtXzr7iOc",
-    annualPriceId: "price_1TAUs8C1ibVojXJKk9KaIU2z",
+    monthlyPriceId: "price_1TNYTnC1ibVojXJKpUwoZSLk",
+    annualPriceId: "price_1TNYVPC1ibVojXJKlJKQkFZX",
     style: "ring-2 ring-accent border-accent bg-card",
     cta: "Expand My Reset",
   },
@@ -81,14 +81,14 @@ const TIERS = [
     ],
     icon: Crown,
     badge: "FULL ACCESS",
-    monthlyPriceId: "price_1TAUuwC1ibVojXJKW8fcj8Hc",
-    annualPriceId: "price_1TAUwUC1ibVojXJKqMHhdeJE",
+    monthlyPriceId: "price_1TNYdXC1ibVojXJKPkHDKXgL",
+    annualPriceId: "price_1TNYeNC1ibVojXJKlvFsGuhA",
     style: "border-secondary bg-secondary/20",
     cta: "Embody My Reset",
   },
 ];
 
-const FOUNDING_PRICE_ID = "price_1TAUzKC1ibVojXJKoehSnlnq";
+const FOUNDING_PRICE_ID = "price_1TNYgqC1ibVojXJKdUQ9Wa7W";
 const FOUNDING_FEATURES = [
   "Full 30-Day Reset Experience",
   "All 5 Identity Trap Modules + AI Support",

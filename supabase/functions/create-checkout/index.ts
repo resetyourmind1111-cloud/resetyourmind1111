@@ -8,13 +8,13 @@ const corsHeaders = {
 };
 
 const PRICE_TIER_MAP: Record<string, string> = {
-  "price_1TAUgeC1ibVojXJKMY9OXfeh": "RESET",
-  "price_1TAUl6C1ibVojXJKGipOvp36": "RESET",
-  "price_1TAUqnC1ibVojXJKtXzr7iOc": "EXPAND",
-  "price_1TAUs8C1ibVojXJKk9KaIU2z": "EXPAND",
-  "price_1TAUuwC1ibVojXJKW8fcj8Hc": "EMBODY",
-  "price_1TAUwUC1ibVojXJKqMHhdeJE": "EMBODY",
-  "price_1TAUzKC1ibVojXJKoehSnlnq": "FOUNDING",
+  "price_1TNYPhC1ibVojXJK3CB5eX7T": "RESET",
+  "price_1TNYQoC1ibVojXJK9f7YhF3n": "RESET",
+  "price_1TNYTnC1ibVojXJKpUwoZSLk": "EXPAND",
+  "price_1TNYVPC1ibVojXJKlJKQkFZX": "EXPAND",
+  "price_1TNYdXC1ibVojXJKPkHDKXgL": "EMBODY",
+  "price_1TNYeNC1ibVojXJKlvFsGuhA": "EMBODY",
+  "price_1TNYgqC1ibVojXJKdUQ9Wa7W": "FOUNDING",
 };
 
 Deno.serve(async (req) => {
