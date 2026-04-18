@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { healingTools } from "@/data/healingToolsData";
 import HealingToolsDashboard from "@/components/healing-tools/HealingToolsDashboard";
-import { useTrialStatus, getTrialAllowedTools } from "@/hooks/useTrialStatus";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { TrialBackButton } from "@/components/TrialBackButton";
 
 export default function HealingTools() {
