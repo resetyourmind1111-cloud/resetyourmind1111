@@ -78,10 +78,24 @@ export default function EmotionalSurgeryModule() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { effectiveTier } = useSubscription();
+  const { isTrialActive, trialExpired } = useTrialStatus();
+  const { recommendedTrack } = useRecommendedTrack();
+  const isTrialUser = isTrialActive || trialExpired;
   const { toast } = useToast();
 
   const moduleInfo = slug ? MODULE_SLUG_MAP[slug] : null;
   const requiredTier = slug ? MODULE_TIER_REQUIRED[slug] : "reset";
+
+  // For trial users:
+  //   - Phase 1 (Recognition) is unlocked across all tracks (Foundation).
+  //   - Phases 2–5 are unlocked only on the user's recommended track.
+  // We treat "unlocked for trial" as bypassing the LockedContent paywall.
+  const phaseNumber = moduleInfo?.lessonNumber ?? 0;
+  const trialBypassPaywall =
+    isTrialUser &&
+    (phaseNumber === 1 || (recommendedTrack !== null && phaseNumber >= 2));
+  // When tier already grants access, just use it. Otherwise, trial bypass.
+  const effectiveTierForGate = trialBypassPaywall ? "embody" : effectiveTier;
 
   const [completions, setCompletions] = useState<Record<string, LessonCompletion>>({});
   const [selectedTrackLesson, setSelectedTrackLesson] = useState<TrackLesson | null>(null);
