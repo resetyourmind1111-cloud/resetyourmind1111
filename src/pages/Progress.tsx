@@ -1,13 +1,15 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Flame, Check, BookOpen, ChevronRight, Sparkles, TrendingUp } from "lucide-react";
+import { Flame, Check, BookOpen, ChevronRight, Sparkles, TrendingUp, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { EmptySlate } from "@/components/ui/empty-slate";
+import { SkeletonCardList } from "@/components/ui/brand-skeleton";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -46,7 +48,7 @@ export default function Progress() {
   const { user } = useAuth();
 
   /* ---- Profile (streak) ---- */
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       const { data } = await supabase.from("profiles").select("current_streak").eq("user_id", user!.id).single();
@@ -177,6 +179,12 @@ export default function Progress() {
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-2">Your Progress</h1>
             <p className="text-muted-foreground text-sm italic">You are not starting over. You are evolving.</p>
           </motion.div>
+
+          {profileLoading && (
+            <div className="mb-8" aria-busy="true" aria-label="Loading your progress">
+              <SkeletonCardList count={3} />
+            </div>
+          )}
 
           {/* SECTION 1 — Current Phase Card */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-8">

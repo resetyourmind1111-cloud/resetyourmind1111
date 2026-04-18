@@ -36,6 +36,7 @@ import { TransformationCard } from "@/components/home/TransformationCard";
 import { OraclePreviewCard } from "@/components/home/OraclePreviewCard";
 import { WelcomeBackCard } from "@/components/home/WelcomeBackCard";
 import { useTrialResume } from "@/hooks/useTrialResume";
+import { SkeletonCard } from "@/components/ui/brand-skeleton";
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
   { label: "I feel emotional", emoji: "💧", module: "Release" },
@@ -122,8 +123,18 @@ export default function Home() {
 
   if (isLoading || trialLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="pt-20 md:pt-24 pb-24 md:pb-16">
+          <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+            <div className="space-y-4" aria-busy="true" aria-label="Loading your dashboard">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+          </div>
+        </main>
+        <BottomNav />
       </div>
     );
   }
