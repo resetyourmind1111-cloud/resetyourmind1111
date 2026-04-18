@@ -87,10 +87,6 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
     }
   }, [screen]);
 
-  const openMindist30 = () => {
-    window.open(MINDIST_30DAY_URL, "_blank", "noopener,noreferrer");
-    setMindistOpened(true);
-  };
 
   const handleShare = async () => {
     if (navigator.share) {
