@@ -154,6 +154,26 @@ export default function PermissionSlips() {
         {/* ===== DAILY SLIP ===== */}
         <TabsContent value="daily">
           <div className="max-w-xl mx-auto">
+            {showBonusBanner && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 rounded-xl border-2 border-[#C9A84C] bg-card p-5 text-center shadow-[0_0_30px_rgba(201,168,76,0.15)]"
+              >
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Gift className="w-4 h-4 text-[#C9A84C]" />
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold">
+                    Day 6 Bonus
+                  </p>
+                </div>
+                <h3 className="font-serif text-lg text-foreground mb-1">
+                  Your bonus Permission Slip.
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Drawn fresh — just for showing up.
+                </p>
+              </motion.div>
+            )}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -161,10 +181,12 @@ export default function PermissionSlips() {
             >
               <Sparkles className="w-10 h-10 text-accent mx-auto mb-4" />
               <h2 className="font-serif text-2xl font-bold text-foreground mb-2">
-                Today's Permission Slip
+                {showBonusBanner ? "Your Bonus Slip" : "Today's Permission Slip"}
               </h2>
               <p className="text-muted-foreground text-sm">
-                Your daily message of empowerment
+                {showBonusBanner
+                  ? "Accept it. It's yours."
+                  : "Your daily message of empowerment"}
               </p>
             </motion.div>
             <FeaturedSlipCard
