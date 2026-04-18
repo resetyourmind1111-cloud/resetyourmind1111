@@ -128,7 +128,44 @@ export function AssessmentResults({
   const { isTrialActive } = useTrialStatus();
   // Filter recommendations: trial users see only unlocked content
   const showTrialMode = !!user && isTrialActive;
-  const visibleSteps = showTrialMode ? TRIAL_UNLOCKED_STEPS : thermostatType.nextSteps;
+
+  // Pull the user's onboarding_reason + assigned trial tools so recommendations
+  // route to surfaces they can actually open (no lock screens during trial).
+  const [trialProfile, setTrialProfile] = useState<{
+    onboarding_reason: string | null;
+    trial_tool_1: string | null;
+    trial_tool_2: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!user || !showTrialMode) return;
+    let cancelled = false;
+    supabase
+      .from("profiles")
+      .select("onboarding_reason, trial_tool_1, trial_tool_2")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        setTrialProfile({
+          onboarding_reason: (data as any).onboarding_reason ?? null,
+          trial_tool_1: (data as any).trial_tool_1 ?? null,
+          trial_tool_2: (data as any).trial_tool_2 ?? null,
+        });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user, showTrialMode]);
+
+  const visibleSteps = showTrialMode
+    ? buildTrialNextSteps(
+        categoryScores,
+        trialProfile?.onboarding_reason ?? null,
+        trialProfile?.trial_tool_1 ?? null,
+        trialProfile?.trial_tool_2 ?? null,
+      )
+    : thermostatType.nextSteps;
   const lockedPreviewSteps = showTrialMode ? thermostatType.nextSteps : [];
 
   // Auto-save assessment results for logged-in users
