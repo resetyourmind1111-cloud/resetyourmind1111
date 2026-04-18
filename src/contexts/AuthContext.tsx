@@ -64,7 +64,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Clear local session immediately, then call Supabase. Even if the network
+    // call fails (stale token, offline), the user is signed out locally.
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn("signOut: server call failed, clearing locally", e);
+    }
+    setUser(null);
+    setSession(null);
+    // Hard redirect so all in-memory app state is wiped (subscriptions, trial status, etc.)
+    window.location.href = "/auth";
   };
 
   const updatePassword = async (newPassword: string) => {
