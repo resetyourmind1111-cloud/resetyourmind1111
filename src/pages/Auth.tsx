@@ -187,6 +187,13 @@ export default function Auth() {
             setFormError({ message: error.message });
           }
         } else {
+          // Fire-and-forget: enqueue the 7-day trial email sequence.
+          // Wait briefly for session to attach so the function call carries auth.
+          setTimeout(() => {
+            supabase.functions.invoke("enqueue-trial-emails").catch((err) => {
+              console.warn("enqueue-trial-emails failed (non-blocking):", err);
+            });
+          }, 1500);
           setShowTransition(true);
         }
       } finally {
