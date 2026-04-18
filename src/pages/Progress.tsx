@@ -180,15 +180,10 @@ export default function Progress() {
             <p className="text-muted-foreground text-sm italic">You are not starting over. You are evolving.</p>
           </motion.div>
 
-          {profileLoading ? (
-            <SkeletonCardList count={3} />
-          ) : (
-          <>
-          </>
-          )}
-
-          {!profileLoading && (
-          <></>
+          {profileLoading && (
+            <div className="mb-8" aria-busy="true" aria-label="Loading your progress">
+              <SkeletonCardList count={3} />
+            </div>
           )}
 
           {/* SECTION 1 — Current Phase Card */}
