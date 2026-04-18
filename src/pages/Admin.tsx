@@ -26,7 +26,7 @@ export default function Admin() {
   const [foundingMode, setFoundingMode] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingValue, setPendingValue] = useState(false);
-  const [stats, setStats] = useState({ total: 0, active: 0, trial: 0, founding: 0, lifetime: 0, spotsTaken: 0 });
+  const [stats, setStats] = useState({ total: 0, active: 0, trial: 0, founding: 0, spotsTaken: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,7 +62,6 @@ export default function Admin() {
         active: activeRes.count ?? 0,
         trial: trialCount ?? 0,
         founding: foundingRes.count ?? 0,
-        lifetime: 0,
         spotsTaken: foundingRes.count ?? 0,
       });
 
