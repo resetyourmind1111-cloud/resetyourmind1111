@@ -1056,7 +1056,10 @@ export type Database = {
           longterm_cards_shown: Json
           lorie_30day_shown: boolean
           lorie_welcome_shown: boolean
+          loss_frame_shown: boolean | null
           milestone_cards_shown: Json
+          mirror_card_dismissed: boolean | null
+          mirror_card_shown: boolean | null
           monthly_ceremonies_completed: Json
           notification_time: string | null
           notifications_enabled: boolean
@@ -1128,7 +1131,10 @@ export type Database = {
           longterm_cards_shown?: Json
           lorie_30day_shown?: boolean
           lorie_welcome_shown?: boolean
+          loss_frame_shown?: boolean | null
           milestone_cards_shown?: Json
+          mirror_card_dismissed?: boolean | null
+          mirror_card_shown?: boolean | null
           monthly_ceremonies_completed?: Json
           notification_time?: string | null
           notifications_enabled?: boolean
@@ -1200,7 +1206,10 @@ export type Database = {
           longterm_cards_shown?: Json
           lorie_30day_shown?: boolean
           lorie_welcome_shown?: boolean
+          loss_frame_shown?: boolean | null
           milestone_cards_shown?: Json
+          mirror_card_dismissed?: boolean | null
+          mirror_card_shown?: boolean | null
           monthly_ceremonies_completed?: Json
           notification_time?: string | null
           notifications_enabled?: boolean
