@@ -27,17 +27,52 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { useTrialStatus, TRIAL_TOOL_MAP, TRIAL_TOOL_NAMES } from "@/hooks/useTrialStatus";
 import { z } from "zod";
 
-// Steps that are actually unlocked during the 7-day free trial
-const TRIAL_UNLOCKED_STEPS: { text: string; link: string }[] = [
-  { text: "Begin your first guided meditation (3 unlocked in trial)", link: "/meditations" },
-  { text: "Open your personalized healing tools (2 matched to your focus)", link: "/healing-tools" },
-  { text: "Pull a single Oracle card for today's guidance (3 pulls in trial)", link: "/oracle" },
-  { text: "Start Days 1–3 of the 30-Day Experience", link: "/30-day-experience" },
-  { text: "Discover your Identity Pattern with the quick quiz", link: "/patterns" },
+// The 3 meditations actually unlocked during the 7-day trial (tier_required = 'trial')
+// All three live in /meditations → Mind Library and are playable without upgrade.
+const TRIAL_MEDITATIONS: { title: string; tagline: string }[] = [
+  { title: "Permission Granted — Foundation Practice", tagline: "Set the tone for your reset" },
+  { title: "Morning Permission — Daily Morning Practice", tagline: "Begin the day in your power" },
+  { title: "Evening Release — Daily Evening Practice", tagline: "Let the day go before you rest" },
 ];
+
+// Build the trial-safe "next steps" using only unlocked surfaces.
+// - Meditations → /meditations (one of the 3 trial titles, chosen by category focus)
+// - Tools → user's actual trial_tool_1 / trial_tool_2 (mapped from onboarding_reason)
+// - Oracle → /oracle (free daily pull only — no specific deck/spread)
+// - 30-Day → only Days 1–3 are open in trial
+// - Patterns quiz is free
+function buildTrialNextSteps(
+  categoryScores: Record<string, number>,
+  onboardingReason: string | null,
+  trialTool1: string | null,
+  trialTool2: string | null,
+): { text: string; link: string }[] {
+  // Pick the meditation that best matches their lowest-scoring category, but always
+  // fall back to one of the 3 trial-unlocked titles — never a locked one.
+  const lowest = Object.entries(categoryScores).sort((a, b) => a[1] - b[1])[0]?.[0];
+  let med = TRIAL_MEDITATIONS[0]; // Foundation Practice as default
+  if (lowest === "love" || lowest === "boundaries") med = TRIAL_MEDITATIONS[2]; // Evening Release
+  else if (lowest === "action" || lowest === "career") med = TRIAL_MEDITATIONS[1]; // Morning Permission
+
+  // Resolve the user's two unlocked tools (fall back to reason mapping, then default)
+  const fallback = TRIAL_TOOL_MAP[onboardingReason || "stuck"] || TRIAL_TOOL_MAP["stuck"];
+  const t1 = trialTool1 || fallback[0];
+  const t2 = trialTool2 || fallback[1];
+  const t1Name = TRIAL_TOOL_NAMES[t1] || "Your Reset Tool";
+  const t2Name = TRIAL_TOOL_NAMES[t2] || "Your Reset Tool";
+
+  return [
+    { text: `Listen: "${med.title}" — ${med.tagline}`, link: "/meditations" },
+    { text: `Open your first reset tool: ${t1Name}`, link: "/healing-tools" },
+    { text: `Open your second reset tool: ${t2Name}`, link: "/healing-tools" },
+    { text: "Pull your daily Oracle card for today's guidance", link: "/oracle" },
+    { text: "Start Day 1 of the 30-Day Experience", link: "/30-day-experience" },
+    { text: "Discover your Identity Pattern with the quick quiz", link: "/patterns" },
+  ];
+}
 
 const emailSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
@@ -93,7 +128,44 @@ export function AssessmentResults({
   const { isTrialActive } = useTrialStatus();
   // Filter recommendations: trial users see only unlocked content
   const showTrialMode = !!user && isTrialActive;
-  const visibleSteps = showTrialMode ? TRIAL_UNLOCKED_STEPS : thermostatType.nextSteps;
+
+  // Pull the user's onboarding_reason + assigned trial tools so recommendations
+  // route to surfaces they can actually open (no lock screens during trial).
+  const [trialProfile, setTrialProfile] = useState<{
+    onboarding_reason: string | null;
+    trial_tool_1: string | null;
+    trial_tool_2: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!user || !showTrialMode) return;
+    let cancelled = false;
+    supabase
+      .from("profiles")
+      .select("onboarding_reason, trial_tool_1, trial_tool_2")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        setTrialProfile({
+          onboarding_reason: (data as any).onboarding_reason ?? null,
+          trial_tool_1: (data as any).trial_tool_1 ?? null,
+          trial_tool_2: (data as any).trial_tool_2 ?? null,
+        });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user, showTrialMode]);
+
+  const visibleSteps = showTrialMode
+    ? buildTrialNextSteps(
+        categoryScores,
+        trialProfile?.onboarding_reason ?? null,
+        trialProfile?.trial_tool_1 ?? null,
+        trialProfile?.trial_tool_2 ?? null,
+      )
+    : thermostatType.nextSteps;
   const lockedPreviewSteps = showTrialMode ? thermostatType.nextSteps : [];
 
   // Auto-save assessment results for logged-in users
