@@ -167,7 +167,11 @@ export default function EmotionalSurgery() {
               const completed = phaseCompletions[mod.phase] || 0;
               const progress = Math.round((completed / totalTracks) * 100);
               const required = MODULE_TIER_REQUIRED[mod.phase];
-              const unlocked = hasTierAccess(effectiveTier, required);
+              const tierUnlocked = hasTierAccess(effectiveTier, required);
+              // Trial users get Phase 1 (Foundation) unlocked. The deep
+              // module screen further restricts to recommended track only.
+              const trialUnlocked = isTrialUser && mod.phase === 1;
+              const unlocked = tierUnlocked || trialUnlocked;
               const isActive = mod.phase === activePhase;
 
               return (
