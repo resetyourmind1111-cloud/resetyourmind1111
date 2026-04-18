@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useHaptic } from "@/hooks/useHaptic";
 
 interface CelebrationOverlayProps {
   message: string;
@@ -9,17 +10,19 @@ interface CelebrationOverlayProps {
 
 export function CelebrationOverlay({ message, show, onDone }: CelebrationOverlayProps) {
   const [visible, setVisible] = useState(show);
+  const { vibrate } = useHaptic();
 
   useEffect(() => {
     if (show) {
       setVisible(true);
+      vibrate("success");
       const timer = setTimeout(() => {
         setVisible(false);
         onDone?.();
       }, 2500);
       return () => clearTimeout(timer);
     }
-  }, [show, onDone]);
+  }, [show, onDone, vibrate]);
 
   return (
     <AnimatePresence>
