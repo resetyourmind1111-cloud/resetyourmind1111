@@ -15,6 +15,11 @@ import { emotionalSurgeryTracks, Lesson } from "@/data/emotionalSurgeryData";
 import { useToast } from "@/hooks/use-toast";
 import { moduleScreens } from "@/data/emotionalSurgeryModules";
 import ModuleScreen from "@/components/emotional-surgery/ModuleScreen";
+import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
+
+const QUIET_PHASE_AUDIO_URL =
+  "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Modules/The%20Quiet%20Phase%204f0i7mmu3pviIoFd26Uv.mp3";
+const QUIET_PHASE_AUDIO_TITLE = "The Quiet Phase™ — Integration Meditation";
 
 const MODULE_SLUG_MAP: Record<string, { lessonNumber: number; title: string }> = {
   recognition: { lessonNumber: 1, title: "Recognition" },
