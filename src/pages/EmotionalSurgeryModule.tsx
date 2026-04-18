@@ -213,11 +213,20 @@ export default function EmotionalSurgeryModule() {
 
   const completedCount = trackLessons.filter((tl) => completions[completionKey(tl.trackName)]?.completed_at).length;
 
+  // Filter the visible tracks for trial users:
+  //  - Phase 1 (Foundation): show all 4 tracks.
+  //  - Phases 2–5: show ONLY the user's recommended track.
+  const visibleTrackLessons = isTrialUser
+    ? trackLessons.filter((tl) =>
+        isTrialPhaseUnlocked(moduleInfo.lessonNumber, tl.trackName, recommendedTrack),
+      )
+    : trackLessons;
+
   return (
     <AuthenticatedLayout title={`${moduleInfo.title} — Emotional Surgery™`}>
       <div className="min-h-screen pt-24 pb-32 px-4">
         <div className="max-w-3xl mx-auto">
-          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTier}>
+          <LockedContent requiredTier={requiredTier as any} currentTier={effectiveTierForGate}>
             <AnimatePresence mode="wait">
               {selectedTrackLesson ? (
                 /* Lesson Detail */
