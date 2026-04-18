@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ResetPlanCards } from "@/components/onboarding/ResetPlanCards";
-import { MomentOneScreen } from "@/components/trial/MomentOneScreen";
 
 const TOTAL_STEPS = 8; // screens 1–8 have dots (name through notification)
 
@@ -105,7 +104,6 @@ export function PersonalizedOnboarding() {
   const [notifHour, setNotifHour] = useState(8);
   const [notifMinute, setNotifMinute] = useState(0);
   const [notifEnabled, setNotifEnabled] = useState(true);
-  const [showMomentOne, setShowMomentOne] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -188,12 +186,8 @@ export function PersonalizedOnboarding() {
         notifications_enabled: notifEnabled,
       } as any)
       .eq("user_id", user.id);
-    // Show Moment One screen
-    setShowMomentOne(true);
-  };
-
-  const handleMomentOneComplete = () => {
-    setShowMomentOne(false);
+    // Route directly to /home — the LorieWelcomeCard there will deliver the
+    // ceremonial Day 1 experience (Lorie message → Permission Slip → Assessment).
     navigate("/home");
   };
 
@@ -207,10 +201,6 @@ export function PersonalizedOnboarding() {
     center: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -40 },
   };
-
-  if (showMomentOne) {
-    return <MomentOneScreen onComplete={handleMomentOneComplete} />;
-  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
