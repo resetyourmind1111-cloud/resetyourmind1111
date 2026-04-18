@@ -25,6 +25,7 @@ import { TrialJourneyBar } from "@/components/trial/TrialJourneyBar";
 import { Day7CompletionModal } from "@/components/trial/Day7CompletionModal";
 import { Day3AcknowledgmentCard } from "@/components/trial/Day3AcknowledgmentCard";
 import { LorieWelcomeCard } from "@/components/trial/LorieWelcomeCard";
+import { TrialAnthemCard } from "@/components/trial/TrialAnthemCard";
 import { DailyShiftWidget } from "@/components/home/DailyShiftWidget";
 import { LongTermMilestoneCard } from "@/components/home/LongTermMilestoneCard";
 import { MonthlyThermostatNudge } from "@/components/home/MonthlyThermostatNudge";
@@ -253,6 +254,9 @@ export default function Home() {
                   <div className="mb-6">
                     <DailyPermissionSlipCard />
                   </div>
+
+                  {/* 3b. Reset Anthem — replayable any day during trial */}
+                  <TrialAnthemCard />
 
                   {/* 4. Visual Reset Map — proof of progress */}
                   <div className="mb-6">
