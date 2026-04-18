@@ -313,8 +313,7 @@ export default function Home() {
               {/* Oracle Preview Card */}
               <OraclePreviewCard />
 
-              {/* Long-term Milestone Cards (Day 60/90/180) */}
-              <LongTermMilestoneCard />
+              {/* Long-term milestone cards replaced by StreakMilestoneOverlay (mounted at root) */}
 
               {/* Monthly Reset Nudge */}
               <MonthlyResetNudge />
@@ -404,11 +403,13 @@ export default function Home() {
                 <JourneyCheckinCard />
               </motion.div>
 
-              {/* Streak Card */}
+              {/* Streak Card — uses live streak from grace-aware hook */}
               <StreakCard
-                streak={streak}
+                streak={liveStreak || streak}
                 totalSessions={totalSessions}
-                longestStreak={longestStreak}
+                longestStreak={Math.max(longestStreak, liveStreak || 0)}
+                lastModule={lastModule}
+              />
                 lastModule={lastModule}
               />
 
@@ -422,6 +423,8 @@ export default function Home() {
       </main>
       <Day7BottomBanner />
       <BottomNav />
+      {/* Streak milestone full-screen celebration (7/14/21/30/60/90/111) */}
+      <StreakMilestoneOverlay streak={liveStreak || streak} />
     </div>
   );
 }
