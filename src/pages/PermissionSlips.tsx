@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Check, Sparkles, Plus, Send } from "lucide-react";
+import { Check, Sparkles, Plus, Send, Gift } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,11 +31,32 @@ interface AcceptedSlip {
 export default function PermissionSlips() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<string>("daily");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isBonusDraw = searchParams.get("bonus") === "1";
+  const [activeTab, setActiveTab] = useState<string>(isBonusDraw ? "daily" : "daily");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [customText, setCustomText] = useState("");
+  const [showBonusBanner, setShowBonusBanner] = useState(isBonusDraw);
 
-  const dailySlip = useMemo(() => getDailySlip(), []);
+  // Pick a fresh random slip when arriving via the Day-6 bonus chain;
+  // otherwise show the deterministic daily slip.
+  const dailySlip = useMemo(() => {
+    if (isBonusDraw) {
+      const i = Math.floor(Math.random() * allPermissionSlips.length);
+      return allPermissionSlips[i];
+    }
+    return getDailySlip();
+  }, [isBonusDraw]);
+
+  // Strip the ?bonus=1 param after mount so a refresh doesn't keep re-rolling.
+  useEffect(() => {
+    if (isBonusDraw) {
+      const next = new URLSearchParams(searchParams);
+      next.delete("bonus");
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { data: acceptedSlips = [] } = useQuery({
     queryKey: ["accepted-slips", user?.id],
