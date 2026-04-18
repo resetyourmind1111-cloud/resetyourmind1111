@@ -55,6 +55,7 @@ export default function EmotionalSurgery() {
   const { effectiveTier, isLoading: tierLoading } = useSubscription();
   const { isTrialActive, trialExpired } = useTrialStatus();
   const isTrialUser = isTrialActive || trialExpired;
+  const { recommendedTrack } = useRecommendedTrack();
   const navigate = useNavigate();
 
   // Track completions per lesson_number across all tracks (4 tracks total)
@@ -90,7 +91,11 @@ export default function EmotionalSurgery() {
 
   const handleModuleClick = (mod: ModuleInfo) => {
     const required = MODULE_TIER_REQUIRED[mod.phase];
-    if (!hasTierAccess(effectiveTier, required)) {
+    const tierUnlocked = hasTierAccess(effectiveTier, required);
+    // Trial users get Phase 1 (Foundation) — and the deep module is rendered
+    // inside EmotionalSurgeryModule with per-track gating.
+    const trialUnlocked = isTrialUser && mod.phase === 1;
+    if (!tierUnlocked && !trialUnlocked) {
       navigate("/#pricing");
       return;
     }
