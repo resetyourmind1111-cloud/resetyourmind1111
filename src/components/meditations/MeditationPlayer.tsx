@@ -10,6 +10,7 @@ interface MeditationPlayerProps {
   audioUrl: string;
   onClose?: () => void;
   onComplete?: () => void;
+  onError?: () => void;
 }
 
 function formatTime(seconds: number) {
@@ -19,7 +20,7 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export function MeditationPlayer({ meditationId, title, audioUrl, onClose, onComplete }: MeditationPlayerProps) {
+export function MeditationPlayer({ meditationId, title, audioUrl, onClose, onComplete, onError }: MeditationPlayerProps) {
   const { user } = useAuth();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -49,7 +50,10 @@ export function MeditationPlayer({ meditationId, title, audioUrl, onClose, onCom
         });
       }
     };
-    const onErr = () => setError("Audio unavailable. Please try again later.");
+    const onErr = () => {
+      setError("Audio unavailable. Please try again later.");
+      onError?.();
+    };
 
     audio.addEventListener("loadedmetadata", onLoaded);
     audio.addEventListener("timeupdate", onTime);

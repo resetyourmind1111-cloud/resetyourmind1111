@@ -10,10 +10,19 @@ const WELCOME_AUDIO_URL =
   "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Onboarding/Welcome%20to%20your%20reset%20KI7mjPpBjDKiNh6w4NO0.mp3";
 const WELCOME_AUDIO_TITLE = "Welcome to Your Reset";
 
+const WELCOME_FALLBACK_TEXT = [
+  "If you're here, something in you already knows it's time.",
+  "You don't have to have it all figured out. You just have to be willing to see yourself clearly — for the next 7 days.",
+  "That's all I'm asking. Show up. Press play. Read the prompts. Let the work do what it does.",
+  "I'll meet you here every day. — Lorie",
+];
+
 export function LorieWelcomeCard() {
   const { user } = useAuth();
   const { trialDay, isTrialActive } = useTrialStatus();
   const [show, setShow] = useState(false);
+  const [audioFailed, setAudioFailed] = useState(false);
+
 
   useEffect(() => {
     // Show on Day 1 of trial OR for paid/post-trial users — until dismissed forever
@@ -66,7 +75,23 @@ export function LorieWelcomeCard() {
         </p>
 
         <div className="mb-4">
-          <MeditationPlayer title={WELCOME_AUDIO_TITLE} audioUrl={WELCOME_AUDIO_URL} />
+          {audioFailed ? (
+            <div className="rounded-2xl bg-[#06060e] border border-[#C9A84C]/20 p-5 sm:p-6 space-y-3">
+              <p className="text-[#F9F6F0] font-serif text-base text-center mb-2">{WELCOME_AUDIO_TITLE}</p>
+              {WELCOME_FALLBACK_TEXT.map((line, i) => (
+                <p key={i} className="text-[#F9F6F0]/75 text-sm leading-relaxed">{line}</p>
+              ))}
+              <p className="text-[#C9A84C]/60 text-[10px] text-center pt-2">
+                (Audio unavailable — Lorie's words above.)
+              </p>
+            </div>
+          ) : (
+            <MeditationPlayer
+              title={WELCOME_AUDIO_TITLE}
+              audioUrl={WELCOME_AUDIO_URL}
+              onError={() => setAudioFailed(true)}
+            />
+          )}
         </div>
 
         <div className="mb-3">
