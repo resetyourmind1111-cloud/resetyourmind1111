@@ -211,14 +211,6 @@ export default function EmotionalSurgeryModule() {
     );
   }
 
-  const completedCount = visibleTrackLessonsCompletedCount();
-
-  function visibleTrackLessonsCompletedCount() {
-    return visibleTrackLessons.filter(
-      (tl) => completions[completionKey(tl.trackName)]?.completed_at,
-    ).length;
-  }
-
   // Filter the visible tracks for trial users:
   //  - Phase 1 (Foundation): show all 4 tracks.
   //  - Phases 2–5: show ONLY the user's recommended track.
@@ -227,6 +219,10 @@ export default function EmotionalSurgeryModule() {
         isTrialPhaseUnlocked(moduleInfo.lessonNumber, tl.trackName, recommendedTrack),
       )
     : trackLessons;
+
+  const completedCount = visibleTrackLessons.filter(
+    (tl) => completions[completionKey(tl.trackName)]?.completed_at,
+  ).length;
 
   return (
     <AuthenticatedLayout title={`${moduleInfo.title} — Emotional Surgery™`}>
