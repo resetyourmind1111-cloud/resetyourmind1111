@@ -107,8 +107,10 @@ export default function HealingToolPage() {
       {(() => {
         const freeTierTools = ["nervous-system-diagnostic"];
         const isFreeTool = freeTierTools.includes(toolId || "");
-        const isCurriculumUnlocked = isTrialActive && TRIAL_CURRICULUM_TOOLS.includes(toolId || "");
-        const effectiveTier = (isTrialUnlocked || isFreeTool || isCurriculumUnlocked) ? "expand" : tier;
+        // During the 7-day trial, ALL 21 healing tools are unlocked so any
+        // recommendation surface (Daily Featured, Support Flow, 30-Day, etc.)
+        // can route into them without hitting a paywall.
+        const effectiveTier = (isTrialActive || isTrialUnlocked || isFreeTool) ? "expand" : tier;
         const requiredTier = isFreeTool ? "reset" as const : "expand" as const;
         return (
           <LockedContent requiredTier={requiredTier} currentTier={effectiveTier}>
