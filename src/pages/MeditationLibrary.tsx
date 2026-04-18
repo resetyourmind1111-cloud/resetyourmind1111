@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { toast } from "@/hooks/use-toast";
+import { SkeletonGrid } from "@/components/ui/brand-skeleton";
+import { EmptySlate } from "@/components/ui/empty-slate";
 
 interface Meditation {
   id: string;
@@ -153,7 +155,7 @@ export default function MeditationLibrary() {
   const [showTrialNudge, setShowTrialNudge] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
 
-  const { data: meditations = [] } = useQuery({
+  const { data: meditations = [], isLoading: meditationsLoading } = useQuery({
     queryKey: ["meditations"],
     queryFn: async () => {
       const { data } = await supabase
@@ -233,19 +235,33 @@ export default function MeditationLibrary() {
         </TabsList>
 
         <TabsContent value="mind" className="space-y-3">
-          {mind.map((m, i) => (
-            <MindCard
-              key={m.id}
-              meditation={m}
-              index={i}
-              locked={!canPlayMind(m)}
-              onPlay={() => handlePlay(m)}
+          {meditationsLoading ? (
+            <SkeletonGrid count={6} />
+          ) : mind.length === 0 ? (
+            <EmptySlate
+              icon={<Headphones className="w-6 h-6" />}
+              title="Your first session is ready."
+              body="Even 5 minutes changes the pattern."
+              ctaLabel="Start a meditation →"
+              ctaTo="/meditations"
             />
-          ))}
-          {isTrialUser && effectiveTier === "free" && (
-            <p className="text-xs text-[#F9F6F0]/50 text-center pt-3 italic">
-              Unlock all meditations — <Link to="/upgrade" className="text-[#C9A84C] hover:underline">upgrade your membership</Link>
-            </p>
+          ) : (
+            <>
+              {mind.map((m, i) => (
+                <MindCard
+                  key={m.id}
+                  meditation={m}
+                  index={i}
+                  locked={!canPlayMind(m)}
+                  onPlay={() => handlePlay(m)}
+                />
+              ))}
+              {isTrialUser && effectiveTier === "free" && (
+                <p className="text-xs text-[#F9F6F0]/50 text-center pt-3 italic">
+                  Unlock all meditations — <Link to="/upgrade" className="text-[#C9A84C] hover:underline">upgrade your membership</Link>
+                </p>
+              )}
+            </>
           )}
         </TabsContent>
 
