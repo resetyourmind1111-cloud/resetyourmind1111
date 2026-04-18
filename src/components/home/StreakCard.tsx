@@ -1,8 +1,12 @@
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Flame, Sparkles, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useHaptic } from "@/hooks/useHaptic";
+
+const MILESTONE_STREAKS = new Set([1, 3, 7, 14, 21, 30, 60, 90]);
 
 interface StreakCardProps {
   streak: number;
