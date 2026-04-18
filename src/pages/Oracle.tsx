@@ -128,16 +128,18 @@ const Oracle = () => {
     } as SpreadTemplate);
     setStep('pulling');
     
-    // Increment pulls
-    const newPulls = oraclePreviewPulls + 1;
-    setOraclePreviewPulls(newPulls);
-    const updates: Record<string, any> = { oracle_preview_pulls_used: newPulls };
-    // If this pull consumes the Day-6 bonus (i.e. the 4th pull), mark it used
-    // so we don't keep granting an extra pull forever.
-    if (day6BonusAvailable && newPulls > 3) {
+    // If the Day-6 bonus is available, this pull is FREE (doesn't count against
+    // the 3-pull trial cap) and immediately consumes the bonus + triggers the
+    // bonus Permission Slip chain. Otherwise increment the normal counter.
+    const updates: Record<string, any> = {};
+    if (day6BonusAvailable) {
       updates.day6_bonus_oracle_used = true;
       setDay6BonusAvailable(false);
       setDay6BonusJustConsumed(true);
+    } else {
+      const newPulls = oraclePreviewPulls + 1;
+      setOraclePreviewPulls(newPulls);
+      updates.oracle_preview_pulls_used = newPulls;
     }
     await supabase.from('profiles').update(updates as any).eq('user_id', user.id);
   };
