@@ -388,10 +388,10 @@ export function AssessmentResults({
           className="glass-card p-8 mb-8 bg-gradient-to-br from-primary/10 to-accent/10"
         >
           <h3 className="font-display text-2xl font-semibold text-foreground mb-6">
-            Your Next Steps in the App
+            {showTrialMode ? "Start Here During Your 7-Day Reset" : "Your Next Steps in the App"}
           </h3>
           <div className="space-y-3">
-            {thermostatType.nextSteps.map((step, index) => (
+            {visibleSteps.map((step, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, x: -10 }}
@@ -412,6 +412,43 @@ export function AssessmentResults({
             ))}
           </div>
         </motion.div>
+
+        {/* Locked preview — what they unlock after upgrading */}
+        {showTrialMode && lockedPreviewSteps.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4 }}
+            className="glass-card p-8 mb-8 border border-accent/30"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Lock className="w-5 h-5 text-accent" />
+              <h3 className="font-display text-xl font-semibold text-foreground">
+                When You Upgrade, You'll Also Unlock
+              </h3>
+            </div>
+            <p className="text-muted-foreground text-sm mb-5">
+              Personalized recommendations for your <span className="text-accent">{thermostatType.name}</span> thermostat:
+            </p>
+            <div className="space-y-2">
+              {lockedPreviewSteps.map((step, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-background/30 opacity-75"
+                >
+                  <Lock className="w-4 h-4 text-accent shrink-0 mt-1" />
+                  <span className="text-foreground/80 flex-1 text-sm">{step.text}</span>
+                </div>
+              ))}
+            </div>
+            <Link to="/upgrade" className="block mt-5">
+              <Button variant="gold" size="lg" className="w-full">
+                Unlock Your Full Reset Plan
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </motion.div>
+        )}
 
         {/* Share Card (hidden, used for image generation) */}
         <div className="absolute -left-[9999px]">
