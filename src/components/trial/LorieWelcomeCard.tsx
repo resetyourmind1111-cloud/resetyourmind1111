@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
 
-const MINDIST_WELCOME_URL = "https://mindist.page.link/eyTV";
+const WELCOME_AUDIO_URL =
+  "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Onboarding/Welcome%20to%20your%20reset%20KI7mjPpBjDKiNh6w4NO0.mp3";
+const WELCOME_AUDIO_TITLE = "Welcome to Your Reset";
 
 export function LorieWelcomeCard() {
   const { user } = useAuth();
   const { trialDay, isTrialActive } = useTrialStatus();
   const [show, setShow] = useState(false);
-  const [opened, setOpened] = useState(false);
 
   useEffect(() => {
     if (!user || !isTrialActive || trialDay > 1) return;
@@ -29,11 +30,6 @@ export function LorieWelcomeCard() {
     };
     check();
   }, [user, isTrialActive, trialDay]);
-
-  const openMindist = () => {
-    window.open(MINDIST_WELCOME_URL, "_blank", "noopener,noreferrer");
-    setOpened(true);
-  };
 
   const handleDismissLater = () => setShow(false);
 
@@ -60,24 +56,9 @@ export function LorieWelcomeCard() {
           A Message From Lorie
         </p>
 
-        <div className="flex items-center gap-4 mb-4">
-          <button
-            onClick={openMindist}
-            className="w-12 h-12 rounded-full bg-[#C9A84C] flex items-center justify-center shrink-0 hover:bg-[#C9A84C]/90 transition-colors"
-          >
-            <Play className="w-5 h-5 text-[#06060e] ml-0.5" />
-          </button>
-          <div>
-            <p className="text-[#F9F6F0] text-sm font-semibold">Welcome to Your Reset</p>
-            <p className="text-[#F9F6F0]/40 text-xs flex items-center gap-1">
-              3 min — Opens in Mindist <ExternalLink className="w-3 h-3 inline" />
-            </p>
-          </div>
+        <div className="mb-4">
+          <MeditationPlayer title={WELCOME_AUDIO_TITLE} audioUrl={WELCOME_AUDIO_URL} />
         </div>
-
-        {opened && (
-          <p className="text-xs text-[#C9A84C]/80 mb-3">✦ Guided reset opened — listen and come back when you're done</p>
-        )}
 
         <div className="mb-3">
           <p className="text-[#F9F6F0]/80 text-sm font-medium">Lorie Wu</p>

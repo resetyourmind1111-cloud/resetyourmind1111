@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Check, Play, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { AnthemPlayer } from "@/components/anthem/AnthemPlayer";
+import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
 
-const MINDIST_30DAY_URL = "https://mindist.page.link/rzWi";
+const DAY30_AUDIO_URL =
+  "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Onboarding/Day%2030%20you%20did%20the%20work%20Ht9Jluy1p0P53EQzddfE.mp3";
+const DAY30_AUDIO_TITLE = "Day 30 — You Did The Work";
 
 interface Day30CompletionProps {
   onDismiss: () => void;
