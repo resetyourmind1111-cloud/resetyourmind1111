@@ -36,7 +36,7 @@ export function StreakResetCard({ show, onDismiss }: StreakResetCardProps) {
             <p className="text-sm text-muted-foreground leading-relaxed mb-4 whitespace-pre-line">
               {`Every reset is a new beginning.\nThe most powerful thing you can do right now\nis start again. Today.`}
             </p>
-            <Link to="/30-day" onClick={onDismiss}>
+            <Link to="/30-day-experience" onClick={onDismiss}>
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-xl">
                 Start again →
               </Button>
