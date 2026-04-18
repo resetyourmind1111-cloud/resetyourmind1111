@@ -1,0 +1,1 @@
+UPDATE public.profiles SET lorie_welcome_shown = false WHERE lorie_welcome_shown = true AND created_at > now() - interval '1 day';
