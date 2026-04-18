@@ -131,7 +131,7 @@ export default function Patterns() {
                   variant="ghost"
                   size="sm"
                   className="text-muted-foreground"
-                  onClick={() => navigate("/patterns/quiz")}
+                  onClick={() => navigate("/patterns/quiz?retake=true")}
                 >
                   <RotateCcw className="w-4 h-4 mr-2" /> Retake Quiz
                 </Button>
