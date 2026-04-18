@@ -125,8 +125,8 @@ export function useTrialStatus(): TrialStatus {
   }
 
   const trialDay = differenceInDays(new Date(), trialStartDate);
-  const isTrialActive = trialDay <= 7;
-  const trialExpired = trialDay > 7;
+  const isTrialActive = trialDay <= 6;
+  const trialExpired = trialDay >= 7;
 
   return {
     isTrialActive, trialDay, trialExpired, isLoading: false,
