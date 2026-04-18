@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useSubscription } from "@/hooks/useSubscription";
+import { TwoFuturesCard } from "@/components/trial/TwoFuturesCard";
 
 export function Day7CompletionModal() {
   const { user } = useAuth();
@@ -144,19 +145,14 @@ export function Day7CompletionModal() {
 
             <div className="w-16 h-px bg-[#C9A84C]/30 mx-auto" />
 
-            <Button
-              size="lg"
-              onClick={handleUpgrade}
-              className="w-full bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-bold text-base py-6 rounded-xl"
-            >
-              Start My Full Reset →
-            </Button>
+            {/* Two Futures — replaces the generic upgrade CTA */}
+            <TwoFuturesCard onUpgrade={handleUpgrade} />
 
             <button
               onClick={handleDecideLater}
               className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline"
             >
-              Remind me in 24 hours
+              I'll decide later
             </button>
           </motion.div>
         </motion.div>
