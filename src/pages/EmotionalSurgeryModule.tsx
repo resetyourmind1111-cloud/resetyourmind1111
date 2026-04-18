@@ -16,6 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import { moduleScreens } from "@/data/emotionalSurgeryModules";
 import ModuleScreen from "@/components/emotional-surgery/ModuleScreen";
 import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { useRecommendedTrack, isTrialPhaseUnlocked } from "@/hooks/useRecommendedTrack";
 
 const QUIET_PHASE_AUDIO_URL =
   "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Modules/The%20Quiet%20Phase%204f0i7mmu3pviIoFd26Uv.mp3";
