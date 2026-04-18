@@ -7,6 +7,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { healingTools } from "@/data/healingToolsData";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
+
+// Tools the 30-Day curriculum routes trial users to during Days 1-3.
+// These must remain unlocked for active trialists regardless of assigned trial_tool_1/2.
+const TRIAL_CURRICULUM_TOOLS = ["emotional-trigger-tracker"];
 import LimitingBeliefRewriter from "@/components/healing-tools/LimitingBeliefRewriter";
 import EmotionalTriggerTracker from "@/components/healing-tools/EmotionalTriggerTracker";
 import InnerChildHealing from "@/components/healing-tools/InnerChildHealing";
@@ -57,6 +62,7 @@ export default function HealingToolPage() {
   const { toolId } = useParams<{ toolId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isTrialActive } = useTrialStatus();
 
   const { data: profile } = useQuery({
     queryKey: ["profile-healing-tool", user?.id],
@@ -101,7 +107,8 @@ export default function HealingToolPage() {
       {(() => {
         const freeTierTools = ["nervous-system-diagnostic"];
         const isFreeTool = freeTierTools.includes(toolId || "");
-        const effectiveTier = (isTrialUnlocked || isFreeTool) ? "expand" : tier;
+        const isCurriculumUnlocked = isTrialActive && TRIAL_CURRICULUM_TOOLS.includes(toolId || "");
+        const effectiveTier = (isTrialUnlocked || isFreeTool || isCurriculumUnlocked) ? "expand" : tier;
         const requiredTier = isFreeTool ? "reset" as const : "expand" as const;
         return (
           <LockedContent requiredTier={requiredTier} currentTier={effectiveTier}>
