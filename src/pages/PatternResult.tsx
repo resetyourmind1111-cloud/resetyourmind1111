@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TRAP_SLUGS } from "@/data/identityTrapData";
 import { useSubscription } from "@/hooks/useSubscription";
 import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
+import { PatternShareCard } from "@/components/patterns/PatternShareCard";
 import { TrialBackButton } from "@/components/TrialBackButton";
 
 export default function PatternResult() {
@@ -71,6 +72,10 @@ export default function PatternResult() {
             label="Ask AI For Help →"
             onClick={() => setShowAiChat(true)}
           />
+
+          <div className="pt-2 flex justify-center">
+            <PatternShareCard trapName={primary} />
+          </div>
         </div>
       </motion.div>
       </div>
