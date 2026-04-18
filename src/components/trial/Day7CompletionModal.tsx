@@ -181,9 +181,6 @@ export function Day7CompletionModal() {
                 <button onClick={() => handleDismiss("/home")} className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline">
                   I'll decide later
                 </button>
-                <button onClick={() => handleDismiss("/home")} className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline">
-                  I'll decide later
-                </button>
                 <p className="text-xs text-[#F9F6F0]/40">
                   {spotsRemaining} spots remaining. When they're gone, they're gone.
                 </p>
