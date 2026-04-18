@@ -1,0 +1,10 @@
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-1-permission-granted-foundation.mp3' WHERE id = '84acfc23-4f57-4023-bedd-efb1d9f3c10f';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-2-morning-permission.mp3' WHERE id = '8abe26ed-1049-4e7e-940a-b5903a297eaa';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-3-evening-release.mp3' WHERE id = '725b0808-0ca3-4334-818d-8cb8414b2bce';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-4-permission-rest-sleep.mp3' WHERE id = 'c9cdfcc2-63a3-4884-92e1-d393040eca66';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-5-permission-say-no.mp3' WHERE id = '96122977-97f2-47f8-a0e7-da82fb226285';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-6-permission-want-more.mp3' WHERE id = 'a2323d07-f3a9-4de1-8eaa-61ebc3845f52';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-7-permission-choose-yourself.mp3' WHERE id = 'c0339d29-b82f-4e50-b45f-27b58d4b6993';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-8-permission-mother-wound.mp3' WHERE id = '32911676-1ac9-4033-91cb-34b0dfadb92d';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-9-permission-receive.mp3' WHERE id = '1bc28b12-2c14-450b-b359-d04ca1244238';
+UPDATE meditations SET audio_url = 'https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/med-10-permission-be-seen.mp3' WHERE id = '857fb099-ba7e-4673-ba96-48f7a5bcfdd2';

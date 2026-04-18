@@ -9,7 +9,7 @@ import { AnthemPlayer } from "@/components/anthem/AnthemPlayer";
 import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
 
 const DAY30_AUDIO_URL =
-  "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Onboarding/Day%2030%20you%20did%20the%20work%20Ht9Jluy1p0P53EQzddfE.mp3";
+  "https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/day30.mp3";
 const DAY30_AUDIO_TITLE = "Day 30 — You Did The Work";
 
 interface Day30CompletionProps {

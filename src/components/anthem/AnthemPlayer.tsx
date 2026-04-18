@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { Play, Pause } from "lucide-react";
 
-const ANTHEM_AUDIO_URL = "https://cdn1.suno.ai/08c870c4-5dc0-46cc-85fe-0a0e8cc0ce49.mp3";
+const ANTHEM_AUDIO_URL =
+  "https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/anthem-permission-granted.mp3";
 
 interface AnthemPlayerProps {
   title?: string;
@@ -17,11 +18,7 @@ export function AnthemPlayer({ title = "Permission Granted", artist = "Lorie Wu"
     if (!audioRef.current) {
       audioRef.current = new Audio(ANTHEM_AUDIO_URL);
       audioRef.current.addEventListener("ended", () => setPlaying(false));
-      audioRef.current.addEventListener("error", () => {
-        setPlaying(false);
-        // Fallback: open Suno page directly
-        window.open("https://suno.com/s/wP487osdtsq9Kl4S", "_blank");
-      });
+      audioRef.current.addEventListener("error", () => setPlaying(false));
     }
     if (playing) {
       audioRef.current.pause();

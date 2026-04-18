@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
 
 
-const AUDIO_URL = "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Modules/Releasing%20Resistance%20and%20Resetting%20Nervous%20System%200So410du88t71RpfDdtC.mp3";
+const AUDIO_URL = "https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/releasing-resistance.mp3";
 const AUDIO_TITLE = "Releasing Resistance and Resetting Your Nervous System";
 
 const SCREENS = ["insight", "framework", "reflection", "reset", "complete"] as const;
