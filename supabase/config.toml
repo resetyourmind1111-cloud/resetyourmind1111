@@ -59,3 +59,4 @@ verify_jwt = false
 
 [functions.admin-set-trial-day]
 verify_jwt = false
+
