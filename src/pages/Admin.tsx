@@ -62,7 +62,6 @@ export default function Admin() {
         active: activeRes.count ?? 0,
         trial: trialCount ?? 0,
         founding: foundingRes.count ?? 0,
-        lifetime: 0,
         spotsTaken: foundingRes.count ?? 0,
       });
 
