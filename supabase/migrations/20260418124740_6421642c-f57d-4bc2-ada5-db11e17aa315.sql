@@ -1,0 +1,2 @@
+UPDATE public.profiles SET subscription_tier = 'founding_full_access' WHERE user_id = 'e47a8591-1f40-4878-8f9c-69a08ce5abd7';
+UPDATE public.subscriptions SET tier = 'founding_full_access', status = 'active' WHERE user_id = 'e47a8591-1f40-4878-8f9c-69a08ce5abd7';
