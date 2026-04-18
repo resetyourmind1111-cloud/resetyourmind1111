@@ -73,14 +73,13 @@ export function TrialExpiredOverlay() {
         </div>
 
         <div className="space-y-3">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#F9F6F0]">
-            Your preview has ended.
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#F9F6F0] leading-snug">
+            You did 7 days of seeing<br />yourself clearly.
           </h2>
-          <p className="text-[#F9F6F0]/80 text-lg leading-relaxed">
-            You started something real.<br />
-            Don't leave it unfinished.
+          <p className="font-serif text-lg md:text-xl text-[#C9A84C] italic leading-relaxed">
+            The next 30 are where you become her.
           </p>
-          <p className="text-[#F9F6F0]/50 text-sm">
+          <p className="text-[#F9F6F0]/50 text-sm pt-2">
             Everything you experienced is still here. The rest is waiting.
           </p>
         </div>
@@ -109,7 +108,7 @@ export function TrialExpiredOverlay() {
           onClick={() => navigate("/upgrade")}
           className="w-full bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90 font-serif font-bold text-lg px-8 py-6"
         >
-          Continue My Reset →
+          Start My Full Reset →
         </Button>
 
         <Button
