@@ -20,7 +20,7 @@ import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { useRecommendedTrack, isTrialPhaseUnlocked } from "@/hooks/useRecommendedTrack";
 
 const QUIET_PHASE_AUDIO_URL =
-  "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Modules/The%20Quiet%20Phase%204f0i7mmu3pviIoFd26Uv.mp3";
+  "https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/quiet-phase.mp3";
 const QUIET_PHASE_AUDIO_TITLE = "The Quiet Phase™ — Integration Meditation";
 
 const MODULE_SLUG_MAP: Record<string, { lessonNumber: number; title: string }> = {
