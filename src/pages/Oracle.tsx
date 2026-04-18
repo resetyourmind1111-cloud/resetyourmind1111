@@ -129,9 +129,14 @@ const Oracle = () => {
     // Increment pulls
     const newPulls = oraclePreviewPulls + 1;
     setOraclePreviewPulls(newPulls);
-    await supabase.from('profiles').update({
-      oracle_preview_pulls_used: newPulls,
-    } as any).eq('user_id', user.id);
+    const updates: Record<string, any> = { oracle_preview_pulls_used: newPulls };
+    // If this pull consumes the Day-6 bonus (i.e. the 4th pull), mark it used
+    // so we don't keep granting an extra pull forever.
+    if (day6BonusAvailable && newPulls > 3) {
+      updates.day6_bonus_oracle_used = true;
+      setDay6BonusAvailable(false);
+    }
+    await supabase.from('profiles').update(updates as any).eq('user_id', user.id);
   };
 
   const handleFlipCard = (index: number) => {
