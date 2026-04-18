@@ -359,14 +359,7 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
               </Button>
             </div>
 
-            {/* Lifetime */}
-            <div className="p-4 rounded-xl border border-[#F9F6F0]/10 bg-[#F9F6F0]/5 text-left">
-              <p className="text-[#F9F6F0] font-bold text-xs mb-1">Lifetime Access — $1,111 one-time</p>
-              <p className="text-[#F9F6F0]/50 text-[10px] mb-2">Never pay again. Full access forever.</p>
-              <Button onClick={() => handleUpgrade("/upgrade")} variant="outline" size="sm" className="w-full border-[#F9F6F0]/10 text-[#F9F6F0]/70 hover:bg-[#F9F6F0]/10 text-xs">
-                Get lifetime access
-              </Button>
-            </div>
+
 
             <p className="text-[#F9F6F0]/40 text-xs">
               Your reset doesn't stop here. You've already done the hardest part.
