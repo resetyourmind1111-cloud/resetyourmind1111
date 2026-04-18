@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Lock, Play, Pause, ChevronDown, ChevronUp, Check, ChevronLeft, Volume2, ExternalLink } from "lucide-react";
+import { Lock, Play, Pause, ChevronDown, ChevronUp, Check, ChevronLeft, Volume2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
@@ -18,6 +18,7 @@ import { LockedContent } from "@/components/LockedContent";
 import { PatternAiChatPanel, PatternAiTriggerButton } from "@/components/patterns/PatternAiChatPanel";
 import { startAmbientTone, stopAmbientTone, setAmbientVolume } from "@/lib/ambientTones";
 import { Slider } from "@/components/ui/slider";
+import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
 
 const TOTAL_SCREENS = 12;
 const PATTERN_PREVIEW_RETURN_PATH = "/patterns";
@@ -30,16 +31,11 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
   setShowScript: (v: boolean) => void;
   onNext: () => void;
 }) {
-  const [mindistOpened, setMindistOpened] = useState(false);
+  const [audioCompleted, setAudioCompleted] = useState(false);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const openMindist = () => {
-    window.open(trap.audioUrl, "_blank");
-    setMindistOpened(true);
-  };
 
   const toggleAmbient = useCallback(() => {
     if (ambientPlaying) {
@@ -86,24 +82,12 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
       <h2 className="font-serif text-xl font-bold text-foreground">Do The Reset</h2>
       <p className="text-muted-foreground text-sm">Find a quiet space. Press play and let the guided meditation move through you.</p>
 
-      {/* Primary: Mindist guided reset */}
-      <Card className="p-6 space-y-4" style={{ background: "linear-gradient(135deg, rgba(61,26,110,0.4), rgba(10,10,10,0.8))" }}>
-        <div>
-          <p className="font-semibold text-foreground">{trap.audioTitle}</p>
-          <p className="text-xs text-muted-foreground">{trap.audioDuration} — Guided Reset by Lorie Wu</p>
-        </div>
-        <Button
-          onClick={openMindist}
-          className="w-full bg-primary hover:bg-primary/80 text-primary-foreground gap-2"
-        >
-          <Play className="w-4 h-4" />
-          {mindistOpened ? "Reopen Guided Reset" : "Play Guided Reset"}
-          <ExternalLink className="w-3.5 h-3.5 ml-1 opacity-60" />
-        </Button>
-        {mindistOpened && (
-          <p className="text-xs text-primary/80 text-center">✦ Guided reset opened — listen and come back when you're done</p>
-        )}
-      </Card>
+      {/* Native HTML5 audio player */}
+      <MeditationPlayer
+        title={trap.audioTitle}
+        audioUrl={trap.audioUrl}
+        onComplete={() => setAudioCompleted(true)}
+      />
 
       {/* Secondary: In-app ambient tones */}
       <div className="space-y-2">
@@ -170,7 +154,7 @@ function ResetAudioScreen({ trap, showScript, setShowScript, onNext }: {
       )}
 
       <Button variant="gold" onClick={onNext} className="w-full">
-        {mindistOpened || elapsed >= AMBIENT_DURATION ? "Continue →" : "Mark Complete →"}
+        {audioCompleted || elapsed >= AMBIENT_DURATION ? "Continue →" : "Mark Complete →"}
       </Button>
     </div>
   );

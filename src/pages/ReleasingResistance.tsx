@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Pause, Check, Sparkles, BookOpen, Repeat, Home, Volume2, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Check, Sparkles, BookOpen, Repeat, Home, Volume2 } from "lucide-react";
 import { startAmbientTone, stopAmbientTone, isAmbientPlaying, setAmbientVolume } from "@/lib/ambientTones";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,11 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
 
 
-const AUDIO_URL = "https://mindist.page.link/Uiar";
+const AUDIO_URL = "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Modules/Releasing%20Resistance%20and%20Resetting%20Nervous%20System%200So410du88t71RpfDdtC.mp3";
+const AUDIO_TITLE = "Releasing Resistance and Resetting Your Nervous System";
 
 const SCREENS = ["insight", "framework", "reflection", "reset", "complete"] as const;
 type Screen = typeof SCREENS[number];
@@ -78,9 +80,6 @@ export default function ReleasingResistance() {
     toast({ title: "Reflection saved ✨" });
   };
 
-  const openAudioInMindist = () => {
-    window.open(AUDIO_URL, "_blank", "noopener,noreferrer");
-  };
 
   const markComplete = async () => {
     if (!user) return;
@@ -295,18 +294,10 @@ export default function ReleasingResistance() {
                       )}
                     </div>
 
-                    {/* Mindist External Link */}
-                    <button
-                      onClick={openAudioInMindist}
-                      className="w-full rounded-xl border border-border/50 bg-card/60 p-4 mb-6 flex items-center gap-3 hover:border-primary/30 transition-colors text-left"
-                    >
-                      <Play className="w-8 h-8 text-primary shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground">Guided Reset Meditation</p>
-                        <p className="text-xs text-muted-foreground">Opens in Mindist</p>
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
-                    </button>
+                    {/* Native HTML5 audio player */}
+                    <div className="mb-6">
+                      <MeditationPlayer title={AUDIO_TITLE} audioUrl={AUDIO_URL} />
+                    </div>
 
                     <Button
                       className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-6 rounded-2xl"

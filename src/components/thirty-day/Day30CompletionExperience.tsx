@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Check, Play, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { AnthemPlayer } from "@/components/anthem/AnthemPlayer";
+import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
 
-const MINDIST_30DAY_URL = "https://mindist.page.link/rzWi";
+const DAY30_AUDIO_URL =
+  "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Onboarding/Day%2030%20you%20did%20the%20work%20Ht9Jluy1p0P53EQzddfE.mp3";
+const DAY30_AUDIO_TITLE = "Day 30 — You Did The Work";
 
 interface Day30CompletionProps {
   onDismiss: () => void;
@@ -23,7 +25,7 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
   });
   const [day7Reflection, setDay7Reflection] = useState<string | null>(null);
   const [day30Reflection, setDay30Reflection] = useState<string | null>(null);
-  const [mindistOpened, setMindistOpened] = useState(false);
+  
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -85,10 +87,6 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
     }
   }, [screen]);
 
-  const openMindist30 = () => {
-    window.open(MINDIST_30DAY_URL, "_blank", "noopener,noreferrer");
-    setMindistOpened(true);
-  };
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -273,23 +271,12 @@ export function Day30CompletionExperience({ onDismiss }: Day30CompletionProps) {
         >
           <div className="max-w-md w-full text-center space-y-6">
             <h2 className="font-serif text-2xl font-bold text-[#F9F6F0]">A message from Lorie.</h2>
-            <div className="p-5 rounded-xl bg-[#2A1F3D] border border-[#2A1F3D]">
-              <div className="flex items-center gap-4 mb-3">
-                <button
-                  onClick={openMindist30}
-                  className="w-12 h-12 rounded-full bg-[#C9A84C] flex items-center justify-center shrink-0 hover:bg-[#C9A84C]/90 transition-colors"
-                >
-                  <Play className="w-5 h-5 text-[#06060e] ml-0.5" />
-                </button>
-                <div className="text-left">
-                  <p className="text-[#F9F6F0] text-sm font-semibold">You Did The Work</p>
-                  <p className="text-[#F9F6F0]/40 text-xs flex items-center gap-1">
-                    3 min — Opens in Mindist <ExternalLink className="w-3 h-3 inline" />
-                  </p>
-                </div>
+            <div className="p-5 rounded-xl bg-[#2A1F3D] border border-[#2A1F3D] space-y-4">
+              <MeditationPlayer title={DAY30_AUDIO_TITLE} audioUrl={DAY30_AUDIO_URL} />
+              <div className="text-left">
+                <p className="text-[#F9F6F0]/80 text-sm font-medium">Lorie Wu</p>
+                <p className="text-[#F9F6F0]/40 text-xs">CEO, Reset Your Mind 1111™</p>
               </div>
-              <p className="text-[#F9F6F0]/80 text-sm font-medium text-left">Lorie Wu</p>
-              <p className="text-[#F9F6F0]/40 text-xs text-left">CEO, Reset Your Mind 1111™</p>
             </div>
             <Button
               onClick={async () => {

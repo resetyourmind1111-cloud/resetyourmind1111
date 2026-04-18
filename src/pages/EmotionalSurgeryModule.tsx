@@ -15,6 +15,11 @@ import { emotionalSurgeryTracks, Lesson } from "@/data/emotionalSurgeryData";
 import { useToast } from "@/hooks/use-toast";
 import { moduleScreens } from "@/data/emotionalSurgeryModules";
 import ModuleScreen from "@/components/emotional-surgery/ModuleScreen";
+import { MeditationPlayer } from "@/components/meditations/MeditationPlayer";
+
+const QUIET_PHASE_AUDIO_URL =
+  "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Modules/The%20Quiet%20Phase%204f0i7mmu3pviIoFd26Uv.mp3";
+const QUIET_PHASE_AUDIO_TITLE = "The Quiet Phase™ — Integration Meditation";
 
 const MODULE_SLUG_MAP: Record<string, { lessonNumber: number; title: string }> = {
   recognition: { lessonNumber: 1, title: "Recognition" },
@@ -262,6 +267,18 @@ export default function EmotionalSurgeryModule() {
                     <p className="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-1">Phase {moduleInfo.lessonNumber}</p>
                     <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">{moduleInfo.title}</h1>
                   </div>
+
+                  {slug === "quiet-phase" && (
+                    <div className="mb-6">
+                      <p className="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-2 text-center">
+                        Integration Meditation
+                      </p>
+                      <MeditationPlayer
+                        title={QUIET_PHASE_AUDIO_TITLE}
+                        audioUrl={QUIET_PHASE_AUDIO_URL}
+                      />
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
                     <span>Module Progress</span>

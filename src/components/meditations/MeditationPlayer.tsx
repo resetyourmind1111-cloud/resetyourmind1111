@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface MeditationPlayerProps {
-  meditationId: string;
+  meditationId?: string;
   title: string;
   audioUrl: string;
   onClose?: () => void;
+  onComplete?: () => void;
 }
 
 function formatTime(seconds: number) {
@@ -18,7 +19,7 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export function MeditationPlayer({ meditationId, title, audioUrl, onClose }: MeditationPlayerProps) {
+export function MeditationPlayer({ meditationId, title, audioUrl, onClose, onComplete }: MeditationPlayerProps) {
   const { user } = useAuth();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -38,7 +39,8 @@ export function MeditationPlayer({ meditationId, title, audioUrl, onClose }: Med
     const onEnded = async () => {
       setPlaying(false);
       setCompleted(true);
-      if (user && !completionLoggedRef.current) {
+      onComplete?.();
+      if (user && meditationId && !completionLoggedRef.current) {
         completionLoggedRef.current = true;
         await supabase.from("meditation_completions").insert({
           user_id: user.id,
