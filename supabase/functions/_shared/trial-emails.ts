@@ -41,7 +41,7 @@ export interface TrialEmail {
 export const TRIAL_EMAILS: TrialEmail[] = [
   {
     day: 1,
-    subject: "Welcome to your reset",
+    subject: "Day 1 — See yourself clearly",
     html: (n) => shell(
       `<h1 style="font-size:28px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">Welcome, ${n}.</h1>
 <p style="font-size:16px;line-height:1.7;margin:0 0 16px;">You just made a quiet, powerful choice — to stop settling for crumbs.</p>
@@ -52,7 +52,7 @@ export const TRIAL_EMAILS: TrialEmail[] = [
   },
   {
     day: 2,
-    subject: "Day 2 — the hardest day is the next one",
+    subject: "Day 2 — Name the pattern",
     html: (n, r) => shell(
       `<h1 style="font-size:26px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, here's the truth no one tells you.</h1>
 <p style="font-size:16px;line-height:1.7;margin:0 0 16px;">Day 2 is where most people quietly drift. The novelty wears off. Life gets loud. ${r && reasonHook[r] ? `And ${reasonHook[r]} starts whispering that nothing is really changing.` : "And the old patterns start whispering that nothing is really changing."}</p>
@@ -62,7 +62,7 @@ export const TRIAL_EMAILS: TrialEmail[] = [
   },
   {
     day: 3,
-    subject: "Day 3 — something special inside",
+    subject: "Day 3 — Your first interrupt",
     html: (n) => shell(
       `<h1 style="font-size:26px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, you made it through the dip.</h1>
 <p style="font-size:16px;line-height:1.7;margin:0 0 16px;">This is the day most people stop. You didn't. That tells me something about who you actually are.</p>
@@ -72,7 +72,7 @@ export const TRIAL_EMAILS: TrialEmail[] = [
   },
   {
     day: 4,
-    subject: "Day 4 — your nervous system is listening",
+    subject: "Day 4 — Begin the journey",
     html: (n) => shell(
       `<h1 style="font-size:26px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, the body keeps the receipts.</h1>
 <p style="font-size:16px;line-height:1.7;margin:0 0 16px;">Your nervous system has been holding the patterns longer than your mind has. Today's practice is for the body — not the mind.</p>
@@ -82,7 +82,7 @@ export const TRIAL_EMAILS: TrialEmail[] = [
   },
   {
     day: 5,
-    subject: "Day 5 — the proof is starting to show",
+    subject: "Day 5 — Go deeper",
     html: (n) => shell(
       `<h1 style="font-size:26px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, notice what's different.</h1>
 <p style="font-size:16px;line-height:1.7;margin:0 0 16px;">By Day 5, something subtle starts shifting. A pause before the old reaction. A second of softness you didn't have before. The fact that you're still here.</p>
@@ -92,7 +92,7 @@ export const TRIAL_EMAILS: TrialEmail[] = [
   },
   {
     day: 6,
-    subject: "Day 6 — a gift is waiting",
+    subject: "Day 6 — Notice what shifted",
     html: (n) => shell(
       `<h1 style="font-size:26px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, I left you something.</h1>
 <p style="font-size:16px;line-height:1.7;margin:0 0 16px;">Open the app today. There's a gift card on your home screen — only visible once, only on Day 6, only for you.</p>
@@ -102,7 +102,7 @@ export const TRIAL_EMAILS: TrialEmail[] = [
   },
   {
     day: 7,
-    subject: "Day 7 — the real choice begins",
+    subject: "Day 7 — Choose yourself",
     html: (n) => shell(
       `<h1 style="font-size:26px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, you finished what you started.</h1>
 <p style="font-size:16px;line-height:1.7;margin:0 0 16px;">Most people don't make it here. You did. That's not nothing — that's the pattern breaking.</p>
