@@ -45,6 +45,8 @@ const Oracle = () => {
   const [trialPullComplete, setTrialPullComplete] = useState(false);
   // Day-6 surprise gift: one bonus pull on top of the trial cap.
   const [day6BonusAvailable, setDay6BonusAvailable] = useState(false);
+  // True when the *current* pull consumed the Day-6 bonus — used to chain to the bonus Permission Slip.
+  const [day6BonusJustConsumed, setDay6BonusJustConsumed] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -135,6 +137,7 @@ const Oracle = () => {
     if (day6BonusAvailable && newPulls > 3) {
       updates.day6_bonus_oracle_used = true;
       setDay6BonusAvailable(false);
+      setDay6BonusJustConsumed(true);
     }
     await supabase.from('profiles').update(updates as any).eq('user_id', user.id);
   };
