@@ -9,8 +9,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { useSubscription } from "@/hooks/useSubscription";
-import { TrialLockedContent } from "@/components/TrialLockedContent";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { useRecommendedTrack } from "@/hooks/useRecommendedTrack";
 
 interface ModuleInfo {
   phase: number;
