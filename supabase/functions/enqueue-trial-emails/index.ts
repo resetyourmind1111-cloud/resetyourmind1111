@@ -47,8 +47,19 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Curriculum-aligned titles/bodies (matches TrialDayCurriculumCard themes).
+    const CURRICULUM = [
+      { title: "Day 1 — See yourself clearly",   body: "Before anything changes, you have to see where you are." },
+      { title: "Day 2 — Name the pattern",       body: "Now we name what's been running the show." },
+      { title: "Day 3 — Your first interrupt",   body: "Knowing the pattern is step one. This is step two." },
+      { title: "Day 4 — Begin the journey",      body: "The daily practice starts today." },
+      { title: "Day 5 — Go deeper",              body: "Patterns don't break in a day. You're right on time." },
+      { title: "Day 6 — Notice what shifted",    body: "Six days ago you didn't know any of this." },
+      { title: "Day 7 — Choose yourself",        body: "This is the last day of your preview. Make it count." },
+    ];
+
     const start = new Date();
-    const rows = Array.from({ length: 7 }, (_, i) => {
+    const rows = CURRICULUM.map((c, i) => {
       const day = i + 1;
       const sendAt = new Date(start);
       sendAt.setDate(sendAt.getDate() + i);
@@ -58,8 +69,8 @@ Deno.serve(async (req) => {
         user_id: userId,
         day_number: day,
         scheduled_time: sendAt.toISOString(),
-        message_title: `Day ${day}`,
-        message_body: `trial_email_day_${day}`, // marker; real copy lives in send-trial-emails
+        message_title: c.title,
+        message_body: c.body,
         sent: false,
       };
     });
