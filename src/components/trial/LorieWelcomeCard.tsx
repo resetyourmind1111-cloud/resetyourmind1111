@@ -36,18 +36,25 @@ export function LorieWelcomeCard() {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Decide whether to show: Day 1 of trial OR paid users until dismissed forever.
+  // Show on Day 1 of trial (trialDay 0 or 1) OR for paid users — until dismissed.
+  // Note: useTrialStatus returns isTrialActive=false for paid users, so we must
+  // also allow the card through for them. We only suppress it for trial users
+  // who are past Day 1.
   useEffect(() => {
     if (!user) return;
-    if (isTrialActive && trialDay > 1) return;
+    if (isTrialActive && trialDay > 1) return; // past Day 1 of an active trial
 
     const check = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("lorie_welcome_shown")
         .eq("user_id", user.id)
-        .single();
-      if (data && !(data as any).lorie_welcome_shown) {
+        .maybeSingle();
+      if (error) {
+        console.error("[LorieWelcomeCard] profile fetch failed", error);
+        return;
+      }
+      if (!data || !(data as any).lorie_welcome_shown) {
         setShow(true);
       }
     };
