@@ -268,6 +268,18 @@ export default function EmotionalSurgeryModule() {
                     <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">{moduleInfo.title}</h1>
                   </div>
 
+                  {slug === "quiet-phase" && (
+                    <div className="mb-6">
+                      <p className="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-2 text-center">
+                        Integration Meditation
+                      </p>
+                      <MeditationPlayer
+                        title={QUIET_PHASE_AUDIO_TITLE}
+                        audioUrl={QUIET_PHASE_AUDIO_URL}
+                      />
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
                     <span>Module Progress</span>
                     <span className="font-semibold text-foreground">{completedCount} / {trackLessons.length}</span>
