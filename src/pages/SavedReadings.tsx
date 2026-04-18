@@ -9,8 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, BookOpen, Calendar, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Sparkles, Layers } from 'lucide-react';
 import { format } from 'date-fns';
+import { EmptySlate } from '@/components/ui/empty-slate';
+import { SkeletonCardList } from '@/components/ui/brand-skeleton';
 
 interface SavedReading {
   id: string;
@@ -77,9 +79,10 @@ const SavedReadings = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navigation />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="animate-pulse-soft text-4xl">✨</div>
-        </div>
+        <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl pt-24" aria-busy="true" aria-label="Loading saved readings">
+          <SkeletonCardList count={4} />
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -139,11 +142,13 @@ const SavedReadings = () => {
         {/* Readings List */}
         <div className="space-y-4">
           {readings.length === 0 && (
-            <div className="text-center py-16 text-muted-foreground">
-              <div className="text-4xl mb-4">🔮</div>
-              <p>No readings saved yet. Pull some cards to get started!</p>
-              <Button className="mt-4" onClick={() => navigate('/oracle')}>Go to Oracle</Button>
-            </div>
+            <EmptySlate
+              icon={<Layers className="w-6 h-6" />}
+              title="No readings saved yet."
+              body="Pull a card today and save it to see it here."
+              ctaLabel="Pull today's card →"
+              ctaTo="/oracle"
+            />
           )}
 
           {readings.map((reading, index) => {
