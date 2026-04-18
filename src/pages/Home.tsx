@@ -178,29 +178,29 @@ export default function Home() {
           <StreakGraceBanner show={graceActivated} onDismiss={dismissGrace} />
           <StreakResetCard show={streakWasReset} onDismiss={dismissReset} />
 
-          {/* Lorie Welcome Card (Day 1 only) */}
-          <LorieWelcomeCard />
-
-          {/* Day 6 Surprise Unlock (trial users only, fires once) */}
+          {/* Day 6 Surprise Unlock (trial users only, fires once) — conversion-critical */}
           <Day6GiftCard trialDay={trialDay} isTrialActive={isTrialActive} />
 
-          {/* Welcome Back Card (Day 2+ trial users) */}
-          {shouldHoldTrialContent ? (
-            <Card className="mb-6 p-6 border-primary/20 bg-card/70">
-              <div className="h-3 w-24 rounded-full bg-muted animate-pulse mb-3" />
-              <div className="h-6 w-56 rounded-md bg-muted animate-pulse mb-2" />
-              <div className="h-4 w-40 rounded-md bg-muted animate-pulse mb-4" />
-              <div className="h-10 w-56 rounded-xl bg-muted animate-pulse" />
-            </Card>
-          ) : (
-            <WelcomeBackCard loading={resumeLoading} nextAction={nextAction} />
-          )}
-
-          {/* Personalized "For You Today" recommendation */}
-          {!shouldHoldTrialContent && <RecommendedForYouCard />}
-
-          {/* Day 3 Acknowledgment Card */}
+          {/* Day 3 Acknowledgment Card — conversion-critical (always show during trial) */}
           {!shouldHoldTrialContent && <Day3AcknowledgmentCard />}
+
+          {/* Paid-only: Lorie Welcome, Welcome Back, Recommended For You */}
+          {!isTrialActive && (
+            <>
+              <LorieWelcomeCard />
+              {shouldHoldTrialContent ? (
+                <Card className="mb-6 p-6 border-primary/20 bg-card/70">
+                  <div className="h-3 w-24 rounded-full bg-muted animate-pulse mb-3" />
+                  <div className="h-6 w-56 rounded-md bg-muted animate-pulse mb-2" />
+                  <div className="h-4 w-40 rounded-md bg-muted animate-pulse mb-4" />
+                  <div className="h-10 w-56 rounded-xl bg-muted animate-pulse" />
+                </Card>
+              ) : (
+                <WelcomeBackCard loading={resumeLoading} nextAction={nextAction} />
+              )}
+              {!shouldHoldTrialContent && <RecommendedForYouCard />}
+            </>
+          )}
 
           {/* Header */}
           {!isReturningTrialUser && (
