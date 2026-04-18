@@ -351,11 +351,8 @@ export default function Upgrade() {
         </div>
       </div>
 
-      {/* Lifetime text link */}
       <div className="text-center pb-16 px-4">
-        <p className="text-sm text-muted-foreground mb-2">Want lifetime access? <strong>$1,111</strong> — one-time, everything, forever.</p>
-        <button onClick={() => handleCheckout(FOUNDING_PRICE_ID, "LIFETIME")} className="text-accent text-sm underline hover:text-accent/80">Get Lifetime Access →</button>
-        <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5 mt-4">
+        <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
           <Lock className="w-3.5 h-3.5" /> Powered by Stripe. Cancel anytime.
         </p>
       </div>
