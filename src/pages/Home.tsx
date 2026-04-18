@@ -410,8 +410,6 @@ export default function Home() {
                 longestStreak={Math.max(longestStreak, liveStreak || 0)}
                 lastModule={lastModule}
               />
-                lastModule={lastModule}
-              />
 
               {/* Transformation Card */}
               <div className="mt-6">
