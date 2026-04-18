@@ -50,3 +50,12 @@ verify_jwt = false
 
 [functions.send-assessment-email]
 verify_jwt = false
+
+[functions.send-trial-emails]
+verify_jwt = false
+
+[functions.enqueue-trial-emails]
+verify_jwt = false
+
+[functions.admin-set-trial-day]
+verify_jwt = false
