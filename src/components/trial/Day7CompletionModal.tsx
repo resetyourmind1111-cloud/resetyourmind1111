@@ -178,13 +178,9 @@ export function Day7CompletionModal() {
                 >
                   Lock In My Founding Rate
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleDismiss("/upgrade")}
-                  className="w-full border-[#C9A84C]/40 text-[#C9A84C] hover:bg-[#C9A84C]/10 rounded-xl"
-                >
-                  Get Lifetime Access — $1,111
-                </Button>
+                <button onClick={() => handleDismiss("/home")} className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline">
+                  I'll decide later
+                </button>
                 <button onClick={() => handleDismiss("/home")} className="text-sm text-[#F9F6F0]/40 hover:text-[#F9F6F0]/60 transition-colors underline">
                   I'll decide later
                 </button>
