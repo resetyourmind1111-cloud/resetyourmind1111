@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { MomentOneScreen } from "@/components/trial/MomentOneScreen";
 
 const WELCOME_AUDIO_URL =
-  "https://yolulmwfrjhnxykghvpg.supabase.co/storage/v1/object/public/Onboarding/Welcome%20to%20your%20reset%20KI7mjPpBjDKiNh6w4NO0.mp3";
+  "https://hxhwqprtkqwjbdqhulrn.supabase.co/storage/v1/object/public/audio/lorie-welcome.mp3";
 
 const WELCOME_FALLBACK_TEXT = [
   "If you're here, something in you already knows it's time.",
