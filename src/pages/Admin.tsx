@@ -175,6 +175,56 @@ export default function Admin() {
           </Card>
         </motion.div>
 
+        {/* Trial Day Jumper (QA) */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+          <Card className="glass-card">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <FastForward className="w-5 h-5 text-accent" />
+                <h2 className="font-serif text-xl font-bold text-foreground">Trial Day Jumper (QA)</h2>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Backdate any user's trial_start_date so they appear on the chosen day. Day 8 = expired.
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground">User email</Label>
+                  <Input
+                    type="email"
+                    placeholder="user@example.com"
+                    value={jumpEmail}
+                    onChange={(e) => setJumpEmail(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Trial day</Label>
+                  <div className="flex gap-2 mt-1 flex-wrap">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((d) => (
+                      <Button
+                        key={d}
+                        type="button"
+                        size="sm"
+                        variant={jumpDay === d ? "default" : "outline"}
+                        onClick={() => setJumpDay(d)}
+                        className="w-12"
+                      >
+                        {d}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <Button onClick={handleTrialJump} disabled={jumping} className="w-full mt-2">
+                  {jumping ? "Setting..." : `Set to Day ${jumpDay}`}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  After jumping, the target user must refresh or sign out/in to see the new state.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* App Stats */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="glass-card">
