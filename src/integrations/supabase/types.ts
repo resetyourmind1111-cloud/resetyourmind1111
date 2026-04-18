@@ -629,6 +629,101 @@ export type Database = {
         }
         Relationships: []
       }
+      meditation_completions: {
+        Row: {
+          completed_at: string
+          id: string
+          meditation_id: string | null
+          meditation_title: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          meditation_id?: string | null
+          meditation_title: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          meditation_id?: string | null
+          meditation_title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meditation_completions_meditation_id_fkey"
+            columns: ["meditation_id"]
+            isOneToOne: false
+            referencedRelation: "meditations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meditation_notify_requests: {
+        Row: {
+          created_at: string
+          id: string
+          library: string
+          meditation_title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          library: string
+          meditation_title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          library?: string
+          meditation_title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      meditations: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          duration_label: string | null
+          id: string
+          is_coming_soon: boolean
+          library: string
+          sort_order: number
+          tier_required: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          duration_label?: string | null
+          id?: string
+          is_coming_soon?: boolean
+          library: string
+          sort_order?: number
+          tier_required?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          duration_label?: string | null
+          id?: string
+          is_coming_soon?: boolean
+          library?: string
+          sort_order?: number
+          tier_required?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nervous_system_checkins: {
         Row: {
           created_at: string
