@@ -372,6 +372,36 @@ const Oracle = () => {
                   canSave={Boolean(user)}
                 />
 
+                {/* Day-6 bonus chain: route to bonus Permission Slip draw */}
+                {day6BonusJustConsumed && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl border-2 border-[#C9A84C] bg-card p-6 text-center shadow-[0_0_30px_rgba(201,168,76,0.15)]"
+                  >
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-2">
+                      One More Gift
+                    </p>
+                    <h3 className="font-serif text-xl text-foreground mb-2">
+                      Your bonus Permission Slip is waiting.
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-5">
+                      One more piece of permission — just for showing up on Day 6.
+                    </p>
+                    <Button
+                      variant="gold"
+                      size="lg"
+                      className="w-full"
+                      onClick={() => {
+                        setDay6BonusJustConsumed(false);
+                        navigate('/permission-slips?bonus=1');
+                      }}
+                    >
+                      Draw My Bonus Slip →
+                    </Button>
+                  </motion.div>
+                )}
+
                 {/* After-pull info */}
                 {pullsRemaining > 0 ? (
                   <p className="text-center text-sm text-muted-foreground">
