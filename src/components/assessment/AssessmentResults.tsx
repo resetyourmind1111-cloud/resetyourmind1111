@@ -27,7 +27,17 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { z } from "zod";
+
+// Steps that are actually unlocked during the 7-day free trial
+const TRIAL_UNLOCKED_STEPS: { text: string; link: string }[] = [
+  { text: "Begin your first guided meditation (3 unlocked in trial)", link: "/meditations" },
+  { text: "Open your personalized healing tools (2 matched to your focus)", link: "/healing-tools" },
+  { text: "Pull a single Oracle card for today's guidance (3 pulls in trial)", link: "/oracle" },
+  { text: "Start Days 1–3 of the 30-Day Experience", link: "/30-day-experience" },
+  { text: "Discover your Identity Pattern with the quick quiz", link: "/patterns" },
+];
 
 const emailSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
