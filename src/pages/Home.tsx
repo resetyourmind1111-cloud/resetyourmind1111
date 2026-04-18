@@ -174,8 +174,15 @@ export default function Home() {
       <Day7CompletionModal />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+          {/* Retention: streak grace + reset notices (top of dashboard) */}
+          <StreakGraceBanner show={graceActivated} onDismiss={dismissGrace} />
+          <StreakResetCard show={streakWasReset} onDismiss={dismissReset} />
+
           {/* Lorie Welcome Card (Day 1 only) */}
           <LorieWelcomeCard />
+
+          {/* Day 6 Surprise Unlock (trial users only, fires once) */}
+          <Day6GiftCard trialDay={trialDay} isTrialActive={isTrialActive} />
 
           {/* Welcome Back Card (Day 2+ trial users) */}
           {shouldHoldTrialContent ? (
@@ -188,6 +195,9 @@ export default function Home() {
           ) : (
             <WelcomeBackCard loading={resumeLoading} nextAction={nextAction} />
           )}
+
+          {/* Personalized "For You Today" recommendation */}
+          {!shouldHoldTrialContent && <RecommendedForYouCard />}
 
           {/* Day 3 Acknowledgment Card */}
           {!shouldHoldTrialContent && <Day3AcknowledgmentCard />}
