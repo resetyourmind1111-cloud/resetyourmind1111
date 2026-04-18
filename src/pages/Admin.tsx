@@ -122,7 +122,7 @@ export default function Admin() {
 
               <p className="text-sm text-muted-foreground mb-4">
                 {foundingMode
-                  ? "Users see only Founding Member + Lifetime pricing. Regular tiers are hidden."
+                  ? "Users see only Founding Member pricing. Regular tiers are hidden."
                   : "Users see Reset / Expand / Embody tiers. Founding offer is hidden."}
               </p>
 
