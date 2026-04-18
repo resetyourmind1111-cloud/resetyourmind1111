@@ -45,6 +45,8 @@ const Oracle = () => {
   const [trialPullComplete, setTrialPullComplete] = useState(false);
   // Day-6 surprise gift: one bonus pull on top of the trial cap.
   const [day6BonusAvailable, setDay6BonusAvailable] = useState(false);
+  // True when the *current* pull consumed the Day-6 bonus — used to chain to the bonus Permission Slip.
+  const [day6BonusJustConsumed, setDay6BonusJustConsumed] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -135,6 +137,7 @@ const Oracle = () => {
     if (day6BonusAvailable && newPulls > 3) {
       updates.day6_bonus_oracle_used = true;
       setDay6BonusAvailable(false);
+      setDay6BonusJustConsumed(true);
     }
     await supabase.from('profiles').update(updates as any).eq('user_id', user.id);
   };
@@ -368,6 +371,36 @@ const Oracle = () => {
                   onNewReading={resetReading}
                   canSave={Boolean(user)}
                 />
+
+                {/* Day-6 bonus chain: route to bonus Permission Slip draw */}
+                {day6BonusJustConsumed && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl border-2 border-[#C9A84C] bg-card p-6 text-center shadow-[0_0_30px_rgba(201,168,76,0.15)]"
+                  >
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-2">
+                      One More Gift
+                    </p>
+                    <h3 className="font-serif text-xl text-foreground mb-2">
+                      Your bonus Permission Slip is waiting.
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-5">
+                      One more piece of permission — just for showing up on Day 6.
+                    </p>
+                    <Button
+                      variant="gold"
+                      size="lg"
+                      className="w-full"
+                      onClick={() => {
+                        setDay6BonusJustConsumed(false);
+                        navigate('/permission-slips?bonus=1');
+                      }}
+                    >
+                      Draw My Bonus Slip →
+                    </Button>
+                  </motion.div>
+                )}
 
                 {/* After-pull info */}
                 {pullsRemaining > 0 ? (

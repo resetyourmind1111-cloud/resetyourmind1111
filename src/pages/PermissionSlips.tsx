@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Check, Sparkles, Plus, Send } from "lucide-react";
+import { Check, Sparkles, Plus, Send, Gift } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,11 +31,32 @@ interface AcceptedSlip {
 export default function PermissionSlips() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<string>("daily");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isBonusDraw = searchParams.get("bonus") === "1";
+  const [activeTab, setActiveTab] = useState<string>(isBonusDraw ? "daily" : "daily");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [customText, setCustomText] = useState("");
+  const [showBonusBanner, setShowBonusBanner] = useState(isBonusDraw);
 
-  const dailySlip = useMemo(() => getDailySlip(), []);
+  // Pick a fresh random slip when arriving via the Day-6 bonus chain;
+  // otherwise show the deterministic daily slip.
+  const dailySlip = useMemo(() => {
+    if (isBonusDraw) {
+      const i = Math.floor(Math.random() * allPermissionSlips.length);
+      return allPermissionSlips[i];
+    }
+    return getDailySlip();
+  }, [isBonusDraw]);
+
+  // Strip the ?bonus=1 param after mount so a refresh doesn't keep re-rolling.
+  useEffect(() => {
+    if (isBonusDraw) {
+      const next = new URLSearchParams(searchParams);
+      next.delete("bonus");
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { data: acceptedSlips = [] } = useQuery({
     queryKey: ["accepted-slips", user?.id],
@@ -132,6 +154,26 @@ export default function PermissionSlips() {
         {/* ===== DAILY SLIP ===== */}
         <TabsContent value="daily">
           <div className="max-w-xl mx-auto">
+            {showBonusBanner && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 rounded-xl border-2 border-[#C9A84C] bg-card p-5 text-center shadow-[0_0_30px_rgba(201,168,76,0.15)]"
+              >
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Gift className="w-4 h-4 text-[#C9A84C]" />
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold">
+                    Day 6 Bonus
+                  </p>
+                </div>
+                <h3 className="font-serif text-lg text-foreground mb-1">
+                  Your bonus Permission Slip.
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Drawn fresh — just for showing up.
+                </p>
+              </motion.div>
+            )}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -139,10 +181,12 @@ export default function PermissionSlips() {
             >
               <Sparkles className="w-10 h-10 text-accent mx-auto mb-4" />
               <h2 className="font-serif text-2xl font-bold text-foreground mb-2">
-                Today's Permission Slip
+                {showBonusBanner ? "Your Bonus Slip" : "Today's Permission Slip"}
               </h2>
               <p className="text-muted-foreground text-sm">
-                Your daily message of empowerment
+                {showBonusBanner
+                  ? "Accept it. It's yours."
+                  : "Your daily message of empowerment"}
               </p>
             </motion.div>
             <FeaturedSlipCard
