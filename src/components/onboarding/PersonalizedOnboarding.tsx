@@ -173,6 +173,12 @@ export function PersonalizedOnboarding() {
       await doSave();
     }
 
+    // Fire-and-forget: notify admin + send the user their welcome email.
+    // Idempotent on the server (won't double-send on retry).
+    supabase.functions.invoke("notify-trial-started").catch((e) =>
+      console.error("notify-trial-started failed:", e),
+    );
+
     setTimeout(() => setScreen(7), 2500);
   };
 
