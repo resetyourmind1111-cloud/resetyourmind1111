@@ -58,6 +58,31 @@ Deno.serve(async (req) => {
     return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
+  // Resolve user_id from subscription metadata, or fall back to DB lookup
+  // by stripe_subscription_id / stripe_customer_id. Stripe doesn't always
+  // carry metadata on renewals or portal-driven updates.
+  async function resolveUserId(sub: Stripe.Subscription): Promise<string | null> {
+    const metaId = (sub.metadata as any)?.user_id;
+    if (metaId) return metaId;
+
+    const { data: bySub } = await supabaseAdmin
+      .from("subscriptions")
+      .select("user_id")
+      .eq("stripe_subscription_id", sub.id)
+      .maybeSingle();
+    if (bySub?.user_id) return bySub.user_id;
+
+    if (sub.customer) {
+      const { data: byCust } = await supabaseAdmin
+        .from("subscriptions")
+        .select("user_id")
+        .eq("stripe_customer_id", sub.customer as string)
+        .maybeSingle();
+      if (byCust?.user_id) return byCust.user_id;
+    }
+    return null;
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {
@@ -129,7 +154,7 @@ Deno.serve(async (req) => {
         const priceId = subscription.items.data[0]?.price?.id;
         const mapping = priceId ? PRICE_TIER_MAP[priceId] : null;
 
-        const userId = subscription.metadata?.user_id;
+        const userId = await resolveUserId(subscription);
         if (!userId) break;
 
         const updateData: Record<string, any> = {
@@ -162,7 +187,7 @@ Deno.serve(async (req) => {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata?.user_id;
+        const userId = await resolveUserId(subscription);
         if (!userId) break;
 
         await supabaseAdmin
@@ -183,7 +208,7 @@ Deno.serve(async (req) => {
         if (!subscriptionId) break;
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const userId = subscription.metadata?.user_id;
+        const userId = await resolveUserId(subscription);
         if (!userId) break;
 
         await supabaseAdmin
@@ -203,7 +228,7 @@ Deno.serve(async (req) => {
         if (!subscriptionId) break;
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const userId = subscription.metadata?.user_id;
+        const userId = await resolveUserId(subscription);
         if (!userId) break;
 
         await supabaseAdmin
