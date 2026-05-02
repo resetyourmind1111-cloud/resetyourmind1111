@@ -111,11 +111,12 @@ export default function Upgrade() {
   const { user } = useAuth();
   const { effectiveTier } = useSubscription();
   const { foundingMode, spotsRemaining } = useFoundingMode();
+  const { isLiveReset } = useUserSource();
   const [isAnnual, setIsAnnual] = useState(false);
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
 
-  const handleCheckout = async (priceId: string, tierKey: string) => {
+  const handleCheckout = async (priceId: string, tierKey: string, couponId?: string) => {
     if (!user) {
       navigate("/auth");
       return;
@@ -127,7 +128,7 @@ export default function Upgrade() {
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId, tierKey },
+        body: { priceId, tierKey, couponId },
       });
       if (error) throw error;
       if (!data?.url) throw new Error("No checkout URL returned");
