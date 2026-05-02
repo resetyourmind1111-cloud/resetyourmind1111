@@ -39,7 +39,10 @@ type AuthView = "signIn" | "signUp" | "forgotPassword" | "updatePassword" | "res
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
-  const initialView = searchParams.get("view") === "signup" ? "signUp" : "signIn";
+  const initialView =
+    searchParams.get("view") === "signup" || searchParams.has("source")
+      ? "signUp"
+      : "signIn";
   const [view, setView] = useState<AuthView>(initialView);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -187,9 +190,23 @@ export default function Auth() {
             setFormError({ message: error.message });
           }
         } else {
-          // Fire-and-forget: enqueue the 7-day trial email sequence.
-          // Wait briefly for session to attach so the function call carries auth.
-          setTimeout(() => {
+          // Capture ?source=live-reset → persist on profile so we can offer
+          // the Founding $11 first-month rate on Day 7.
+          const sourceParam = searchParams.get("source");
+          const userSource = sourceParam === "live-reset" ? "live-reset" : "organic";
+          setTimeout(async () => {
+            try {
+              const { data: { user: newUser } } = await supabase.auth.getUser();
+              if (newUser) {
+                await supabase
+                  .from("profiles")
+                  .update({ user_source: userSource } as any)
+                  .eq("user_id", newUser.id);
+              }
+            } catch (err) {
+              console.warn("user_source update failed (non-blocking):", err);
+            }
+            // Enqueue the 7-day trial email sequence
             supabase.functions.invoke("enqueue-trial-emails").catch((err) => {
               console.warn("enqueue-trial-emails failed (non-blocking):", err);
             });

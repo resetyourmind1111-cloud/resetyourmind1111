@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useFoundingMode } from "@/hooks/useFoundingMode";
+import { useUserSource } from "@/hooks/useUserSource";
+import { SHOW_ALL_TIERS, LIVE_RESET_FIRST_MONTH_COUPON } from "@/config/featureFlags";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -109,11 +111,12 @@ export default function Upgrade() {
   const { user } = useAuth();
   const { effectiveTier } = useSubscription();
   const { foundingMode, spotsRemaining } = useFoundingMode();
+  const { isLiveReset } = useUserSource();
   const [isAnnual, setIsAnnual] = useState(false);
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
 
-  const handleCheckout = async (priceId: string, tierKey: string) => {
+  const handleCheckout = async (priceId: string, tierKey: string, couponId?: string) => {
     if (!user) {
       navigate("/auth");
       return;
@@ -125,7 +128,7 @@ export default function Upgrade() {
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId, tierKey },
+        body: { priceId, tierKey, couponId },
       });
       if (error) throw error;
       if (!data?.url) throw new Error("No checkout URL returned");
@@ -157,39 +160,66 @@ export default function Upgrade() {
     else navigate("/dashboard", { replace: true });
   };
 
-  // ─── FOUNDING MODE ───
-  if (foundingMode) {
+  // ─── FOUNDING-ONLY MODE ───
+  // Active when feature flag SHOW_ALL_TIERS is false OR when foundingMode is on.
+  // Live-reset attendees see "$11 first month" via Stripe coupon.
+  // Organic users see straight $44/month.
+  if (!SHOW_ALL_TIERS || foundingMode) {
+    const liveResetCta = isLiveReset;
+    const headline = liveResetCta
+      ? "Continue your reset for $11."
+      : "Get in before this closes.";
+    const subhead = liveResetCta
+      ? "Your $33 live session has already been applied toward your membership. First month $11 — then just $44/month. Cancel anytime."
+      : "Lock in $44/month for full access. Cancel anytime.";
+    const ctaLabel = liveResetCta
+      ? "Continue for $11 →"
+      : "Continue for $44/month →";
+    const priceDisplay = liveResetCta ? "$11" : "$44";
+    const priceSubtext = liveResetCta
+      ? "first month, then $44/month"
+      : "/month";
+
     return (
       <div className="min-h-screen bg-background">
         <button onClick={handleBack} className="fixed top-4 left-4 z-50 flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors">
           <ChevronLeft className="w-4 h-4" /> Back
         </button>
         <div className="pt-16 pb-8 px-4 text-center">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-3">FOUNDING MEMBER ACCESS</p>
+          <p className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-3">
+            {liveResetCta ? "FOUNDING MEMBER · LIVE RESET RATE" : "FOUNDING MEMBER ACCESS"}
+          </p>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-3xl md:text-5xl font-bold text-foreground mb-4">
-            Get in before this closes.
+            {headline}
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-            The first 111 members lock in $44/month for full access — for life, as long as they stay active. When founding closes, this price is gone forever.
+            {subhead}
           </motion.p>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="text-accent font-serif text-2xl font-bold mt-6">
-            {spotsRemaining} spots remaining
-          </motion.p>
+          {foundingMode && (
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="text-accent font-serif text-2xl font-bold mt-6">
+              {spotsRemaining} spots remaining
+            </motion.p>
+          )}
         </div>
 
         <div className="max-w-xl mx-auto px-4 mb-12">
-          {/* Founding Member Card */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="relative rounded-2xl p-6 md:p-8 border-2 border-accent bg-secondary/20">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent text-accent-foreground">
-              ⭐ LIMITED — {spotsRemaining} SPOTS REMAINING
-            </div>
+            {foundingMode && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent text-accent-foreground">
+                ⭐ LIMITED — {spotsRemaining} SPOTS REMAINING
+              </div>
+            )}
             <div className="text-center mb-6 mt-2">
               <h3 className="font-serif text-2xl font-bold text-foreground">Founding Member</h3>
               <div className="mt-2">
-                <span className="font-serif text-4xl font-bold text-foreground">$44</span>
-                <span className="text-muted-foreground text-sm">/month</span>
+                <span className="font-serif text-4xl font-bold text-foreground">{priceDisplay}</span>
+                <span className="text-muted-foreground text-sm ml-1">{priceSubtext}</span>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">Locked in for life while you stay active</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {liveResetCta
+                  ? "One subscription. First cycle billed at $11."
+                  : "Locked in for full access. Cancel anytime."}
+              </p>
             </div>
             <ul className="space-y-2 mb-6">
               {FOUNDING_FEATURES.map(f => (
@@ -198,17 +228,35 @@ export default function Upgrade() {
                 </li>
               ))}
             </ul>
-            <p className="text-[10px] text-muted-foreground mb-4">If you cancel, your founding rate cannot be reinstated under any circumstances.</p>
-            <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold rounded-xl" onClick={() => handleCheckout(FOUNDING_PRICE_ID, "FOUNDING")} disabled={!!loadingTier}>
-              {loadingTier === "FOUNDING" ? "Loading…" : "Lock In My Founding Rate"}
+            <p className="text-[10px] text-muted-foreground mb-4">
+              {liveResetCta
+                ? "After your first $11 month, your membership renews at $44/month. Cancel anytime."
+                : "Cancel anytime from your account."}
+            </p>
+            <Button
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold rounded-xl"
+              onClick={() => handleCheckout(
+                FOUNDING_PRICE_ID,
+                "FOUNDING",
+                liveResetCta ? LIVE_RESET_FIRST_MONTH_COUPON : undefined,
+              )}
+              disabled={!!loadingTier}
+            >
+              {loadingTier === "FOUNDING" ? "Loading…" : ctaLabel}
             </Button>
-            <p className="text-[10px] text-muted-foreground text-center mt-2">111 spots total. {spotsRemaining} remaining.</p>
+            {!liveResetCta && (
+              <p className="text-[10px] text-muted-foreground text-center mt-3">
+                Attended a live reset? Your $33 session unlocks the $11 first-month rate.{" "}
+                <a href="https://resetyourmind1111.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">
+                  Learn about the live reset →
+                </a>
+              </p>
+            )}
           </motion.div>
         </div>
 
         <div className="text-center pb-16 px-4">
-          <p className="text-xs text-muted-foreground">After founding closes, monthly access starts at $44. Lock in your rate now.</p>
-          <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5 mt-2">
+          <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
             <Lock className="w-3.5 h-3.5" /> Powered by Stripe. Cancel anytime.
           </p>
         </div>

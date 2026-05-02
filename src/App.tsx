@@ -69,7 +69,8 @@ const App = () => (
                 <Route path="/landing" element={<Index />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/assessment" element={<Assessment />} />
-                <Route path="/auth" element={<Auth />} />
+               <Route path="/auth" element={<Auth />} />
+               <Route path="/register" element={<Auth />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/oracle" element={<Oracle />} />

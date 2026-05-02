@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     const userId = user.id;
     const userEmail = user.email;
 
-    const { priceId, tierKey } = await req.json();
+    const { priceId, tierKey, couponId } = await req.json();
     
     if (!priceId || !PRICE_TIER_MAP[priceId]) {
       return new Response(JSON.stringify({ error: "Invalid price" }), {
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     // Get or create Stripe customer
     const { data: profile } = await supabaseAdmin
       .from("profiles")
-      .select("stripe_customer_id, full_name")
+      .select("stripe_customer_id, full_name, user_source")
       .eq("user_id", userId)
       .single();
 
@@ -100,7 +100,14 @@ Deno.serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://id-preview--e0c3104e-89de-46cb-978e-ccf1844a67a2.lovable.app";
 
-    const session = await stripe.checkout.sessions.create({
+    // Server-side guard: only live-reset users may apply the founding coupon.
+    // This prevents a malicious organic user from passing couponId from the client.
+    let safeCouponId: string | undefined;
+    if (couponId && (profile as any)?.user_source === "live-reset") {
+      safeCouponId = couponId;
+    }
+
+    const sessionParams: any = {
       customer: stripeCustomerId,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
@@ -116,7 +123,13 @@ Deno.serve(async (req) => {
           tier_requested: tierKey || PRICE_TIER_MAP[priceId],
         },
       },
-    });
+    };
+
+    if (safeCouponId) {
+      sessionParams.discounts = [{ coupon: safeCouponId }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
