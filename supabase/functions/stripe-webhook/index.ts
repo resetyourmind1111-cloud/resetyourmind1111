@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
         const priceId = subscription.items.data[0]?.price?.id;
         const mapping = priceId ? PRICE_TIER_MAP[priceId] : null;
 
-        const userId = subscription.metadata?.user_id;
+        const userId = await resolveUserId(subscription);
         if (!userId) break;
 
         const updateData: Record<string, any> = {
@@ -187,7 +187,7 @@ Deno.serve(async (req) => {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata?.user_id;
+        const userId = await resolveUserId(subscription);
         if (!userId) break;
 
         await supabaseAdmin
@@ -208,7 +208,7 @@ Deno.serve(async (req) => {
         if (!subscriptionId) break;
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const userId = subscription.metadata?.user_id;
+        const userId = await resolveUserId(subscription);
         if (!userId) break;
 
         await supabaseAdmin
@@ -228,7 +228,7 @@ Deno.serve(async (req) => {
         if (!subscriptionId) break;
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const userId = subscription.metadata?.user_id;
+        const userId = await resolveUserId(subscription);
         if (!userId) break;
 
         await supabaseAdmin
