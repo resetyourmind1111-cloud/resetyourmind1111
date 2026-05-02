@@ -14,4 +14,4 @@ export const SHOW_ALL_TIERS = false;
  * first billing cycle. Applied automatically for users whose
  * profiles.user_source === 'live-reset'.
  */
-export const LIVE_RESET_FIRST_MONTH_COUPON = "ToZEtxpW";
+export const LIVE_RESET_FIRST_MONTH_COUPON = "jFPZRQQb";
