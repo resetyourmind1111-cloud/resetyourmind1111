@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useFoundingMode } from "@/hooks/useFoundingMode";
+import { useUserSource } from "@/hooks/useUserSource";
+import { SHOW_ALL_TIERS, LIVE_RESET_FIRST_MONTH_COUPON } from "@/config/featureFlags";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
