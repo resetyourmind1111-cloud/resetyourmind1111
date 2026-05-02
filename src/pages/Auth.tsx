@@ -39,7 +39,10 @@ type AuthView = "signIn" | "signUp" | "forgotPassword" | "updatePassword" | "res
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
-  const initialView = searchParams.get("view") === "signup" ? "signUp" : "signIn";
+  const initialView =
+    searchParams.get("view") === "signup" || searchParams.has("source")
+      ? "signUp"
+      : "signIn";
   const [view, setView] = useState<AuthView>(initialView);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
