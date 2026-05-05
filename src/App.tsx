@@ -50,6 +50,7 @@ import WhatsNext from "./pages/WhatsNext";
 import SacredCircle from "./pages/SacredCircle";
 import Admin from "./pages/Admin";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import FoundingMemberWelcome from "./pages/FoundingMemberWelcome";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
