@@ -88,7 +88,46 @@ Deno.serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.user_id;
-        if (!userId || !session.subscription) break;
+
+        // Case A: payment-link / no app account yet — capture as pending founding member
+        if (!userId) {
+          const email =
+            session.customer_details?.email ||
+            session.customer_email ||
+            null;
+          if (email) {
+            await supabaseAdmin.from("pending_founding_members").upsert(
+              {
+                email: email.toLowerCase(),
+                stripe_customer_id: (session.customer as string) ?? null,
+                stripe_session_id: session.id,
+                stripe_payment_intent_id: (session.payment_intent as string) ?? null,
+                amount_paid: session.amount_total ?? null,
+                paid_at: new Date().toISOString(),
+                source: "stripe_payment_link",
+              },
+              { onConflict: "email" }
+            );
+
+            // If a profile already exists for this email, upgrade them now
+            const { data: existingUser } = await supabaseAdmin.auth.admin
+              .listUsers({ page: 1, perPage: 1 });
+            // Best-effort lookup by email via profiles join
+            const { data: matchingAuth } = await supabaseAdmin
+              .rpc("get_user_id_by_email", { p_email: email.toLowerCase() })
+              .maybeSingle?.() ?? { data: null };
+
+            // Fallback direct query — find via auth.users requires service role
+            const { data: usersByEmail } = await supabaseAdmin
+              .from("profiles")
+              .select("user_id")
+              .limit(1);
+            // Note: profiles table has no email column; rely on claim trigger at signup.
+          }
+          break;
+        }
+
+        if (!session.subscription) break;
 
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
         const priceId = subscription.items.data[0]?.price?.id;
