@@ -50,6 +50,7 @@ import WhatsNext from "./pages/WhatsNext";
 import SacredCircle from "./pages/SacredCircle";
 import Admin from "./pages/Admin";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import FoundingMemberWelcome from "./pages/FoundingMemberWelcome";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -109,6 +110,7 @@ const App = () => (
                 <Route path="/sacred-circle" element={<SacredCircle />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
+                <Route path="/founding-member-welcome" element={<FoundingMemberWelcome />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

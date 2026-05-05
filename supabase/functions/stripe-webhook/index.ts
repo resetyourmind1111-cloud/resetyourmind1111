@@ -88,7 +88,32 @@ Deno.serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.user_id;
-        if (!userId || !session.subscription) break;
+
+        // Case A: payment-link checkout (no app user yet) — record as pending founding member
+        if (!userId) {
+          const email =
+            session.customer_details?.email ||
+            session.customer_email ||
+            null;
+          if (email) {
+            await supabaseAdmin.from("pending_founding_members").upsert(
+              {
+                email: email.toLowerCase(),
+                stripe_customer_id: (session.customer as string) ?? null,
+                stripe_session_id: session.id,
+                stripe_payment_intent_id: (session.payment_intent as string) ?? null,
+                amount_paid: session.amount_total ?? null,
+                paid_at: new Date().toISOString(),
+                source: "stripe_payment_link",
+              },
+              { onConflict: "email" }
+            );
+            console.log("Recorded pending founding member:", email);
+          }
+          break;
+        }
+
+        if (!session.subscription) break;
 
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
         const priceId = subscription.items.data[0]?.price?.id;

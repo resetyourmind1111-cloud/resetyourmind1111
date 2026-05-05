@@ -997,6 +997,51 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_founding_members: {
+        Row: {
+          amount_paid: number | null
+          claimed: boolean
+          claimed_at: string | null
+          claimed_by_user_id: string | null
+          created_at: string
+          email: string
+          id: string
+          paid_at: string
+          source: string | null
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+        }
+        Insert: {
+          amount_paid?: number | null
+          claimed?: boolean
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          paid_at?: string
+          source?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+        }
+        Update: {
+          amount_paid?: number | null
+          claimed?: boolean
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          paid_at?: string
+          source?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+        }
+        Relationships: []
+      }
       permission_slips_accepted: {
         Row: {
           category: string
