@@ -110,6 +110,7 @@ const App = () => (
                 <Route path="/sacred-circle" element={<SacredCircle />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
+                <Route path="/founding-member-welcome" element={<FoundingMemberWelcome />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
