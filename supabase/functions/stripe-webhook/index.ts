@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.user_id;
 
-        // Case A: payment-link / no app account yet — capture as pending founding member
+        // Case A: payment-link checkout (no app user yet) — record as pending founding member
         if (!userId) {
           const email =
             session.customer_details?.email ||
@@ -108,21 +108,7 @@ Deno.serve(async (req) => {
               },
               { onConflict: "email" }
             );
-
-            // If a profile already exists for this email, upgrade them now
-            const { data: existingUser } = await supabaseAdmin.auth.admin
-              .listUsers({ page: 1, perPage: 1 });
-            // Best-effort lookup by email via profiles join
-            const { data: matchingAuth } = await supabaseAdmin
-              .rpc("get_user_id_by_email", { p_email: email.toLowerCase() })
-              .maybeSingle?.() ?? { data: null };
-
-            // Fallback direct query — find via auth.users requires service role
-            const { data: usersByEmail } = await supabaseAdmin
-              .from("profiles")
-              .select("user_id")
-              .limit(1);
-            // Note: profiles table has no email column; rely on claim trigger at signup.
+            console.log("Recorded pending founding member:", email);
           }
           break;
         }
