@@ -1,0 +1,1 @@
+UPDATE public.profiles SET user_source = 'live-reset' WHERE user_id = 'ef6d9701-13b3-41e3-928a-ec4b55409aff'
