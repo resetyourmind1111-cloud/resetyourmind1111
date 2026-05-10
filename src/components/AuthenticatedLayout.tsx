@@ -7,6 +7,8 @@ import { CancelledBanner } from "@/components/CancelledBanner";
 import { BottomNav } from "@/components/BottomNav";
 import { TrialDayBanner } from "@/components/TrialDayBanner";
 import { TrialExpiredOverlay } from "@/components/TrialExpiredOverlay";
+import { GiftedCountdownBanner } from "@/components/gifted/GiftedCountdownBanner";
+import { GiftedExperienceGate } from "@/components/gifted/GiftedExperienceGate";
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
