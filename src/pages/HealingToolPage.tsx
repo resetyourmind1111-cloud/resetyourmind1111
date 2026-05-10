@@ -86,6 +86,12 @@ export default function HealingToolPage() {
   const tool = healingTools.find((t) => t.id === toolId);
   const ToolComponent = toolId ? toolComponents[toolId] : null;
 
+  useEffect(() => {
+    if (user?.id && toolId) {
+      incrementGiftedCounter(user.id, "tools_opened_count").catch(() => {});
+    }
+  }, [user?.id, toolId]);
+
   if (!tool) {
     return (
       <AuthenticatedLayout title="Tool Not Found">
