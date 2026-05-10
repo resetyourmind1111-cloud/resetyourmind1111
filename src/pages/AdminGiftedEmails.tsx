@@ -88,6 +88,26 @@ export default function AdminGiftedEmails() {
     }
   };
 
+  const performResend = async () => {
+    if (!confirm) return;
+    const key = `${confirm.userId}:${confirm.milestone}`;
+    setResendingKey(key);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-resend-gifted-email", {
+        body: { user_id: confirm.userId, milestone: confirm.milestone },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success(`${confirm.milestone === "day15" ? "Day 15" : "Day 21"} email sent to ${confirm.email}`);
+      setConfirm(null);
+      await load();
+    } catch (e: any) {
+      toast.error(e.message || "Resend failed");
+    } finally {
+      setResendingKey(null);
+    }
+  };
+
   const q = search.trim().toLowerCase();
   const filtered = rows.filter(r => {
     if (q) {
