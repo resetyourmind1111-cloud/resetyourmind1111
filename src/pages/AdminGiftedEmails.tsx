@@ -76,7 +76,12 @@ export default function AdminGiftedEmails() {
     }
   };
 
+  const q = search.trim().toLowerCase();
   const filtered = rows.filter(r => {
+    if (q) {
+      const hay = `${r.email ?? ""} ${r.full_name ?? ""}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
     if (filter === "all") return true;
     if (filter === "day15_sent") return !!r.day15_email_sent_at;
     if (filter === "day21_sent") return !!r.day21_email_sent_at;
