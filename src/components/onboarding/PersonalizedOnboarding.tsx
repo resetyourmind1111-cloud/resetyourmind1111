@@ -226,6 +226,10 @@ export function PersonalizedOnboarding() {
     exit: { opacity: 0, x: -40 },
   };
 
+  if (missionChecked && showMission) {
+    return <MissionIntroScreen onContinue={handleMissionContinue} />;
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <AnimatePresence mode="wait">
