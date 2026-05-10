@@ -304,8 +304,11 @@ export default function Upgrade() {
         </motion.div>
       </div>
 
+      <PermissionGrantedSection />
+
       {/* Annual toggle */}
-      <div className="flex items-center justify-center gap-3 mb-10">
+      <div className="flex items-center justify-center gap-3 mb-10 mt-12">
+
         <span className={`text-sm font-medium ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
         <button onClick={() => setIsAnnual(!isAnnual)} className={`relative w-14 h-7 rounded-full transition-colors ${isAnnual ? "bg-accent" : "bg-muted"}`}>
           <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-background shadow transition-transform ${isAnnual ? "translate-x-7" : "translate-x-0.5"}`} />
