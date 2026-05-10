@@ -167,20 +167,32 @@ export default function Upgrade() {
   // Live-reset attendees see "$11 first month" via Stripe coupon.
   // Organic users see straight $44/month.
   if (!SHOW_ALL_TIERS || foundingMode) {
-    const liveResetCta = isLiveReset;
-    const headline = liveResetCta
+    // Variant priority: gifted > live-reset > organic
+    const discountedCta = isGifted || isLiveReset;
+    const eyebrow = isGifted
+      ? "FOUNDING MEMBER · GIFTED ACCESS RATE"
+      : isLiveReset
+      ? "FOUNDING MEMBER · LIVE RESET RATE"
+      : "FOUNDING MEMBER ACCESS";
+    const headline = isGifted
+      ? "You were given access. Now make it yours."
+      : isLiveReset
       ? "Continue your reset for $11."
       : "Get in before this closes.";
-    const subhead = liveResetCta
+    const subhead = isGifted
+      ? `Because you were gifted this experience, you qualify for the Founding Member rate: $11 for your first 30 days — then $44/month after. This offer is only available while your gifted access is active${
+          giftedDaysRemaining > 0 ? ` (${giftedDaysRemaining} ${giftedDaysRemaining === 1 ? "day" : "days"} left)` : ""
+        }. It disappears the moment your free access expires.`
+      : isLiveReset
       ? "Your $33 live session has already been applied toward your membership. First month $11 — then just $44/month. Cancel anytime."
       : "Lock in $44/month for full access. Cancel anytime.";
-    const ctaLabel = liveResetCta
+    const ctaLabel = isGifted
+      ? "Claim My $11 Rate →"
+      : isLiveReset
       ? "Continue for $11 →"
       : "Continue for $44/month →";
-    const priceDisplay = liveResetCta ? "$11" : "$44";
-    const priceSubtext = liveResetCta
-      ? "first month, then $44/month"
-      : "/month";
+    const priceDisplay = discountedCta ? "$11" : "$44";
+    const priceSubtext = discountedCta ? "first month, then $44/month" : "/month";
 
     return (
       <div className="min-h-screen bg-background">
