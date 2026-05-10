@@ -110,6 +110,7 @@ const App = () => (
                 <Route path="/whats-next" element={<WhatsNext />} />
                 <Route path="/sacred-circle" element={<SacredCircle />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/gifted-emails" element={<AdminGiftedEmails />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/founding-member-welcome" element={<FoundingMemberWelcome />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
