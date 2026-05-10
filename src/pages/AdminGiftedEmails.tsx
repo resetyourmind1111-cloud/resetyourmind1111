@@ -129,18 +129,33 @@ export default function AdminGiftedEmails() {
           </div>
         )}
 
-        <div className="flex gap-2 flex-wrap">
-          {(["all", "day15_sent", "day21_sent", "pending"] as const).map(f => (
-            <Button
-              key={f}
-              variant={filter === f ? "default" : "outline"}
-              size="sm"
-              onClick={() => setFilter(f)}
-              className={filter === f ? "bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90" : ""}
-            >
-              {f === "all" ? "All" : f === "day15_sent" ? "Day 15 Sent" : f === "day21_sent" ? "Day 21 Sent" : "Pending"}
-            </Button>
-          ))}
+        <div className="flex gap-3 flex-wrap items-center">
+          <div className="relative flex-1 min-w-[220px] max-w-md">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              placeholder="Search by email or name…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {(["all", "day15_sent", "day21_sent", "pending"] as const).map(f => (
+              <Button
+                key={f}
+                variant={filter === f ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilter(f)}
+                className={filter === f ? "bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90" : ""}
+              >
+                {f === "all" ? "All" : f === "day15_sent" ? "Day 15 Sent" : f === "day21_sent" ? "Day 21 Sent" : "Pending"}
+              </Button>
+            ))}
+          </div>
+          {(search || filter !== "all") && (
+            <span className="text-xs text-muted-foreground">{filtered.length} of {rows.length}</span>
+          )}
         </div>
 
         <Card>
