@@ -1079,8 +1079,10 @@ export type Database = {
           comeback_card_shown: boolean
           created_at: string
           current_streak: number | null
+          day15_email_sent_at: string | null
           day15_modal_shown: boolean
           day15_remind_later_at: string | null
+          day21_email_sent_at: string | null
           day21_modal_shown: boolean
           day3_card_shown: boolean
           day5_emotional_peak_completed: boolean
@@ -1160,8 +1162,10 @@ export type Database = {
           comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
+          day15_email_sent_at?: string | null
           day15_modal_shown?: boolean
           day15_remind_later_at?: string | null
+          day21_email_sent_at?: string | null
           day21_modal_shown?: boolean
           day3_card_shown?: boolean
           day5_emotional_peak_completed?: boolean
@@ -1241,8 +1245,10 @@ export type Database = {
           comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
+          day15_email_sent_at?: string | null
           day15_modal_shown?: boolean
           day15_remind_later_at?: string | null
+          day21_email_sent_at?: string | null
           day21_modal_shown?: boolean
           day3_card_shown?: boolean
           day5_emotional_peak_completed?: boolean
