@@ -7,6 +7,8 @@ import { CancelledBanner } from "@/components/CancelledBanner";
 import { BottomNav } from "@/components/BottomNav";
 import { TrialDayBanner } from "@/components/TrialDayBanner";
 import { TrialExpiredOverlay } from "@/components/TrialExpiredOverlay";
+import { GiftedCountdownBanner } from "@/components/gifted/GiftedCountdownBanner";
+import { GiftedExperienceGate } from "@/components/gifted/GiftedExperienceGate";
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
@@ -41,6 +43,8 @@ export function AuthenticatedLayout({ children, title, subtitle }: Authenticated
       <CancelledBanner />
       <TrialDayBanner />
       <TrialExpiredOverlay />
+      <GiftedCountdownBanner />
+      <GiftedExperienceGate />
       <main className="pt-20 md:pt-24 pb-24 md:pb-16">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-10">

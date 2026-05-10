@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     // Get or create Stripe customer
     const { data: profile } = await supabaseAdmin
       .from("profiles")
-      .select("stripe_customer_id, full_name, user_source")
+      .select("stripe_customer_id, full_name, user_source, access_expires_at")
       .eq("user_id", userId)
       .single();
 
@@ -100,11 +100,18 @@ Deno.serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://id-preview--e0c3104e-89de-46cb-978e-ccf1844a67a2.lovable.app";
 
-    // Server-side guard: only live-reset users may apply the founding coupon.
-    // This prevents a malicious organic user from passing couponId from the client.
+    // Server-side guard: only live-reset attendees OR active gifted-access users
+    // may apply the founding coupon. Prevents organic users from passing couponId
+    // from the client. Gifted users with expired access fall back to full price.
     let safeCouponId: string | undefined;
-    if (couponId && (profile as any)?.user_source === "live-reset") {
-      safeCouponId = couponId;
+    if (couponId) {
+      const src = (profile as any)?.user_source;
+      const expiresAt = (profile as any)?.access_expires_at;
+      const giftedActive =
+        src === "gifted" && expiresAt && new Date(expiresAt).getTime() > Date.now();
+      if (src === "live-reset" || giftedActive) {
+        safeCouponId = couponId;
+      }
     }
 
     const sessionParams: any = {

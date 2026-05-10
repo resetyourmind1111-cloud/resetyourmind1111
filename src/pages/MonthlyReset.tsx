@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { AnthemPlayer } from "@/components/anthem/AnthemPlayer";
 import { allPermissionSlips } from "@/data/permissionSlipsData";
 import { useToast } from "@/hooks/use-toast";
+import { incrementGiftedCounter } from "@/hooks/useGiftedAccess";
 import html2canvas from "html2canvas";
 
 const monthlyThemes: Record<number, { theme: string; question: string; teaching: string }> = {
@@ -63,6 +64,7 @@ export default function MonthlyReset() {
     const key = `${monthName.toLowerCase()}_${year}`;
     completed[key] = true;
     await supabase.from("profiles").update({ monthly_ceremonies_completed: completed } as any).eq("user_id", user.id);
+    incrementGiftedCounter(user.id, "resets_completed_count").catch(() => {});
     toast({ title: `Your ${monthName} reset is set.`, description: "✦" });
     navigate("/home");
   };

@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useFoundingMode } from "@/hooks/useFoundingMode";
 import { useUserSource } from "@/hooks/useUserSource";
+import { useGiftedAccess } from "@/hooks/useGiftedAccess";
 import { SHOW_ALL_TIERS, LIVE_RESET_FIRST_MONTH_COUPON } from "@/config/featureFlags";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -112,6 +113,7 @@ export default function Upgrade() {
   const { effectiveTier } = useSubscription();
   const { foundingMode, spotsRemaining } = useFoundingMode();
   const { isLiveReset } = useUserSource();
+  const { isGifted, daysRemaining: giftedDaysRemaining } = useGiftedAccess();
   const [isAnnual, setIsAnnual] = useState(false);
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
@@ -165,20 +167,32 @@ export default function Upgrade() {
   // Live-reset attendees see "$11 first month" via Stripe coupon.
   // Organic users see straight $44/month.
   if (!SHOW_ALL_TIERS || foundingMode) {
-    const liveResetCta = isLiveReset;
-    const headline = liveResetCta
+    // Variant priority: gifted > live-reset > organic
+    const discountedCta = isGifted || isLiveReset;
+    const eyebrow = isGifted
+      ? "FOUNDING MEMBER · GIFTED ACCESS RATE"
+      : isLiveReset
+      ? "FOUNDING MEMBER · LIVE RESET RATE"
+      : "FOUNDING MEMBER ACCESS";
+    const headline = isGifted
+      ? "You were given access. Now make it yours."
+      : isLiveReset
       ? "Continue your reset for $11."
       : "Get in before this closes.";
-    const subhead = liveResetCta
+    const subhead = isGifted
+      ? `Because you were gifted this experience, you qualify for the Founding Member rate: $11 for your first 30 days — then $44/month after. This offer is only available while your gifted access is active${
+          giftedDaysRemaining > 0 ? ` (${giftedDaysRemaining} ${giftedDaysRemaining === 1 ? "day" : "days"} left)` : ""
+        }. It disappears the moment your free access expires.`
+      : isLiveReset
       ? "Your $33 live session has already been applied toward your membership. First month $11 — then just $44/month. Cancel anytime."
       : "Lock in $44/month for full access. Cancel anytime.";
-    const ctaLabel = liveResetCta
+    const ctaLabel = isGifted
+      ? "Claim My $11 Rate →"
+      : isLiveReset
       ? "Continue for $11 →"
       : "Continue for $44/month →";
-    const priceDisplay = liveResetCta ? "$11" : "$44";
-    const priceSubtext = liveResetCta
-      ? "first month, then $44/month"
-      : "/month";
+    const priceDisplay = discountedCta ? "$11" : "$44";
+    const priceSubtext = discountedCta ? "first month, then $44/month" : "/month";
 
     return (
       <div className="min-h-screen bg-background">
@@ -187,7 +201,7 @@ export default function Upgrade() {
         </button>
         <div className="pt-16 pb-8 px-4 text-center">
           <p className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-3">
-            {liveResetCta ? "FOUNDING MEMBER · LIVE RESET RATE" : "FOUNDING MEMBER ACCESS"}
+            {eyebrow}
           </p>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-3xl md:text-5xl font-bold text-foreground mb-4">
             {headline}
@@ -216,7 +230,7 @@ export default function Upgrade() {
                 <span className="text-muted-foreground text-sm ml-1">{priceSubtext}</span>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {liveResetCta
+                {discountedCta
                   ? "One subscription. First cycle billed at $11."
                   : "Locked in for full access. Cancel anytime."}
               </p>
@@ -229,7 +243,7 @@ export default function Upgrade() {
               ))}
             </ul>
             <p className="text-[10px] text-muted-foreground mb-4">
-              {liveResetCta
+              {discountedCta
                 ? "After your first $11 month, your membership renews at $44/month. Cancel anytime."
                 : "Cancel anytime from your account."}
             </p>
@@ -238,13 +252,13 @@ export default function Upgrade() {
               onClick={() => handleCheckout(
                 FOUNDING_PRICE_ID,
                 "FOUNDING",
-                liveResetCta ? LIVE_RESET_FIRST_MONTH_COUPON : undefined,
+                discountedCta ? LIVE_RESET_FIRST_MONTH_COUPON : undefined,
               )}
               disabled={!!loadingTier}
             >
               {loadingTier === "FOUNDING" ? "Loading…" : ctaLabel}
             </Button>
-            {!liveResetCta && (
+            {!discountedCta && (
               <p className="text-[10px] text-muted-foreground text-center mt-3">
                 Attended a live reset? Your $33 session unlocks the $11 first-month rate.{" "}
                 <a href="https://resetyourmind1111.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">

@@ -1071,6 +1071,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          access_expires_at: string | null
           ai_checkin_days_shown: Json
           body_type: string | null
           body_type_completed_at: string | null
@@ -1078,6 +1079,9 @@ export type Database = {
           comeback_card_shown: boolean
           created_at: string
           current_streak: number | null
+          day15_modal_shown: boolean
+          day15_remind_later_at: string | null
+          day21_modal_shown: boolean
           day3_card_shown: boolean
           day5_emotional_peak_completed: boolean
           day6_bonus_oracle_used: boolean
@@ -1118,6 +1122,7 @@ export type Database = {
           recognition_deficit_count: number | null
           reset_goal: string | null
           reset_plan_generated: boolean
+          resets_completed_count: number
           share_milestones: boolean
           shown_day7_modal: boolean
           sound_effects_enabled: boolean
@@ -1127,6 +1132,7 @@ export type Database = {
           stuck_duration: string | null
           subscription_tier: string | null
           today_recommendation_used_date: string | null
+          tools_opened_count: number
           total_points: number | null
           total_sessions: number
           trial_reflection_saved: boolean
@@ -1146,6 +1152,7 @@ export type Database = {
           worth_score_day24: number | null
         }
         Insert: {
+          access_expires_at?: string | null
           ai_checkin_days_shown?: Json
           body_type?: string | null
           body_type_completed_at?: string | null
@@ -1153,6 +1160,9 @@ export type Database = {
           comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
+          day15_modal_shown?: boolean
+          day15_remind_later_at?: string | null
+          day21_modal_shown?: boolean
           day3_card_shown?: boolean
           day5_emotional_peak_completed?: boolean
           day6_bonus_oracle_used?: boolean
@@ -1193,6 +1203,7 @@ export type Database = {
           recognition_deficit_count?: number | null
           reset_goal?: string | null
           reset_plan_generated?: boolean
+          resets_completed_count?: number
           share_milestones?: boolean
           shown_day7_modal?: boolean
           sound_effects_enabled?: boolean
@@ -1202,6 +1213,7 @@ export type Database = {
           stuck_duration?: string | null
           subscription_tier?: string | null
           today_recommendation_used_date?: string | null
+          tools_opened_count?: number
           total_points?: number | null
           total_sessions?: number
           trial_reflection_saved?: boolean
@@ -1221,6 +1233,7 @@ export type Database = {
           worth_score_day24?: number | null
         }
         Update: {
+          access_expires_at?: string | null
           ai_checkin_days_shown?: Json
           body_type?: string | null
           body_type_completed_at?: string | null
@@ -1228,6 +1241,9 @@ export type Database = {
           comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
+          day15_modal_shown?: boolean
+          day15_remind_later_at?: string | null
+          day21_modal_shown?: boolean
           day3_card_shown?: boolean
           day5_emotional_peak_completed?: boolean
           day6_bonus_oracle_used?: boolean
@@ -1268,6 +1284,7 @@ export type Database = {
           recognition_deficit_count?: number | null
           reset_goal?: string | null
           reset_plan_generated?: boolean
+          resets_completed_count?: number
           share_milestones?: boolean
           shown_day7_modal?: boolean
           sound_effects_enabled?: boolean
@@ -1277,6 +1294,7 @@ export type Database = {
           stuck_duration?: string | null
           subscription_tier?: string | null
           today_recommendation_used_date?: string | null
+          tools_opened_count?: number
           total_points?: number | null
           total_sessions?: number
           trial_reflection_saved?: boolean

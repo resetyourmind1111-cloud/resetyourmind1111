@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { LockedContent } from "@/components/LockedContent";
@@ -8,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { healingTools } from "@/data/healingToolsData";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { incrementGiftedCounter } from "@/hooks/useGiftedAccess";
 
 // Tools the 30-Day curriculum routes trial users to during Days 1-3.
 // These must remain unlocked for active trialists regardless of assigned trial_tool_1/2.
@@ -83,6 +85,12 @@ export default function HealingToolPage() {
   );
   const tool = healingTools.find((t) => t.id === toolId);
   const ToolComponent = toolId ? toolComponents[toolId] : null;
+
+  useEffect(() => {
+    if (user?.id && toolId) {
+      incrementGiftedCounter(user.id, "tools_opened_count").catch(() => {});
+    }
+  }, [user?.id, toolId]);
 
   if (!tool) {
     return (
