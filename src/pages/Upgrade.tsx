@@ -113,6 +113,7 @@ export default function Upgrade() {
   const { effectiveTier } = useSubscription();
   const { foundingMode, spotsRemaining } = useFoundingMode();
   const { isLiveReset } = useUserSource();
+  const { isGifted, daysRemaining: giftedDaysRemaining } = useGiftedAccess();
   const [isAnnual, setIsAnnual] = useState(false);
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
