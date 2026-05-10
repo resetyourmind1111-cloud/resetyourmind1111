@@ -112,15 +112,30 @@ export function PersonalizedOnboarding() {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("full_name")
+      .select("full_name, mission_screen_shown")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
         if (data?.full_name) {
           setFirstName(data.full_name.split(" ")[0]);
         }
+        const shown = !!(data as any)?.mission_screen_shown;
+        setShowMission(!shown);
+        setMissionChecked(true);
       });
   }, [user]);
+
+  const handleMissionContinue = async () => {
+    if (user) {
+      // Fire-and-forget; no need to block UX
+      supabase
+        .from("profiles")
+        .update({ mission_screen_shown: true } as any)
+        .eq("user_id", user.id)
+        .then(() => {});
+    }
+    setShowMission(false);
+  };
 
   const goBack = () => setScreen((s) => Math.max(0, s - 1));
   const goNext = () => setScreen((s) => s + 1);
