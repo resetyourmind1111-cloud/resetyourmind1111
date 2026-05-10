@@ -201,7 +201,7 @@ export default function Upgrade() {
         </button>
         <div className="pt-16 pb-8 px-4 text-center">
           <p className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-3">
-            {liveResetCta ? "FOUNDING MEMBER · LIVE RESET RATE" : "FOUNDING MEMBER ACCESS"}
+            {eyebrow}
           </p>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-3xl md:text-5xl font-bold text-foreground mb-4">
             {headline}
@@ -230,7 +230,7 @@ export default function Upgrade() {
                 <span className="text-muted-foreground text-sm ml-1">{priceSubtext}</span>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {liveResetCta
+                {discountedCta
                   ? "One subscription. First cycle billed at $11."
                   : "Locked in for full access. Cancel anytime."}
               </p>
@@ -243,7 +243,7 @@ export default function Upgrade() {
               ))}
             </ul>
             <p className="text-[10px] text-muted-foreground mb-4">
-              {liveResetCta
+              {discountedCta
                 ? "After your first $11 month, your membership renews at $44/month. Cancel anytime."
                 : "Cancel anytime from your account."}
             </p>
@@ -252,13 +252,13 @@ export default function Upgrade() {
               onClick={() => handleCheckout(
                 FOUNDING_PRICE_ID,
                 "FOUNDING",
-                liveResetCta ? LIVE_RESET_FIRST_MONTH_COUPON : undefined,
+                discountedCta ? LIVE_RESET_FIRST_MONTH_COUPON : undefined,
               )}
               disabled={!!loadingTier}
             >
               {loadingTier === "FOUNDING" ? "Loading…" : ctaLabel}
             </Button>
-            {!liveResetCta && (
+            {!discountedCta && (
               <p className="text-[10px] text-muted-foreground text-center mt-3">
                 Attended a live reset? Your $33 session unlocks the $11 first-month rate.{" "}
                 <a href="https://resetyourmind1111.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">
