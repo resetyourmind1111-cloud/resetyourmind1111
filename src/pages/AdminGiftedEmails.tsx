@@ -38,6 +38,7 @@ export default function AdminGiftedEmails() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [filter, setFilter] = useState<"all" | "day15_sent" | "day21_sent" | "pending">("all");
   const [sending, setSending] = useState(false);
+  const [search, setSearch] = useState("");
 
   const load = async () => {
     setLoading(true);
