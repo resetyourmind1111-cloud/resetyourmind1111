@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Shield, ToggleLeft, ToggleRight, Users, CreditCard, Sparkles, FastForward } from "lucide-react";
+import { Shield, ToggleLeft, ToggleRight, Users, CreditCard, Sparkles, FastForward, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -221,6 +221,20 @@ export default function Admin() {
                   After jumping, the target user must refresh or sign out/in to see the new state.
                 </p>
               </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Gifted Email Report link */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.07 }}>
+          <Card className="glass-card cursor-pointer hover:border-accent transition-colors" onClick={() => navigate("/admin/gifted-emails")}>
+            <CardContent className="p-6 flex items-center gap-4">
+              <Mail className="w-5 h-5 text-accent" />
+              <div className="flex-1">
+                <h2 className="font-serif text-xl font-bold text-foreground">Gifted Milestone Emails</h2>
+                <p className="text-sm text-muted-foreground">View Day 15 / Day 21 send history and trigger the job manually.</p>
+              </div>
+              <Button variant="outline" size="sm">Open →</Button>
             </CardContent>
           </Card>
         </motion.div>
