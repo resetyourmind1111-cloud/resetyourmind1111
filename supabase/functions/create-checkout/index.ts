@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     // Get or create Stripe customer
     const { data: profile } = await supabaseAdmin
       .from("profiles")
-      .select("stripe_customer_id, full_name, user_source")
+      .select("stripe_customer_id, full_name, user_source, access_expires_at")
       .eq("user_id", userId)
       .single();
 
