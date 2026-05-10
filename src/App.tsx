@@ -50,6 +50,7 @@ import WhatsNext from "./pages/WhatsNext";
 import SacredCircle from "./pages/SacredCircle";
 import Admin from "./pages/Admin";
 import AdminGiftedEmails from "./pages/AdminGiftedEmails";
+import Mission from "./pages/Mission";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import FoundingMemberWelcome from "./pages/FoundingMemberWelcome";
 import NotFound from "./pages/NotFound";
@@ -111,6 +112,8 @@ const App = () => (
                 <Route path="/sacred-circle" element={<SacredCircle />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/gifted-emails" element={<AdminGiftedEmails />} />
+                <Route path="/mission" element={<Mission />} />
+                <Route path="/about" element={<Mission />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/founding-member-welcome" element={<FoundingMemberWelcome />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

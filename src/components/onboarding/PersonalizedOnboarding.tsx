@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ResetPlanCards } from "@/components/onboarding/ResetPlanCards";
+import { MissionIntroScreen } from "@/components/onboarding/MissionIntroScreen";
 
 const TOTAL_STEPS = 8; // screens 1–8 have dots (name through notification)
 
@@ -96,6 +97,8 @@ export function PersonalizedOnboarding() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [screen, setScreen] = useState(0);
+  const [showMission, setShowMission] = useState(false);
+  const [missionChecked, setMissionChecked] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [primaryWound, setPrimaryWound] = useState<string | null>(null);
   const [stuckDuration, setStuckDuration] = useState<string | null>(null);
@@ -109,15 +112,30 @@ export function PersonalizedOnboarding() {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("full_name")
+      .select("full_name, mission_screen_shown")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
         if (data?.full_name) {
           setFirstName(data.full_name.split(" ")[0]);
         }
+        const shown = !!(data as any)?.mission_screen_shown;
+        setShowMission(!shown);
+        setMissionChecked(true);
       });
   }, [user]);
+
+  const handleMissionContinue = async () => {
+    if (user) {
+      // Fire-and-forget; no need to block UX
+      supabase
+        .from("profiles")
+        .update({ mission_screen_shown: true } as any)
+        .eq("user_id", user.id)
+        .then(() => {});
+    }
+    setShowMission(false);
+  };
 
   const goBack = () => setScreen((s) => Math.max(0, s - 1));
   const goNext = () => setScreen((s) => s + 1);
@@ -207,6 +225,10 @@ export function PersonalizedOnboarding() {
     center: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -40 },
   };
+
+  if (missionChecked && showMission) {
+    return <MissionIntroScreen onContinue={handleMissionContinue} />;
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

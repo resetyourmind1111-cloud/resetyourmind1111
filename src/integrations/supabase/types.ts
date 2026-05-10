@@ -1111,6 +1111,7 @@ export type Database = {
           milestone_cards_shown: Json
           mirror_card_dismissed: boolean | null
           mirror_card_shown: boolean | null
+          mission_screen_shown: boolean
           monthly_ceremonies_completed: Json
           notification_time: string | null
           notifications_enabled: boolean
@@ -1194,6 +1195,7 @@ export type Database = {
           milestone_cards_shown?: Json
           mirror_card_dismissed?: boolean | null
           mirror_card_shown?: boolean | null
+          mission_screen_shown?: boolean
           monthly_ceremonies_completed?: Json
           notification_time?: string | null
           notifications_enabled?: boolean
@@ -1277,6 +1279,7 @@ export type Database = {
           milestone_cards_shown?: Json
           mirror_card_dismissed?: boolean | null
           mirror_card_shown?: boolean | null
+          mission_screen_shown?: boolean
           monthly_ceremonies_completed?: Json
           notification_time?: string | null
           notifications_enabled?: boolean

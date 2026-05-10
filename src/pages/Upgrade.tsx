@@ -11,6 +11,7 @@ import { SHOW_ALL_TIERS, LIVE_RESET_FIRST_MONTH_COUPON } from "@/config/featureF
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { PermissionGrantedSection } from "@/components/PermissionGrantedSection";
 
 const TIERS = [
   {
@@ -216,7 +217,9 @@ export default function Upgrade() {
           )}
         </div>
 
-        <div className="max-w-xl mx-auto px-4 mb-12">
+        <PermissionGrantedSection />
+
+        <div className="max-w-xl mx-auto px-4 mb-12 mt-12">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="relative rounded-2xl p-6 md:p-8 border-2 border-accent bg-secondary/20">
             {foundingMode && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent text-accent-foreground">
@@ -301,8 +304,11 @@ export default function Upgrade() {
         </motion.div>
       </div>
 
+      <PermissionGrantedSection />
+
       {/* Annual toggle */}
-      <div className="flex items-center justify-center gap-3 mb-10">
+      <div className="flex items-center justify-center gap-3 mb-10 mt-12">
+
         <span className={`text-sm font-medium ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
         <button onClick={() => setIsAnnual(!isAnnual)} className={`relative w-14 h-7 rounded-full transition-colors ${isAnnual ? "bg-accent" : "bg-muted"}`}>
           <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-background shadow transition-transform ${isAnnual ? "translate-x-7" : "translate-x-0.5"}`} />

@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS mission_screen_shown boolean NOT NULL DEFAULT false;
