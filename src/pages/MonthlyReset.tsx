@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { AnthemPlayer } from "@/components/anthem/AnthemPlayer";
 import { allPermissionSlips } from "@/data/permissionSlipsData";
 import { useToast } from "@/hooks/use-toast";
+import { incrementGiftedCounter } from "@/hooks/useGiftedAccess";
 import html2canvas from "html2canvas";
 
 const monthlyThemes: Record<number, { theme: string; question: string; teaching: string }> = {
