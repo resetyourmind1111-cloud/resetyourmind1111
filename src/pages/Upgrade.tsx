@@ -217,7 +217,9 @@ export default function Upgrade() {
           )}
         </div>
 
-        <div className="max-w-xl mx-auto px-4 mb-12">
+        <PermissionGrantedSection />
+
+        <div className="max-w-xl mx-auto px-4 mb-12 mt-12">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="relative rounded-2xl p-6 md:p-8 border-2 border-accent bg-secondary/20">
             {foundingMode && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent text-accent-foreground">
