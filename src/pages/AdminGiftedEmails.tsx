@@ -201,16 +201,20 @@ export default function AdminGiftedEmails() {
                   <th className="px-4 py-3">Access expires</th>
                   <th className="px-4 py-3">Day 15 sent</th>
                   <th className="px-4 py-3">Day 21 sent</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading && (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No matching users.</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No matching users.</td></tr>
                 )}
-                {filtered.map(r => (
+                {filtered.map(r => {
+                  const key15 = `${r.user_id}:day15`;
+                  const key21 = `${r.user_id}:day21`;
+                  return (
                   <tr key={r.user_id} className="border-t border-border">
                     <td className="px-4 py-3">
                       <div className="font-medium text-foreground">{r.email || "(no email)"}</div>
@@ -241,13 +245,64 @@ export default function AdminGiftedEmails() {
                         <span className="text-muted-foreground">—</span>
                       )}
                     </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!r.email || resendingKey === key15}
+                          onClick={() => r.email && setConfirm({ userId: r.user_id, email: r.email, milestone: "day15", alreadySent: !!r.day15_email_sent_at })}
+                          title={r.day15_email_sent_at ? "Resend Day 15" : "Send Day 15"}
+                        >
+                          <RotateCw className={`w-3 h-3 mr-1 ${resendingKey === key15 ? "animate-spin" : ""}`} />
+                          Day 15
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!r.email || resendingKey === key21}
+                          onClick={() => r.email && setConfirm({ userId: r.user_id, email: r.email, milestone: "day21", alreadySent: !!r.day21_email_sent_at })}
+                          title={r.day21_email_sent_at ? "Resend Day 21" : "Send Day 21"}
+                        >
+                          <RotateCw className={`w-3 h-3 mr-1 ${resendingKey === key21 ? "animate-spin" : ""}`} />
+                          Day 21
+                        </Button>
+                      </div>
+                    </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirm?.alreadySent ? "Resend" : "Send"} {confirm?.milestone === "day15" ? "Day 15" : "Day 21"} email?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will deliver the {confirm?.milestone === "day15" ? "halfway" : "Day 21"} milestone email to{" "}
+              <span className="font-medium text-foreground">{confirm?.email}</span>{" "}
+              {confirm?.alreadySent && "again — they have already received it once. "}
+              The send timestamp will be updated.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={!!resendingKey}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); performResend(); }}
+              disabled={!!resendingKey}
+              className="bg-[#C9A84C] text-[#06060e] hover:bg-[#C9A84C]/90"
+            >
+              {resendingKey ? "Sending…" : (confirm?.alreadySent ? "Resend" : "Send")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AuthenticatedLayout>
   );
 }
