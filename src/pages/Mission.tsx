@@ -20,8 +20,11 @@ const SANS = "'Montserrat', sans-serif";
 
 function GoldDivider() {
   return (
-    <div className="flex justify-center my-12">
-      <div className="h-px w-32" style={{ backgroundColor: GOLD, opacity: 0.7 }} />
+    <div className="flex justify-center my-8 sm:my-10 md:my-14">
+      <div
+        className="h-px w-20 sm:w-28 md:w-32"
+        style={{ backgroundColor: GOLD, opacity: 0.7 }}
+      />
     </div>
   );
 }
@@ -29,7 +32,7 @@ function GoldDivider() {
 function SectionSubhead({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="text-xs md:text-sm tracking-[0.3em] mb-6 text-center font-semibold"
+      className="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] sm:tracking-[0.3em] mb-5 sm:mb-6 md:mb-8 text-center font-semibold"
       style={{ color: GOLD, fontFamily: SANS }}
     >
       {children}
@@ -40,7 +43,7 @@ function SectionSubhead({ children }: { children: React.ReactNode }) {
 export default function Mission() {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: SERIF }}>
-      <div className="max-w-3xl mx-auto px-6 md:px-10 pt-8 pb-16">
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 md:px-10 pt-6 sm:pt-8 pb-12 sm:pb-16">
         <Link
           to="/dashboard"
           className="inline-flex items-center gap-2 text-sm hover:opacity-80 transition-opacity"
@@ -50,24 +53,24 @@ export default function Mission() {
         </Link>
 
         {/* Header */}
-        <header className="text-center pt-10">
+        <header className="text-center pt-8 sm:pt-10 md:pt-14">
           <p
-            className="text-3xl font-bold tracking-wider mb-2"
+            className="text-2xl sm:text-3xl font-bold tracking-wider mb-2"
             style={{ color: PURPLE, fontFamily: SERIF }}
           >
             1111
           </p>
-          <div className="flex justify-center my-4">
-            <div className="h-px w-20" style={{ backgroundColor: GOLD }} />
+          <div className="flex justify-center my-3 sm:my-4">
+            <div className="h-px w-16 sm:w-20" style={{ backgroundColor: GOLD }} />
           </div>
           <h1
-            className="text-4xl md:text-6xl font-bold mb-3"
+            className="text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-[1.1]"
             style={{ color: PURPLE, fontFamily: SERIF }}
           >
             Permission Granted™
           </h1>
           <p
-            className="italic text-lg md:text-xl"
+            className="italic text-base sm:text-lg md:text-xl"
             style={{ color: LAVENDER, fontFamily: SERIF }}
           >
             Why Reset Your Mind 1111 exists.
@@ -79,7 +82,7 @@ export default function Mission() {
         {/* Section 1 */}
         <section>
           <p
-            className="text-xl md:text-2xl leading-relaxed text-center"
+            className="text-lg sm:text-xl md:text-2xl leading-relaxed sm:leading-relaxed text-center"
             style={{ color: PURPLE }}
           >
             You do not need another self-help lecture. You need Permission Granted™ for your nervous
@@ -93,7 +96,7 @@ export default function Mission() {
         <section>
           <SectionSubhead>THE REAL PROBLEM</SectionSubhead>
           <div
-            className="space-y-5 text-lg md:text-xl leading-relaxed"
+            className="space-y-4 sm:space-y-5 text-base sm:text-lg md:text-xl leading-relaxed"
             style={{ color: PURPLE }}
           >
             <p>
@@ -119,7 +122,7 @@ export default function Mission() {
         <section>
           <SectionSubhead>WHY WE BUILT THIS</SectionSubhead>
           <div
-            className="space-y-5 text-lg md:text-xl leading-relaxed"
+            className="space-y-4 sm:space-y-5 text-base sm:text-lg md:text-xl leading-relaxed"
             style={{ color: PURPLE }}
           >
             <p>That's why we created Permission Granted™ and Reset Your Mind 1111.</p>
@@ -138,14 +141,17 @@ export default function Mission() {
         {/* Section 4 — Permission Granted To */}
         <section>
           <SectionSubhead>PERMISSION GRANTED™ TO:</SectionSubhead>
-          <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3 max-w-xl mx-auto">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-3 sm:gap-y-4 max-w-xl mx-auto">
             {PERMISSION_LIST.map((item) => (
               <li
                 key={item}
-                className="flex items-start gap-3 text-lg"
+                className="flex items-start gap-2.5 sm:gap-3 text-base sm:text-lg"
                 style={{ color: PURPLE }}
               >
-                <Sparkles className="w-5 h-5 flex-shrink-0 mt-1" style={{ color: GOLD }} />
+                <Sparkles
+                  className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5 sm:mt-1"
+                  style={{ color: GOLD }}
+                />
                 <span>{item}</span>
               </li>
             ))}
@@ -158,7 +164,7 @@ export default function Mission() {
         <section>
           <SectionSubhead>HOW WE DO IT</SectionSubhead>
           <div
-            className="space-y-5 text-lg md:text-xl leading-relaxed"
+            className="space-y-4 sm:space-y-5 text-base sm:text-lg md:text-xl leading-relaxed"
             style={{ color: PURPLE }}
           >
             <p>
@@ -177,43 +183,49 @@ export default function Mission() {
       </div>
 
       {/* Closing — deep purple section */}
-      <section className="px-6 md:px-10 py-16 md:py-20" style={{ backgroundColor: PURPLE }}>
+      <section
+        className="px-5 sm:px-8 md:px-10 py-12 sm:py-16 md:py-20"
+        style={{ backgroundColor: PURPLE }}
+      >
         <div className="max-w-3xl mx-auto text-center">
           <p
-            className="text-xl md:text-2xl leading-relaxed mb-6"
+            className="text-lg sm:text-xl md:text-2xl leading-relaxed mb-5 sm:mb-6"
             style={{ color: "#ffffff", fontFamily: SERIF }}
           >
             Because manifestation becomes very difficult when the body still feels unsafe receiving
             what the mind is asking for.
           </p>
           <p
-            className="text-xl md:text-2xl leading-relaxed mb-10"
+            className="text-lg sm:text-xl md:text-2xl leading-relaxed mb-8 sm:mb-10"
             style={{ color: GOLD, fontFamily: SERIF }}
           >
             Most people do not need more pressure. They need Permission Granted™ to finally feel safe
             again.
           </p>
 
-          <div className="flex justify-center my-8">
-            <div className="h-px w-24" style={{ backgroundColor: GOLD, opacity: 0.7 }} />
+          <div className="flex justify-center my-6 sm:my-8">
+            <div
+              className="h-px w-16 sm:w-20 md:w-24"
+              style={{ backgroundColor: GOLD, opacity: 0.7 }}
+            />
           </div>
 
           <p
-            className="italic text-2xl md:text-3xl mb-10"
+            className="italic text-xl sm:text-2xl md:text-3xl mb-8 sm:mb-10"
             style={{ color: GOLD, fontFamily: SERIF }}
           >
             That's the work. 💜
           </p>
 
           <div style={{ color: "#ffffff", fontFamily: SERIF }} className="space-y-1">
-            <p className="text-base md:text-lg">— Lorie Wu</p>
-            <p className="text-sm md:text-base" style={{ color: LAVENDER }}>
+            <p className="text-base sm:text-lg">— Lorie Wu</p>
+            <p className="text-sm sm:text-base" style={{ color: LAVENDER }}>
               CEO, Reset Your Mind 1111™
             </p>
-            <p className="text-sm md:text-base" style={{ color: LAVENDER }}>
+            <p className="text-sm sm:text-base" style={{ color: LAVENDER }}>
               Creator of Permission Granted™
             </p>
-            <p className="text-sm md:text-base" style={{ color: LAVENDER }}>
+            <p className="text-sm sm:text-base" style={{ color: LAVENDER }}>
               Creator of The Worth Thermostat™
             </p>
           </div>
