@@ -231,6 +231,12 @@ export default function Settings() {
             </Link>
             <h1 className="text-3xl font-bold text-foreground mb-2">Profile Settings</h1>
             <p className="text-muted-foreground">Manage your account information</p>
+            <Link
+              to="/mission"
+              className="inline-flex items-center gap-2 mt-4 text-sm text-accent hover:underline"
+            >
+              About Permission Granted™ →
+            </Link>
           </div>
 
           {isLoading ? (
