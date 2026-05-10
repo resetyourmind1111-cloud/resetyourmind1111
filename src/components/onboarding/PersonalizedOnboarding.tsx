@@ -97,6 +97,8 @@ export function PersonalizedOnboarding() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [screen, setScreen] = useState(0);
+  const [showMission, setShowMission] = useState(false);
+  const [missionChecked, setMissionChecked] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [primaryWound, setPrimaryWound] = useState<string | null>(null);
   const [stuckDuration, setStuckDuration] = useState<string | null>(null);
