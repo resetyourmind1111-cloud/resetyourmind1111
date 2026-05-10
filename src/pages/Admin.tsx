@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Shield, ToggleLeft, ToggleRight, Users, CreditCard, Sparkles, FastForward } from "lucide-react";
+import { Shield, ToggleLeft, ToggleRight, Users, CreditCard, Sparkles, FastForward, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
