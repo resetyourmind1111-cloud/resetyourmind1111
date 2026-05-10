@@ -49,6 +49,7 @@ import MonthlyReset from "./pages/MonthlyReset";
 import WhatsNext from "./pages/WhatsNext";
 import SacredCircle from "./pages/SacredCircle";
 import Admin from "./pages/Admin";
+import AdminGiftedEmails from "./pages/AdminGiftedEmails";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import FoundingMemberWelcome from "./pages/FoundingMemberWelcome";
 import NotFound from "./pages/NotFound";
