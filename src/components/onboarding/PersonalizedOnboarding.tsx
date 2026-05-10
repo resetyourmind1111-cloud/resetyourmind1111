@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ResetPlanCards } from "@/components/onboarding/ResetPlanCards";
+import { MissionIntroScreen } from "@/components/onboarding/MissionIntroScreen";
 
 const TOTAL_STEPS = 8; // screens 1–8 have dots (name through notification)
 
