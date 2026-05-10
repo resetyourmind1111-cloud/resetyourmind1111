@@ -64,6 +64,7 @@ export default function MonthlyReset() {
     const key = `${monthName.toLowerCase()}_${year}`;
     completed[key] = true;
     await supabase.from("profiles").update({ monthly_ceremonies_completed: completed } as any).eq("user_id", user.id);
+    incrementGiftedCounter(user.id, "resets_completed_count").catch(() => {});
     toast({ title: `Your ${monthName} reset is set.`, description: "✦" });
     navigate("/home");
   };
