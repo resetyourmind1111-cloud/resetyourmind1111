@@ -146,6 +146,7 @@ export function MeditationPlayer({ meditationId, title, audioUrl, onClose, onCom
       {onClose && (
         <button
           onClick={onClose}
+          aria-label="Close player"
           className="mt-6 w-full text-xs text-[#F9F6F0]/40 hover:text-[#F9F6F0]/70 transition-colors"
         >
           Close

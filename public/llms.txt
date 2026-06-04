@@ -1,0 +1,16 @@
+# Reset Your Mind 1111™
+
+> Recalibrate your Worth Thermostat across health, wealth, love, and leadership. A nervous-system-level reset app by Lorie Wu, The Emotional Surgeon.
+
+Reset Your Mind 1111 helps people break patterns that keep them settling for crumbs. The app pairs a free Worth Thermostat assessment with oracle cards, guided meditations, daily permission slips, a 30-day reset journey, and an emotional-surgery curriculum.
+
+## Pages
+
+- [Home](/): Landing page with the Worth Thermostat assessment and program overview.
+- [Mission](/mission): Lorie Wu's mission and positioning behind Reset Your Mind 1111.
+- [Worth Thermostat Assessment](/assessment): Free 25-question, 3-minute assessment.
+- [Manifesto](/manifesto): The Reset Your Mind 1111 manifesto.
+
+## Optional
+
+- [Sign in or sign up](/auth): Account access for members.
