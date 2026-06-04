@@ -83,7 +83,7 @@ export default function Assessment() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center space-y-6">
-          <button onClick={handleBack} className="absolute top-4 left-4 flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors">
+          <button onClick={handleBack} aria-label="Go back" className="absolute top-4 left-4 flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors">
             <ChevronLeft className="w-4 h-4" /> Back
           </button>
           <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
@@ -100,7 +100,7 @@ export default function Assessment() {
             <Button variant="outline" className="w-full" onClick={() => { setStep("welcome"); }}>
               Retake Assessment
             </Button>
-            <button onClick={handleBack} className="text-foreground/40 text-[13px] hover:text-foreground/60 transition-colors mt-2">
+            <button onClick={handleBack} aria-label="Go back" className="text-foreground/40 text-[13px] hover:text-foreground/60 transition-colors mt-2">
               ← Go back
             </button>
           </div>

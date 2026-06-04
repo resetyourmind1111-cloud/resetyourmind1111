@@ -21,6 +21,7 @@ export function TrialBackButton({ fallbackPath = "/home", label = "Back", classN
   return (
     <button
       onClick={handleBack}
+      aria-label="Go back"
       className={`flex items-center gap-1 text-sm text-foreground/65 hover:text-foreground/90 transition-colors ${className}`}
     >
       <ChevronLeft className="w-4 h-4" />

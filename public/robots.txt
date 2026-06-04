@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://resetyourmind1111.lovable.app/sitemap.xml
