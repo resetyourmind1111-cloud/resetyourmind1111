@@ -142,7 +142,7 @@ export default function Landing() {
                 <div className="absolute -inset-1 bg-gradient-to-br from-[#C9A84C]/40 via-[#3D1A6E]/30 to-transparent rounded-3xl blur-md" aria-hidden="true" />
                 <img
                   src={lorieFounderAsset.url}
-                  alt="Lorie Wu, creator of Reset Your Mind 1111"
+                  alt="Lorie Wu"
                   loading="eager"
                   className="relative w-full h-auto rounded-3xl border border-[#C9A84C]/20 shadow-2xl object-cover"
                 />
