@@ -66,11 +66,11 @@ export default function Landing() {
           <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-10" />
 
           <h1 className="font-display text-3xl md:text-5xl text-[#F9F6F0] leading-tight mb-5">
-            Why do you keep doing the same thing… even when you know better?
+            Why do you keep doing this?
           </h1>
 
           <p className="text-[#F9F6F0]/70 font-sans text-base md:text-lg mb-8 max-w-md mx-auto">
-            Discover the hidden pattern behind your overthinking, self-doubt, procrastination, overwhelm, or self-sabotage — and get a personalized starting point in minutes.
+            Discover the hidden pattern that may be keeping you stuck — and get a personalized starting point to move forward with more clarity, confidence, and self-trust.
           </p>
 
           {/* Founding badge — only after fetch settles so it doesn't flash */}
@@ -114,12 +114,17 @@ export default function Landing() {
           </div>
 
           <p className="text-[#F9F6F0]/40 text-sm mt-4 italic">
-            You are not broken. You are conditioned. And patterns can change.
+            You are not broken.<br />You are conditioned.<br />And patterns can change.
           </p>
 
-          <p className="text-[#F9F6F0]/30 text-sm mt-6">
-            No credit card required. Free 7-day trial available after your personalized result.
-          </p>
+          <div className="mt-6">
+            <p className="text-[#F9F6F0]/30 text-sm">
+              No credit card required. Free 7-day trial available after your personalized result.
+            </p>
+            <p className="text-[#F9F6F0]/40 text-xs mt-3">
+              People often discover patterns around: overthinking, self-doubt, procrastination, people-pleasing, perfectionism, visibility, worthiness.
+            </p>
+          </div>
         </section>
 
         {/* What happens next */}
@@ -168,7 +173,7 @@ export default function Landing() {
             Health · Wealth · Love · Leadership
           </p>
           <p className="text-[#F9F6F0]/50 text-sm mt-2">
-            The four areas Reset Your Mind 1111™ recalibrates.
+            The four areas where most people discover they've been repeating the same patterns for years.
           </p>
         </section>
       </main>
