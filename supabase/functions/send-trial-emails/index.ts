@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
       .select("id, user_id, day_number, scheduled_time")
       .eq("sent", false)
       .lte("scheduled_time", nowIso)
-      .in("day_number", [1, 2, 3, 4, 5, 6, 7, 12])
+      .in("day_number", [1, 2, 3, 4, 5, 6, 7, 8, 12])
       .limit(200);
 
 

@@ -120,5 +120,25 @@ export const TRIAL_EMAILS: TrialEmail[] = [
       "Open Day 2 →", "/home"
     ),
   },
+  {
+    day: 11, // Day 1 no-activity nudge (sent ~24h after signup if user hasn't activated)
+    subject: "Your reset is one tap away",
+    html: (n) => shell(
+      `<h1 style="font-size:24px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, the door is still open.</h1>
+<p style="font-size:16px;line-height:1.7;margin:0 0 16px;">You signed up yesterday but haven't taken your first step inside yet. That's okay — life happens.</p>
+<p style="font-size:16px;line-height:1.7;margin:0 0 16px;">Your 30-second check-in is waiting. That's the whole first step. One tap.</p>`,
+      "Take My Check-In →", "/home"
+    ),
+  },
+  {
+    day: 8, // Day-after-trial follow-up for non-converters
+    subject: "Your spot is still here",
+    html: (n) => shell(
+      `<h1 style="font-size:26px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, the door didn't close.</h1>
+<p style="font-size:16px;line-height:1.7;margin:0 0 16px;">Your 7-day preview ended yesterday, but the work doesn't have to. Your progress, your pattern, your reset map — all still here.</p>
+<p style="font-size:16px;line-height:1.7;margin:0 0 16px;">If now's the right time, your Founding Member spot is still open.</p>`,
+      "See What's Waiting →", "/upgrade"
+    ),
+  },
 ];
 
