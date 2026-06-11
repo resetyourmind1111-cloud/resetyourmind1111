@@ -114,12 +114,17 @@ export default function Landing() {
           </div>
 
           <p className="text-[#F9F6F0]/40 text-sm mt-4 italic">
-            You are not broken. You are conditioned. And patterns can change.
+            You are not broken.<br />You are conditioned.<br />And patterns can change.
           </p>
 
-          <p className="text-[#F9F6F0]/30 text-sm mt-6">
-            No credit card required. Free 7-day trial available after your personalized result.
-          </p>
+          <div className="mt-6">
+            <p className="text-[#F9F6F0]/30 text-sm">
+              No credit card required. Free 7-day trial available after your personalized result.
+            </p>
+            <p className="text-[#F9F6F0]/40 text-xs mt-3">
+              People often discover patterns around: overthinking, self-doubt, procrastination, people-pleasing, perfectionism, visibility, worthiness.
+            </p>
+          </div>
         </section>
 
         {/* What happens next */}
