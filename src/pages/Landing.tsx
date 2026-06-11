@@ -173,7 +173,7 @@ export default function Landing() {
             Health · Wealth · Love · Leadership
           </p>
           <p className="text-[#F9F6F0]/50 text-sm mt-2">
-            The four areas Reset Your Mind 1111™ recalibrates.
+            The four areas where most people discover they've been repeating the same patterns for years.
           </p>
         </section>
       </main>
