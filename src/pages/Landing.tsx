@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Check } from "lucide-react";
 import logo from "@/assets/logo.png";
+import lorieFounderAsset from "@/assets/lorie-wu-founder.jpeg.asset.json";
 import { track } from "@/lib/analytics";
 
 // TODO(lorie): Replace these with real beta-member quotes (first name + initial only is fine).
