@@ -70,7 +70,7 @@ export default function Landing() {
               <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-10 md:bg-gradient-to-r" />
 
               <h1 className="font-display text-3xl md:text-5xl text-[#F9F6F0] leading-tight mb-5">
-                Why do you keep doing this?
+                Why do you keep doing the same thing… even when you know better?
               </h1>
 
               <p className="text-[#F9F6F0]/70 font-sans text-base md:text-lg mb-8 max-w-md mx-auto md:mx-0">
