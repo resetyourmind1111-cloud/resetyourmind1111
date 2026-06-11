@@ -66,11 +66,11 @@ export default function Landing() {
           <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-10" />
 
           <h1 className="font-display text-3xl md:text-5xl text-[#F9F6F0] leading-tight mb-5">
-            Why do you keep doing the same thing… even when you know better?
+            Why do you keep doing this?
           </h1>
 
           <p className="text-[#F9F6F0]/70 font-sans text-base md:text-lg mb-8 max-w-md mx-auto">
-            Discover the hidden pattern behind your overthinking, self-doubt, procrastination, overwhelm, or self-sabotage — and get a personalized starting point in minutes.
+            Discover the hidden pattern that may be keeping you stuck — and get a personalized starting point to move forward with more clarity, confidence, and self-trust.
           </p>
 
           {/* Founding badge — only after fetch settles so it doesn't flash */}
