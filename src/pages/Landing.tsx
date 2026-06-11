@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Check } from "lucide-react";
 import logo from "@/assets/logo.png";
+import lorieFounderAsset from "@/assets/lorie-wu-founder.jpeg.asset.json";
 import { track } from "@/lib/analytics";
 
 // TODO(lorie): Replace these with real beta-member quotes (first name + initial only is fine).
@@ -58,74 +59,127 @@ export default function Landing() {
 
       <main className="px-6 pb-20">
         {/* Hero */}
-        <section className="max-w-xl mx-auto text-center pt-10 pb-16">
-          <div className="flex justify-center mb-6">
-            <img src={logo} alt="" aria-hidden="true" className="h-20 w-auto" />
-          </div>
-
-          <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-10" />
-
-          <h1 className="font-display text-3xl md:text-5xl text-[#F9F6F0] leading-tight mb-5">
-            Why do you keep doing this?
-          </h1>
-
-          <p className="text-[#F9F6F0]/70 font-sans text-base md:text-lg mb-8 max-w-md mx-auto">
-            Discover the hidden pattern that may be keeping you stuck — and get a personalized starting point to move forward with more clarity, confidence, and self-trust.
-          </p>
-
-          {/* Founding badge — only after fetch settles so it doesn't flash */}
-          {!foundingLoading && foundingMode && spotsRemaining > 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
-              className="mb-8"
-            >
-              <div className="inline-flex items-center gap-2 bg-[#3D1A6E]/30 border border-[#3D1A6E]/50 rounded-full px-4 py-2">
-                <span className="text-sm">⭐</span>
-                <span className="text-sm font-medium">
-                  Founding Member rate — $44/month locked in as long as you stay
-                </span>
+        <section className="max-w-6xl mx-auto pt-10 pb-16">
+          <div className="grid md:grid-cols-2 gap-10 md:gap-14 items-center">
+            {/* Copy column */}
+            <div className="text-center md:text-left max-w-xl mx-auto md:mx-0 order-1">
+              <div className="flex md:justify-start justify-center mb-6">
+                <img src={logo} alt="" aria-hidden="true" className="h-20 w-auto" />
               </div>
-              <p className="text-[#F9F6F0]/40 text-xs mt-2">
-                {spotsRemaining} of 111 spots remaining
+
+              <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-10 md:bg-gradient-to-r" />
+
+              <h1 className="font-display text-3xl md:text-5xl text-[#F9F6F0] leading-tight mb-5">
+                Why do you keep doing this?
+              </h1>
+
+              <p className="text-[#F9F6F0]/70 font-sans text-base md:text-lg mb-8 max-w-md mx-auto md:mx-0">
+                Discover the hidden pattern that may be keeping you stuck — and get a personalized starting point to move forward with more clarity, confidence, and self-trust.
               </p>
+
+              {/* Founding badge — only after fetch settles so it doesn't flash */}
+              {!foundingLoading && foundingMode && spotsRemaining > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="mb-8"
+                >
+                  <div className="inline-flex items-center gap-2 bg-[#3D1A6E]/30 border border-[#3D1A6E]/50 rounded-full px-4 py-2">
+                    <span className="text-sm">⭐</span>
+                    <span className="text-sm font-medium">
+                      Founding Member rate — $44/month locked in as long as you stay
+                    </span>
+                  </div>
+                  <p className="text-[#F9F6F0]/40 text-xs mt-2">
+                    {spotsRemaining} of 111 spots remaining
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Primary CTA */}
+              <div className="space-y-3">
+                <Button
+                  asChild
+                  onClick={() => track("cta_click_start_reset", { location: "hero" })}
+                  className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#0A0A0A] h-14 text-lg font-semibold rounded-xl"
+                >
+                  <Link to="/whats-my-pattern">Discover My Pattern</Link>
+                </Button>
+
+                {/* Lower-commitment secondary CTA */}
+                <Link
+                  to="/assessment"
+                  onClick={() => track("cta_click_assessment", { location: "hero_secondary" })}
+                  className="block text-[#F9F6F0]/70 hover:text-[#C9A84C] text-sm transition-colors pt-1"
+                >
+                  Take the 3-Minute Worth Thermostat →
+                </Link>
+              </div>
+
+              <p className="text-[#F9F6F0]/40 text-sm mt-4 italic">
+                You are not broken.<br />You are conditioned.<br />And patterns can change.
+              </p>
+
+              <div className="mt-6">
+                <p className="text-[#F9F6F0]/30 text-sm">
+                  No credit card required. Free 7-day trial available after your personalized result.
+                </p>
+                <p className="text-[#F9F6F0]/40 text-xs mt-3">
+                  People often discover patterns around: overthinking, self-doubt, procrastination, people-pleasing, perfectionism, visibility, worthiness.
+                </p>
+              </div>
+            </div>
+
+            {/* Founder photo column */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="order-2 flex flex-col items-center md:items-start"
+            >
+              <div className="relative w-full max-w-sm mx-auto md:mx-0">
+                <div className="absolute -inset-1 bg-gradient-to-br from-[#C9A84C]/40 via-[#3D1A6E]/30 to-transparent rounded-3xl blur-md" aria-hidden="true" />
+                <img
+                  src={lorieFounderAsset.url}
+                  alt="Lorie Wu, creator of Reset Your Mind 1111"
+                  loading="eager"
+                  className="relative w-full h-auto rounded-3xl border border-[#C9A84C]/20 shadow-2xl object-cover"
+                />
+              </div>
+              <div className="mt-5 text-center md:text-left max-w-sm">
+                <p className="font-display text-xl text-[#F9F6F0]">Lorie Wu</p>
+                <p className="text-[#C9A84C] text-sm mt-1">
+                  Creator of Reset Your Mind 1111™
+                </p>
+                <p className="text-[#F9F6F0]/60 text-sm mt-3 leading-relaxed">
+                  Helping people uncover the hidden patterns behind overthinking, self-doubt, procrastination, overwhelm, and emotional exhaustion.
+                </p>
+              </div>
             </motion.div>
-          )}
-
-          {/* Primary CTA */}
-          <div className="space-y-3">
-            <Button
-              asChild
-              onClick={() => track("cta_click_start_reset", { location: "hero" })}
-              className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#0A0A0A] h-14 text-lg font-semibold rounded-xl"
-            >
-              <Link to="/whats-my-pattern">Discover My Pattern</Link>
-            </Button>
-
-            {/* Lower-commitment secondary CTA */}
-            <Link
-              to="/assessment"
-              onClick={() => track("cta_click_assessment", { location: "hero_secondary" })}
-              className="block text-[#F9F6F0]/70 hover:text-[#C9A84C] text-sm transition-colors pt-1"
-            >
-              Take the 3-Minute Worth Thermostat →
-            </Link>
-          </div>
-
-          <p className="text-[#F9F6F0]/40 text-sm mt-4 italic">
-            You are not broken.<br />You are conditioned.<br />And patterns can change.
-          </p>
-
-          <div className="mt-6">
-            <p className="text-[#F9F6F0]/30 text-sm">
-              No credit card required. Free 7-day trial available after your personalized result.
-            </p>
-            <p className="text-[#F9F6F0]/40 text-xs mt-3">
-              People often discover patterns around: overthinking, self-doubt, procrastination, people-pleasing, perfectionism, visibility, worthiness.
-            </p>
           </div>
         </section>
+
+        {/* Testimonial / What people discover */}
+        <section className="max-w-2xl mx-auto mb-16">
+          <p className="text-[#C9A84C]/80 text-xs uppercase tracking-[0.2em] text-center mb-3">
+            Realizations people commonly experience
+          </p>
+          <h2 className="font-display text-2xl md:text-3xl text-center text-[#F9F6F0] mb-6">
+            What People Often Discover
+          </h2>
+          <div className="bg-gradient-to-br from-[#06060e] to-[#0A0A0A] border border-[#C9A84C]/25 rounded-2xl p-6 md:p-8 shadow-xl">
+            <blockquote className="text-[#F9F6F0]/90 text-base md:text-lg leading-relaxed italic">
+              “For years I thought something was wrong with me. I kept repeating the same patterns and couldn’t understand why. The biggest shift was realizing I wasn’t broken—I was running patterns I couldn’t see. Once I became aware of them, everything started to make more sense.”
+            </blockquote>
+          </div>
+          <div className="text-center mt-6 space-y-1 text-[#F9F6F0]/70 text-sm md:text-base">
+            <p>The goal isn’t to fix yourself.</p>
+            <p>The goal is to understand the pattern.</p>
+            <p className="text-[#C9A84C]/90">Because awareness is often the first step toward change.</p>
+          </div>
+        </section>
+
 
         {/* What happens next */}
         <section className="max-w-xl mx-auto mb-16">
