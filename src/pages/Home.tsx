@@ -196,6 +196,21 @@ export default function Home() {
           <StreakGraceBanner show={graceActivated} onDismiss={dismissGrace} />
           <StreakResetCard show={streakWasReset} onDismiss={dismissReset} />
 
+          {/*
+            Activation hero — one obvious first action above the fold for
+            free/trial users who haven't yet taken any meaningful action.
+            Collapses (returns null) once user has activated.
+          */}
+          {activated === false && (
+            <CheckInHeroCard
+              firstName={firstName}
+              options={stateOptions}
+              onSelect={handleStateSelect}
+              disabled={tapping !== null}
+            />
+          )}
+
+
           {/* Day 6 Surprise Unlock (trial users only, fires once) — conversion-critical */}
           <Day6GiftCard trialDay={trialDay} isTrialActive={isTrialActive} />
 
