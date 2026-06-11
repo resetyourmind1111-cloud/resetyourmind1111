@@ -11,6 +11,7 @@ import { Check, Sparkles, Plus, Send, Gift } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -95,8 +96,9 @@ export default function PermissionSlips() {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ["accepted-slips"] });
+      track("permission_slip_accepted", { source: "permission_slips_page", category: vars.category });
       toast.success("Permission slip accepted ✨");
     },
     onError: () => toast.error("Failed to accept slip"),

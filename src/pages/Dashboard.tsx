@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { Navigation } from "@/components/Navigation";
 import { PastDueBanner } from "@/components/PastDueBanner";
@@ -153,6 +154,7 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accepted-slips"] });
+      track("permission_slip_accepted", { source: "dashboard_daily" });
       toast.success("Permission slip accepted ✨");
     },
   });

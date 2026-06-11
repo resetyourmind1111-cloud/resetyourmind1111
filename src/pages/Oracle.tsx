@@ -5,6 +5,7 @@ import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/landing/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { track } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sparkles, ArrowLeft, History } from 'lucide-react';
@@ -187,6 +188,7 @@ const Oracle = () => {
       toast.error('Failed to save reading.');
       return;
     }
+    track('card_pull', { spread: selectedSpread.spread_name, deck: selectedDeck });
     toast.success('Reading saved!');
   };
 
