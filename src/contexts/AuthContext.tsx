@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
+
 
 interface AuthContextType {
   user: User | null;
@@ -52,8 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
     });
+    if (!error) {
+      track("signup_success");
+    }
     return { error };
   };
+
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({

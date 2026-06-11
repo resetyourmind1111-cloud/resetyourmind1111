@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Check } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { track } from "@/lib/analytics";
 
 // TODO(lorie): Replace these with real beta-member quotes (first name + initial only is fine).
 const TESTIMONIALS: { quote: string; attribution: string }[] = [];
@@ -15,6 +16,10 @@ export default function Landing() {
   const { foundingMode, spotsRemaining, loading: foundingLoading } = useFoundingMode();
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    track("landing_view");
+  }, []);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -94,6 +99,7 @@ export default function Landing() {
           <div className="space-y-3">
             <Button
               asChild
+              onClick={() => track("cta_click_start_reset", { location: "hero" })}
               className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#0A0A0A] h-14 text-lg font-semibold rounded-xl"
             >
               <Link to="/auth?view=signup">Start My Free 7-Day Reset →</Link>
@@ -102,6 +108,7 @@ export default function Landing() {
             {/* Lower-commitment secondary CTA */}
             <Link
               to="/assessment"
+              onClick={() => track("cta_click_assessment", { location: "hero_secondary" })}
               className="block text-[#F9F6F0]/70 hover:text-[#C9A84C] text-sm transition-colors pt-1"
             >
               Not ready? Take the 3-minute Worth Thermostat →
