@@ -155,28 +155,33 @@ export default function Landing() {
                 <p className="text-[#F9F6F0]/60 text-sm mt-3 leading-relaxed">
                   Helping people uncover the hidden patterns behind overthinking, self-doubt, procrastination, overwhelm, and emotional exhaustion.
                 </p>
+                <p className="text-[#F9F6F0]/60 text-sm mt-2 leading-relaxed">
+                  Because when you understand the pattern, you can begin to change it.
+                </p>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Testimonial / What people discover */}
+        {/* Founder Insight */}
         <section className="max-w-2xl mx-auto mb-16">
           <p className="text-[#C9A84C]/80 text-xs uppercase tracking-[0.2em] text-center mb-3">
-            Realizations people commonly experience
+            A common realization
           </p>
           <h2 className="font-display text-2xl md:text-3xl text-center text-[#F9F6F0] mb-6">
-            What People Often Discover
+            What Many People Discover
           </h2>
-          <div className="bg-gradient-to-br from-[#06060e] to-[#0A0A0A] border border-[#C9A84C]/25 rounded-2xl p-6 md:p-8 shadow-xl">
-            <blockquote className="text-[#F9F6F0]/90 text-base md:text-lg leading-relaxed italic">
-              “For years I thought something was wrong with me. I kept repeating the same patterns and couldn’t understand why. The biggest shift was realizing I wasn’t broken—I was running patterns I couldn’t see. Once I became aware of them, everything started to make more sense.”
-            </blockquote>
-          </div>
-          <div className="text-center mt-6 space-y-1 text-[#F9F6F0]/70 text-sm md:text-base">
-            <p>The goal isn’t to fix yourself.</p>
-            <p>The goal is to understand the pattern.</p>
-            <p className="text-[#C9A84C]/90">Because awareness is often the first step toward change.</p>
+          <div className="text-center space-y-4 text-[#F9F6F0]/85 text-base md:text-lg leading-relaxed">
+            <p>Most people don’t need more information.</p>
+            <p>They already know what they should do.</p>
+            <p>The challenge is understanding why they keep doing something different.</p>
+            <p className="mt-4">One of the most common realizations people experience is:</p>
+            <p className="italic text-[#F9F6F0]/90">
+              “I’m not broken. I’ve been repeating a pattern I couldn’t see.”
+            </p>
+            <p className="text-[#C9A84C]/90">
+              Because awareness is often the first step toward change.
+            </p>
           </div>
         </section>
 
