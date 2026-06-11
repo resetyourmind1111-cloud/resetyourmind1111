@@ -49,6 +49,9 @@ import { StreakResetCard } from "@/components/home/StreakResetCard";
 import { StreakMilestoneOverlay } from "@/components/home/StreakMilestoneOverlay";
 import { Day6GiftCard } from "@/components/home/Day6GiftCard";
 import { RecommendedForYouCard } from "@/components/home/RecommendedForYouCard";
+import { CheckInHeroCard } from "@/components/home/CheckInHeroCard";
+import { track } from "@/lib/analytics";
+import { isActivated } from "@/lib/activation";
 const stateOptions = [
   { label: "I feel overwhelmed", emoji: "🌊", module: "Recognition" },
   { label: "I feel emotional", emoji: "💧", module: "Release" },
@@ -69,6 +72,7 @@ export default function Home() {
   const [lastModule, setLastModule] = useState<string | null>(null);
   const [tapping, setTapping] = useState<number | null>(null);
   const [showWelcomeFlow, setShowWelcomeFlow] = useState(false);
+  const [activated, setActivated] = useState<boolean | null>(null);
   // Retention: streak grace day + reset detection
   const {
     streak: liveStreak,
@@ -125,6 +129,9 @@ export default function Home() {
       .then(({ data }) => {
         if (data?.[0]) setLastModule((data[0] as any).routed_to_module);
       });
+
+    // Activation check — drives the hero "first action" card visibility.
+    isActivated(user.id).then(setActivated);
   }, [user, isLoading, navigate]);
 
   const handleStateSelect = async (index: number) => {
@@ -138,8 +145,13 @@ export default function Home() {
       routed_to_module: option.module,
     });
 
+    // First-action tracking. We intentionally fire on every check-in so we can
+    // compute both "first ever" and ongoing engagement downstream.
+    track("home_first_action", { state: option.label, module: option.module, was_activated: !!activated });
+
     navigate(`/emotional-surgery?module=${index}`);
   };
+
 
   if (isLoading || trialLoading) {
     return (
