@@ -110,4 +110,15 @@ export const TRIAL_EMAILS: TrialEmail[] = [
       "Claim Your Spot →", "/upgrade"
     ),
   },
+  {
+    day: 12, // Day 2 morning nudge (lightweight engagement touchpoint)
+    subject: "A 5-minute nudge for your Day 2",
+    html: (n) => shell(
+      `<h1 style="font-size:24px;color:${BRAND_GOLD};margin:0 0 16px;font-weight:400;">${n}, a quiet nudge.</h1>
+<p style="font-size:16px;line-height:1.7;margin:0 0 16px;">Day 2 is open in your app. Five minutes is all today asks.</p>
+<p style="font-size:16px;line-height:1.7;margin:0 0 16px;">No pressure — just a reminder that the work compounds quietly.</p>`,
+      "Open Day 2 →", "/home"
+    ),
+  },
 ];
+
