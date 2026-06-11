@@ -142,7 +142,7 @@ export default function Landing() {
                 <div className="absolute -inset-1 bg-gradient-to-br from-[#C9A84C]/40 via-[#3D1A6E]/30 to-transparent rounded-3xl blur-md" aria-hidden="true" />
                 <img
                   src={lorieFounderAsset.url}
-                  alt="Lorie Wu, creator of Reset Your Mind 1111"
+                  alt="Lorie Wu"
                   loading="eager"
                   className="relative w-full h-auto rounded-3xl border border-[#C9A84C]/20 shadow-2xl object-cover"
                 />
@@ -153,7 +153,7 @@ export default function Landing() {
                   Creator of Reset Your Mind 1111™
                 </p>
                 <p className="text-[#F9F6F0]/60 text-sm mt-3 leading-relaxed">
-                  Helping people uncover the hidden patterns behind overthinking, self-doubt, procrastination, overwhelm, and emotional exhaustion.
+                  Helping people uncover the hidden patterns behind overthinking, self-doubt, procrastination, and emotional exhaustion.
                 </p>
                 <p className="text-[#F9F6F0]/60 text-sm mt-2 leading-relaxed">
                   Because when you understand the pattern, you can begin to change it.
