@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Compass, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { analytics } from "@/lib/analytics";
+import { track } from "@/lib/analytics";
 
 /**
  * Primary hero card for unactivated users, surfacing the
@@ -17,7 +17,7 @@ export function DiscoverPatternHeroCard() {
 
   const handleClick = () => {
     try {
-      analytics.track("home_first_action", { action: "discover_pattern" });
+      track("home_first_action", { action: "discover_pattern" });
     } catch {
       // fire-and-forget
     }
