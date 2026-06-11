@@ -66,13 +66,11 @@ export default function Landing() {
           <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-10" />
 
           <h1 className="font-display text-3xl md:text-5xl text-[#F9F6F0] leading-tight mb-5">
-            In 7 days, name the exact pattern keeping you stuck —
-            <span className="text-[#C9A84C]"> and get the first tool to interrupt it.</span>
+            Why do you keep doing the same thing… even when you know better?
           </h1>
 
           <p className="text-[#F9F6F0]/70 font-sans text-base md:text-lg mb-8 max-w-md mx-auto">
-            Reset Your Mind 1111™ works at the nervous system level — where the
-            patterns around money, love, health and leadership actually live.
+            Discover the hidden pattern behind your overthinking, self-doubt, procrastination, overwhelm, or self-sabotage — and get a personalized starting point in minutes.
           </p>
 
           {/* Founding badge — only after fetch settles so it doesn't flash */}
@@ -102,7 +100,7 @@ export default function Landing() {
               onClick={() => track("cta_click_start_reset", { location: "hero" })}
               className="w-full bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-[#0A0A0A] h-14 text-lg font-semibold rounded-xl"
             >
-              <Link to="/auth?view=signup">Start My Free 7-Day Reset →</Link>
+              <Link to="/whats-my-pattern">Discover My Pattern</Link>
             </Button>
 
             {/* Lower-commitment secondary CTA */}
@@ -111,26 +109,30 @@ export default function Landing() {
               onClick={() => track("cta_click_assessment", { location: "hero_secondary" })}
               className="block text-[#F9F6F0]/70 hover:text-[#C9A84C] text-sm transition-colors pt-1"
             >
-              Not ready? Take the 3-minute Worth Thermostat →
+              Take the 3-Minute Worth Thermostat →
             </Link>
           </div>
 
+          <p className="text-[#F9F6F0]/40 text-sm mt-4 italic">
+            You are not broken. You are conditioned. And patterns can change.
+          </p>
+
           <p className="text-[#F9F6F0]/30 text-sm mt-6">
-            No credit card required. 7 days free.
+            No credit card required. Free 7-day trial available after your personalized result.
           </p>
         </section>
 
-        {/* What you get in 7 days */}
+        {/* What happens next */}
         <section className="max-w-xl mx-auto mb-16">
           <h2 className="font-display text-xl md:text-2xl text-center mb-6">
-            What happens in your first 7 days
+            What happens next
           </h2>
           <ul className="space-y-3">
             {[
-              "Day 1 — Worth Thermostat result: see the exact pattern running you",
-              "Daily Permission Slip + Reset Anthem to anchor the shift",
-              "One Healing Tool a day, paired to your result",
-              "Day 7 — decide if you want to keep going. No auto-charge.",
+              "Discover Your Pattern — Answer 6 quick questions and identify the pattern that may be keeping you stuck.",
+              "Get Your Personalized Result — Understand how the pattern may be showing up and what it may be trying to protect you from.",
+              "Start Your Reset — Receive a recommended tool and a simple first step designed specifically for your result.",
+              "Continue Your 7-Day Reset — Explore guided tools, permission slips, meditations, and daily practices that help reinforce new patterns.",
             ].map((line) => (
               <li key={line} className="flex items-start gap-3">
                 <Check className="w-5 h-5 text-[#C9A84C] mt-0.5 shrink-0" />
