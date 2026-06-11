@@ -53,6 +53,7 @@ import AdminGiftedEmails from "./pages/AdminGiftedEmails";
 import Mission from "./pages/Mission";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import FoundingMemberWelcome from "./pages/FoundingMemberWelcome";
+import WhatsMyPattern from "./pages/WhatsMyPattern";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
