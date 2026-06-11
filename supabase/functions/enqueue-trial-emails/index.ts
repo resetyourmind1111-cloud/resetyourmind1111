@@ -88,6 +88,19 @@ Deno.serve(async (req) => {
       sent: false,
     });
 
+    // Day 8 follow-up for non-converters (skip-on-upgrade handled in send-trial-emails).
+    const day8 = new Date(start);
+    day8.setDate(day8.getDate() + 7); // 7 days after start = "day 8"
+    day8.setUTCHours(15, 0, 0, 0);
+    rows.push({
+      user_id: userId,
+      day_number: 8,
+      scheduled_time: day8.toISOString(),
+      message_title: "Your spot is still here",
+      message_body: "Your 7-day preview ended yesterday — the door is still open.",
+      sent: false,
+    });
+
     const { error: insErr } = await admin.from("notifications_schedule").insert(rows);
     if (insErr) throw insErr;
 

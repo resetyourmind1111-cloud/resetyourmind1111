@@ -11,6 +11,7 @@ import logo from "@/assets/logo.png";
 import { AuthFormField } from "@/components/auth/AuthFormField";
 import { AuthError } from "@/components/auth/AuthError";
 import { PostSignupTransition } from "@/components/auth/PostSignupTransition";
+import { track } from "@/lib/analytics";
 
 const signUpSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
@@ -56,6 +57,10 @@ export default function Auth() {
 
   const { signUp, signIn, user, isLoading, updatePassword } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    track("auth_view", { view });
+  }, [view]);
 
   useEffect(() => {
     const type = searchParams.get("type");

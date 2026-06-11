@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, CheckCircle } from "lucide-react";
+import { track } from "@/lib/analytics";
 
 type AssessmentStep = "loading" | "already-done" | "welcome" | "questions" | "results" | "comparison";
 
@@ -48,7 +49,10 @@ export default function Assessment() {
     check();
   }, [user]);
 
-  const handleStart = () => setStep("questions");
+  const handleStart = () => {
+    track("assessment_started");
+    setStep("questions");
+  };
 
   const handleSelectAnswer = (points: number) => {
     const questionId = assessmentQuestions[currentQuestionIndex].id;
@@ -58,6 +62,7 @@ export default function Assessment() {
       if (currentQuestionIndex < assessmentQuestions.length - 1) {
         setCurrentQuestionIndex((prev) => prev + 1);
       } else {
+        track("assessment_completed");
         setStep("results");
       }
     }, 300);

@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ResetPlanCards } from "@/components/onboarding/ResetPlanCards";
 import { MissionIntroScreen } from "@/components/onboarding/MissionIntroScreen";
+import { track } from "@/lib/analytics";
 
 // Trimmed onboarding: 3 essential questions (name, primary wound, goal) + notification screen.
 // stuckDuration and triedBefore screens are intentionally unreachable but kept in code & state
@@ -200,6 +201,8 @@ export function PersonalizedOnboarding() {
     supabase.functions.invoke("notify-trial-started").catch((e) =>
       console.error("notify-trial-started failed:", e),
     );
+
+    track("onboarding_complete", { primary_wound: primaryWound, reset_goal: resetGoal });
 
     setTimeout(() => setScreen(7), 2500);
   };

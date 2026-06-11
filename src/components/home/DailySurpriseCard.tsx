@@ -6,6 +6,7 @@ import { Heart, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import { allPermissionSlips } from "@/data/permissionSlipsData";
 import { resetWords } from "@/data/resetWordsData";
 import { useNavigate } from "react-router-dom";
@@ -48,6 +49,7 @@ export function DailySurpriseCard() {
       slip_text: dailyPermission.text,
       category: dailyPermission.category,
     });
+    track("permission_slip_accepted", { source: "daily_surprise_card" });
 
     toast("Permission accepted. ✦", { duration: 2000 });
     setTimeout(() => setGlowing(false), 1000);

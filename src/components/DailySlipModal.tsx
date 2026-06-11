@@ -6,6 +6,7 @@ import { Sparkles, Check, ArrowRight, X } from "lucide-react";
 import { getDailySlip } from "@/data/permissionSlipsData";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
@@ -63,6 +64,7 @@ export function DailySlipModal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accepted-slips"] });
+      track("permission_slip_accepted", { source: "daily_slip_modal" });
       toast.success("Permission slip accepted ✨");
     },
   });
