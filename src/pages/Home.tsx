@@ -50,6 +50,7 @@ import { StreakMilestoneOverlay } from "@/components/home/StreakMilestoneOverlay
 import { Day6GiftCard } from "@/components/home/Day6GiftCard";
 import { RecommendedForYouCard } from "@/components/home/RecommendedForYouCard";
 import { CheckInHeroCard } from "@/components/home/CheckInHeroCard";
+import { DiscoverPatternHeroCard } from "@/components/home/DiscoverPatternHeroCard";
 import { track } from "@/lib/analytics";
 import { isActivated } from "@/lib/activation";
 const stateOptions = [
@@ -202,12 +203,15 @@ export default function Home() {
             Collapses (returns null) once user has activated.
           */}
           {activated === false && (
-            <CheckInHeroCard
-              firstName={firstName}
-              options={stateOptions}
-              onSelect={handleStateSelect}
-              disabled={tapping !== null}
-            />
+            <>
+              <DiscoverPatternHeroCard />
+              <CheckInHeroCard
+                firstName={firstName}
+                options={stateOptions}
+                onSelect={handleStateSelect}
+                disabled={tapping !== null}
+              />
+            </>
           )}
 
 
