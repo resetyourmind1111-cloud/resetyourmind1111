@@ -75,8 +75,22 @@ Deno.serve(async (req) => {
       };
     });
 
+    // Day 2 morning nudge (lightweight engagement touchpoint) — sent ~3h before main Day 2 email.
+    const day2Morning = new Date(start);
+    day2Morning.setDate(day2Morning.getDate() + 1);
+    day2Morning.setUTCHours(12, 0, 0, 0);
+    rows.push({
+      user_id: userId,
+      day_number: 12,
+      scheduled_time: day2Morning.toISOString(),
+      message_title: "A 5-minute nudge for your Day 2",
+      message_body: "Day 2 is open in your app. Five minutes is all today asks.",
+      sent: false,
+    });
+
     const { error: insErr } = await admin.from("notifications_schedule").insert(rows);
     if (insErr) throw insErr;
+
 
     return new Response(JSON.stringify({ status: "enqueued", count: rows.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -10,7 +10,11 @@ import { useNavigate } from "react-router-dom";
 import { ResetPlanCards } from "@/components/onboarding/ResetPlanCards";
 import { MissionIntroScreen } from "@/components/onboarding/MissionIntroScreen";
 
-const TOTAL_STEPS = 8; // screens 1–8 have dots (name through notification)
+// Trimmed onboarding: 3 essential questions (name, primary wound, goal) + notification screen.
+// stuckDuration and triedBefore screens are intentionally unreachable but kept in code & state
+// so the existing DB save shape (and any downstream consumers of those columns) is unchanged.
+const TOTAL_STEPS = 6;
+
 
 const woundOptions = [
   {
@@ -352,12 +356,13 @@ export function PersonalizedOnboarding() {
                 })}
               </div>
               <Button
-                onClick={goNext}
+                onClick={() => setScreen(5)}
                 disabled={!primaryWound}
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base py-6 rounded-xl"
               >
                 This is me — continue →
               </Button>
+
             </div>
           </motion.div>
         )}
@@ -473,10 +478,11 @@ export function PersonalizedOnboarding() {
             transition={{ duration: 0.4 }}
             className="flex-1 flex flex-col px-6 pt-16"
           >
-            <button onClick={goBack} className="self-start mb-6 text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => setScreen(2)} className="self-start mb-6 text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <ProgressDots current={4} total={TOTAL_STEPS} />
+            <ProgressDots current={2} total={TOTAL_STEPS} />
+
             <div className="flex-1 flex flex-col items-center max-w-md mx-auto w-full mt-8">
               <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2 text-center">
                 What does your reset look like when it works?
@@ -524,7 +530,7 @@ export function PersonalizedOnboarding() {
             transition={{ duration: 0.4 }}
             className="flex-1 flex flex-col items-center justify-center px-6 text-center"
           >
-            <ProgressDots current={5} total={TOTAL_STEPS} />
+            <ProgressDots current={3} total={TOTAL_STEPS} />
             <div className="mt-12">
               <PulseAnimation />
               <h2 className="font-serif text-xl md:text-2xl italic text-foreground mt-8 mb-3">
@@ -549,7 +555,7 @@ export function PersonalizedOnboarding() {
             className="flex-1 flex flex-col px-6 pt-16 pb-12 overflow-y-auto"
           >
             <div className="max-w-md mx-auto w-full">
-              <ProgressDots current={6} total={TOTAL_STEPS} />
+              <ProgressDots current={4} total={TOTAL_STEPS} />
               <div className="mt-8">
                 <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2 text-center">
                   {firstName}, here's where you begin.
@@ -601,7 +607,7 @@ export function PersonalizedOnboarding() {
             <button onClick={() => setScreen(7)} className="self-start mb-6 text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <ProgressDots current={7} total={TOTAL_STEPS} />
+            <ProgressDots current={5} total={TOTAL_STEPS} />
             <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full">
               <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mb-6">
                 <Clock className="w-7 h-7 text-primary" />
