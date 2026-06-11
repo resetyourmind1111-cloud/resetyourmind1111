@@ -22,13 +22,17 @@ Deno.serve(async (req) => {
 
     // Pull all due, unsent rows (cap at 200 per run for safety)
     const nowIso = new Date().toISOString();
+    // notifications_schedule is exclusively used for trial emails (days 1-7 + day 12 = Day 2 morning nudge).
+    // The earlier `.like("message_body","trial_email_day_%")` filter never matched any rows because
+    // enqueue-trial-emails writes human-readable copy, not a marker. Filter by day_number instead.
     const { data: due, error: dueErr } = await admin
       .from("notifications_schedule")
       .select("id, user_id, day_number, scheduled_time")
       .eq("sent", false)
       .lte("scheduled_time", nowIso)
-      .like("message_body", "trial_email_day_%")
+      .in("day_number", [1, 2, 3, 4, 5, 6, 7, 12])
       .limit(200);
+
 
     if (dueErr) throw dueErr;
     if (!due || due.length === 0) {
