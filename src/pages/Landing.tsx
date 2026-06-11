@@ -153,7 +153,7 @@ export default function Landing() {
                   Creator of Reset Your Mind 1111™
                 </p>
                 <p className="text-[#F9F6F0]/60 text-sm mt-3 leading-relaxed">
-                  Helping people uncover the hidden patterns behind overthinking, self-doubt, procrastination, overwhelm, and emotional exhaustion.
+                  Helping people uncover the hidden patterns behind overthinking, self-doubt, procrastination, and emotional exhaustion.
                 </p>
                 <p className="text-[#F9F6F0]/60 text-sm mt-2 leading-relaxed">
                   Because when you understand the pattern, you can begin to change it.
