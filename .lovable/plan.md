@@ -1,120 +1,102 @@
-# Gifted Access 30-Day Experience
+## Goal
+Ship the 7 activation fixes safely and modularly. Zero changes to auth, Stripe, subscription, or trial-status logic.
 
-Adds a tailored journey for users whose `user_source = 'gifted'`, ending when their `access_expires_at` passes. The $11 Founding Member rate is offered only while gifted access is active.
+## 1. Lightweight analytics (no external SaaS)
 
-## 1. Database changes (single migration)
+**New table** `analytics_events`:
+- `id uuid`, `user_id uuid null`, `session_id text`, `event text`, `props jsonb`, `path text`, `created_at timestamptz default now()`
+- RLS: anon + authenticated can INSERT only; SELECT restricted to admins (`is_admin`)
+- GRANTs per project standard
 
-Add to `public.profiles`:
-- `access_expires_at` — timestamp with time zone, nullable
-- `day15_modal_shown` — boolean, default false
-- `day21_modal_shown` — boolean, default false
-- `day15_remind_later_at` — timestamp, nullable (so "remind me later" shifts the modal to Day 21)
-- `tools_opened_count` — integer, default 0
-- `resets_completed_count` — integer, default 0
+**New client utility** `src/lib/analytics.ts`:
+- `track(event, props?)` — fire-and-forget insert, anonymous-safe (uses `session_id` from `localStorage`)
+- `useTrackPageView(name)` hook
 
-Update `prevent_profile_privilege_escalation` trigger so regular users can update these new self-owned fields (they are not billing/admin fields, so the existing trigger already allows them — no change needed beyond confirming).
+**Events wired** exactly as you listed:
+`landing_view`, `cta_click_start_reset`, `cta_click_assessment`, `auth_view`, `signup_success`, `onboarding_complete`, `home_first_action`, `card_pull`, `permission_slip_accepted`, `assessment_started`, `assessment_completed`.
 
-No new RLS policies required — existing self-owned profile policies cover reads/writes.
+No replacement of existing logic — only additive `track()` calls at known points (Landing CTAs, Auth mount, signup success in AuthContext, end of `PersonalizedOnboarding.handleProcessing`, Home primary CTA, card-pull mutation, permission-slip-accept mutation, Assessment mount + submit).
 
-## 2. New hook: `useGiftedAccess`
+## 2. Home redesign — one obvious first action
 
-`src/hooks/useGiftedAccess.ts` — single source of truth.
+In `src/pages/Home.tsx`:
+- Add a single primary hero card **above the fold** for trial/free users who have not yet activated: "Take your 30-second check-in →" linking to the existing daily check-in flow.
+- All other dashboard sections (tools grid, oracle, lessons, etc.) stay exactly as-is but render *below* the hero with a subtler visual treatment (smaller heading, no gold gradient).
+- Once the user has any activation event, hero collapses to a compact "Today's practice" card and the rest of the dashboard returns to current weight.
+- Paid users are unaffected — hero only shows for trial/free.
 
-Returns:
+No removal of existing widgets. No changes to gating logic.
+
+## 3. Activation definition
+
+Single source of truth in `src/lib/activation.ts`:
+```ts
+isActivated(userId) → boolean
 ```
-{
-  isGifted: boolean,                       // user_source === 'gifted' AND access_expires_at in future
-  isExpired: boolean,                      // gifted but access_expires_at in past
-  daysRemaining: number,                   // 1-30 (Math.ceil of ms until expiry)
-  daysElapsed: number,                     // 30 - daysRemaining (clamped 0..30)
-  urgencyTier: 'early' | 'mid' | 'late' | 'final',
-  expiresAt: Date | null,
-  toolsOpened: number,
-  resetsCompleted: number,
-  day15ModalShown: boolean,
-  day21ModalShown: boolean,
-  markModalShown: (key: 'day15' | 'day21', remindLater?: boolean) => Promise<void>,
-}
-```
+Returns true if any row exists in: `daily_shifts`, `lesson_completions`, `card_pulls`, `permission_slips_accepted`, `assessment_results`.
 
-Tier mapping (per spec):
-- `early`: daysRemaining ≥ 17 (days 1–14 elapsed)
-- `mid`: 10 ≤ daysRemaining ≤ 16 (days 15–21)
-- `late`: 2 ≤ daysRemaining ≤ 9 (days 22–29)
-- `final`: daysRemaining ≤ 1
+Used by:
+- Home hero (collapse condition)
+- Day-1 no-activity nudge (skip condition)
 
-Subscribes to profile updates via the existing AuthContext profile listener (or a Supabase subscription on the profile row) so the banner updates live.
+## 4. Activation event tracking
+Covered by #1 wire-ups (card_pull, permission_slip_accepted, assessment_completed) + a `home_first_action` fired on the check-in CTA click.
 
-## 3. New component: `GiftedCountdownBanner`
+## 5. Backfill 21 users missing trial schedules
 
-`src/components/gifted/GiftedCountdownBanner.tsx` — a sticky banner mounted once inside `AuthenticatedLayout`, above the main content.
+One-off admin script `scripts/backfill-trial-schedules.ts` (run locally, never auto-executed):
+- Lists profiles where `subscription_tier IN (null,'free')` AND user has **zero** rows in `notifications_schedule`
+- Calls the same insert logic as `enqueue-trial-emails`, anchored on the user's `auth.users.created_at`
+- Skips users whose Day-N would be in the past — only enqueues future days
+- Prints a dry-run summary first; requires `--apply` flag to write
 
-Behaviour:
-- Hidden if `!isGifted` or paid (`subscription_tier !== 'free'`).
-- Hidden on `/upgrade`, `/auth`, `/onboarding` to avoid duplicate CTAs.
-- Renders the four design variants from the spec (lavender / soft gold / deep purple / deep purple bold) with the matching copy and CTA target `/upgrade`.
-- Uses inline tokens for the brand-specific hex codes provided in the spec, since they are one-off marketing colors that don't belong in the global token set.
+Safe: idempotency guaranteed by the existing "any rows = skip" check + script's own pre-filter.
 
-## 4. New components: gifted modals
+## 6. Day-1 no-activity nudge
 
-- `src/components/gifted/GiftedDay15Modal.tsx` — full-screen modal with gold-on-deep-purple, headline "You're halfway through.", primary "Upgrade for $11 →" → `/upgrade`, secondary "Remind me later" sets `day15_remind_later_at = now()` and `day15_modal_shown = true`.
-- `src/components/gifted/GiftedDay21Modal.tsx` — white background, four gold-bordered stat cards driven by `tools_opened_count`, `resets_completed_count`, `daysElapsed`, and existing `current_streak` from profiles. Primary "Continue My Journey — $11 →" → `/upgrade`. Secondary "I'll decide later".
+New edge function `send-day1-nudge` + hourly cron:
+- Finds users whose trial started 22–26h ago, `subscription_tier='free'`, and `isActivated() === false`
+- Sends a single "Your reset is one tap away" email (new template entry, `day_number = 11`)
+- Idempotent: writes a sent marker row to `notifications_schedule` with `day_number=11` before sending; skips if already exists
 
-Both modals dismiss to a no-op (state stays "shown" so they never reappear once flagged).
+## 7. Day-8 follow-up email
 
-## 5. New controller: `GiftedExperienceGate`
+Add `day: 8` to `_shared/trial-emails.ts` and one new row to `enqueue-trial-emails` (start + 8 days, 15:00 UTC). Add `8` to the `day_number` filter in `send-trial-emails`. Skip-on-upgrade logic already handles non-converters correctly.
 
-`src/components/gifted/GiftedExperienceGate.tsx` — mounted once in `AuthenticatedLayout`. Decides which (if any) modal to render:
-- Day 15 modal: `daysElapsed >= 15 && !day15_modal_shown`.
-- Day 21 modal: `daysElapsed >= 21 && !day21_modal_shown` (also triggers if user clicked "Remind me later" on Day 15 and we're now ≥ 21).
+**New signups only** — no backfill of Day-8 for existing trials (consistent with your previous instruction on the Day-2 morning nudge).
 
-Skips both if subscription is paid or if `!isGifted`.
+## Files touched
 
-## 6. Counter increments
+**New:**
+- `supabase/migrations/<ts>_analytics_events.sql`
+- `src/lib/analytics.ts`
+- `src/lib/activation.ts`
+- `src/components/home/CheckInHeroCard.tsx`
+- `scripts/backfill-trial-schedules.ts`
+- `supabase/functions/send-day1-nudge/index.ts`
 
-Two tiny helpers (added inline in the relevant pages, no new files):
-- `tools_opened_count`: increment when a user opens a healing tool — bump on mount of `src/pages/HealingToolPage.tsx` (and any tool page guarded behind auth) for gifted users.
-- `resets_completed_count`: increment in `src/pages/MonthlyReset.tsx` on completion handler, and on the 30-day reset completion in `src/components/thirty-day/Day30CompletionExperience.tsx`.
+**Edited (additive only):**
+- `src/pages/Landing.tsx` (2 track calls)
+- `src/pages/Auth.tsx` (1 track call) + `src/contexts/AuthContext.tsx` (1 track call on signup)
+- `src/components/onboarding/PersonalizedOnboarding.tsx` (1 track call)
+- `src/pages/Home.tsx` (hero insertion)
+- `src/pages/Assessment.tsx` (2 track calls)
+- Card-pull + permission-slip components (1 track call each)
+- `supabase/functions/_shared/trial-emails.ts` (Day 8 + Day 11 templates)
+- `supabase/functions/enqueue-trial-emails/index.ts` (Day 8 row)
+- `supabase/functions/send-trial-emails/index.ts` (extend day_number filter)
 
-Use a single helper `incrementGiftedCounter(field)` colocated in `useGiftedAccess.ts` that no-ops for non-gifted users.
+## Impact confirmation
+- **Auth:** no changes. AuthContext gains one fire-and-forget `track()` call after successful signup.
+- **Checkout / Stripe / subscriptions:** no changes.
+- **Trial status / gating:** no changes. Backfill never touches `subscription_tier` or trial dates.
+- **Existing users:** unaffected unless they're in the 21-user backfill cohort (and only by receiving the email schedule they should have had).
 
-## 7. Upgrade page — gifted variant
+## Execution order
+A. Migration + analytics utility + activation helper (foundation)
+B. Wire `track()` calls + Home hero (activation visibility)
+C. Day-8 email template + enqueue
+D. Backfill script (you run it manually with `--apply` when ready)
+E. Day-1 nudge function + cron (last, since it depends on activation tracking)
 
-In `src/pages/Upgrade.tsx`, extend the existing founding-only branch. Hierarchy of variants:
-1. `isGifted` → gifted copy (highest priority).
-2. `isLiveReset` → existing $11 live-reset copy.
-3. Default → organic $44 copy.
-
-Gifted copy:
-- Eyebrow: "FOUNDING MEMBER · GIFTED ACCESS RATE"
-- Headline: "You were given access. Now make it yours."
-- Subhead: spec body text.
-- CTA label: "Claim My $11 Rate →"
-- Reuses the same `LIVE_RESET_FIRST_MONTH_COUPON` (`jFPZRQQb`, $33 off once) so first month is $11.
-
-Server-side guard in `supabase/functions/create-checkout/index.ts` is widened: the coupon is honored when `user_source` is `'live-reset'` OR `'gifted'`. Gifted users with an expired `access_expires_at` are rejected (coupon dropped, falls back to $44).
-
-## 8. Files touched
-
-```
-supabase/migrations/<new>.sql                  (new — profile fields)
-supabase/functions/create-checkout/index.ts    (widen coupon guard)
-src/hooks/useGiftedAccess.ts                   (new)
-src/components/gifted/GiftedCountdownBanner.tsx (new)
-src/components/gifted/GiftedDay15Modal.tsx     (new)
-src/components/gifted/GiftedDay21Modal.tsx     (new)
-src/components/gifted/GiftedExperienceGate.tsx (new)
-src/components/AuthenticatedLayout.tsx         (mount banner + gate)
-src/pages/Upgrade.tsx                          (gifted variant branch)
-src/pages/HealingToolPage.tsx                  (increment tools_opened_count)
-src/pages/MonthlyReset.tsx                     (increment resets_completed_count)
-src/components/thirty-day/Day30CompletionExperience.tsx (increment resets_completed_count)
-```
-
-## 9. Out of scope / assumptions
-
-- Granting gifted access (setting `user_source = 'gifted'` and `access_expires_at`) is assumed to happen through an existing admin flow or manual DB update — not built here.
-- $11 Stripe payment-link path (`buy.stripe.com/...`) already routes via the existing `stripe-webhook` to flip `subscription_tier = 'founding'`; no webhook changes needed.
-- Banner colors use literal hex per the spec rather than design tokens, since they are marketing-specific and don't map to the existing dark luxury palette.
-
-Approve and I'll ship it.
+Each step is independently revertible.
