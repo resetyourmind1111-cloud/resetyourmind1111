@@ -400,12 +400,19 @@ export default function WhatsMyPattern() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => toast("Coming soon")}
+                onClick={handleSaveClick}
+                disabled={saving || saved}
               >
-                Save My Results
+                {saving ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving…</>
+                ) : saved ? (
+                  <><Check className="w-4 h-4 mr-2" /> Saved</>
+                ) : (
+                  "Save My Results"
+                )}
               </Button>
               <Button variant="ghost" className="w-full" onClick={reset}>
-                Try Again
+                Retake Quiz
               </Button>
             </div>
 
