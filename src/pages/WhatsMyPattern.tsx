@@ -242,9 +242,20 @@ export default function WhatsMyPattern() {
     setAnswers({});
     setFreeTextValue("");
     setResult(null);
+    setSaved(false);
   };
 
   const progress = ((current) / QUESTIONS.length) * 100;
+
+  // --- HYDRATING ---
+  if (hydrating) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
 
   // --- INTRO ---
   if (step === "intro") {
