@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
 import { toast } from "sonner";
-import { Sparkles, ArrowLeft, Loader2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Loader2, Check } from "lucide-react";
 
 type Step = "intro" | "questions" | "loading" | "result";
 
@@ -111,14 +112,75 @@ const PATTERN_TO_RESET_ROUTE: Record<string, string> = {
 
 export default function WhatsMyPattern() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState<Step>("intro");
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [freeTextValue, setFreeTextValue] = useState("");
   const [result, setResult] = useState<PatternResult | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [hydrating, setHydrating] = useState(true);
+
+  // Load most recent saved result on mount
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (!user) {
+        setHydrating(false);
+        return;
+      }
+      const { data } = await supabase
+        .from("whats_my_pattern_results")
+        .select("pattern, why, showing_up, protecting, small_shift, recommended_tool, first_step, answers")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (data?.pattern) {
+        setResult({
+          pattern: data.pattern,
+          why: data.why ?? "",
+          showing_up: (data.showing_up as string[]) ?? [],
+          protecting: data.protecting ?? "",
+          small_shift: data.small_shift ?? "",
+          recommended_tool: data.recommended_tool ?? "",
+          first_step: data.first_step ?? "",
+        });
+        setAnswers((data.answers as Answers) ?? {});
+        setSaved(true);
+        setStep("result");
+      }
+      setHydrating(false);
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  const persistResult = async (r: PatternResult, finalAnswers: Answers) => {
+    if (!user) return false;
+    const { error } = await supabase.from("whats_my_pattern_results").insert({
+      user_id: user.id,
+      pattern: r.pattern,
+      why: r.why,
+      showing_up: r.showing_up,
+      protecting: r.protecting,
+      small_shift: r.small_shift,
+      recommended_tool: r.recommended_tool,
+      first_step: r.first_step,
+      answers: finalAnswers,
+    });
+    if (error) {
+      console.error("Failed to save pattern result", error);
+      return false;
+    }
+    return true;
+  };
 
   const start = () => {
     track("pattern_started");
+    setSaved(false);
     setStep("questions");
   };
 
@@ -130,14 +192,35 @@ export default function WhatsMyPattern() {
       });
       if (error) throw error;
       if (!data?.pattern) throw new Error("No pattern returned");
-      setResult(data as PatternResult);
-      track("pattern_completed", { pattern: data.pattern });
-      track("pattern_result_viewed", { pattern: data.pattern });
+      const r = data as PatternResult;
+      setResult(r);
+      track("pattern_completed", { pattern: r.pattern });
+      track("pattern_result_viewed", { pattern: r.pattern });
       setStep("result");
+      // Auto-save result + recommendations
+      const ok = await persistResult(r, finalAnswers);
+      if (ok) setSaved(true);
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || "Something went wrong. Please try again.");
       setStep("questions");
+    }
+  };
+
+  const handleSaveClick = async () => {
+    if (!result) return;
+    if (!user) {
+      toast.error("Please sign in to save your results.");
+      return;
+    }
+    setSaving(true);
+    const ok = await persistResult(result, answers);
+    setSaving(false);
+    if (ok) {
+      setSaved(true);
+      toast.success("Results saved");
+    } else {
+      toast.error("Could not save. Please try again.");
     }
   };
 
@@ -159,9 +242,20 @@ export default function WhatsMyPattern() {
     setAnswers({});
     setFreeTextValue("");
     setResult(null);
+    setSaved(false);
   };
 
   const progress = ((current) / QUESTIONS.length) * 100;
+
+  // --- HYDRATING ---
+  if (hydrating) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
 
   // --- INTRO ---
   if (step === "intro") {
@@ -306,12 +400,19 @@ export default function WhatsMyPattern() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => toast("Coming soon")}
+                onClick={handleSaveClick}
+                disabled={saving || saved}
               >
-                Save My Results
+                {saving ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving…</>
+                ) : saved ? (
+                  <><Check className="w-4 h-4 mr-2" /> Saved</>
+                ) : (
+                  "Save My Results"
+                )}
               </Button>
               <Button variant="ghost" className="w-full" onClick={reset}>
-                Try Again
+                Retake Quiz
               </Button>
             </div>
 

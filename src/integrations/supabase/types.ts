@@ -1650,6 +1650,51 @@ export type Database = {
         }
         Relationships: []
       }
+      whats_my_pattern_results: {
+        Row: {
+          answers: Json | null
+          created_at: string
+          first_step: string | null
+          id: string
+          pattern: string
+          protecting: string | null
+          recommended_tool: string | null
+          showing_up: Json | null
+          small_shift: string | null
+          updated_at: string
+          user_id: string
+          why: string | null
+        }
+        Insert: {
+          answers?: Json | null
+          created_at?: string
+          first_step?: string | null
+          id?: string
+          pattern: string
+          protecting?: string | null
+          recommended_tool?: string | null
+          showing_up?: Json | null
+          small_shift?: string | null
+          updated_at?: string
+          user_id: string
+          why?: string | null
+        }
+        Update: {
+          answers?: Json | null
+          created_at?: string
+          first_step?: string | null
+          id?: string
+          pattern?: string
+          protecting?: string | null
+          recommended_tool?: string | null
+          showing_up?: Json | null
+          small_shift?: string | null
+          updated_at?: string
+          user_id?: string
+          why?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
