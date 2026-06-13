@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
 import { toast } from "sonner";
-import { Sparkles, ArrowLeft, Loader2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Loader2, Check } from "lucide-react";
 
 type Step = "intro" | "questions" | "loading" | "result";
 
