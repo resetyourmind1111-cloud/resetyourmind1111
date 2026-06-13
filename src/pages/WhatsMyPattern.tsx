@@ -393,9 +393,25 @@ export default function WhatsMyPattern() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => toast("Coming soon")}
+                onClick={() => {
+                  const TOOL_TO_ROUTE: Record<string, string> = {
+                    "Worth Thermostat™": "/assessment",
+                    "Worth Thermostat": "/assessment",
+                    "Permission Granted™": "/manifesto",
+                    "Permission Granted": "/manifesto",
+                    "Emotional Surgery™": "/emotional-surgery",
+                    "Emotional Surgery": "/emotional-surgery",
+                    "Guided Reset": "/support-flow",
+                  };
+                  const route = TOOL_TO_ROUTE[result.recommended_tool] ?? "/tools";
+                  track("pattern_tool_explored", {
+                    pattern: result.pattern,
+                    tool: result.recommended_tool,
+                  });
+                  navigate(route);
+                }}
               >
-                Explore Recommended Tool
+                Explore {result.recommended_tool} →
               </Button>
               <Button
                 variant="outline"
