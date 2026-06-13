@@ -176,6 +176,8 @@ export default function Home() {
 
   const isReturningTrialUser = isTrialActive && Math.min(trialDay + 1, 7) > 1;
   const shouldHoldTrialContent = isReturningTrialUser && resumeLoading;
+  const isAdminPreviewUser = user.email?.toLowerCase() === "resetyourmind1111@gmail.com";
+  const shouldShowPatternHero = activated === false || isAdminPreviewUser;
 
   if (showWelcomeFlow) {
     return (
@@ -202,9 +204,9 @@ export default function Home() {
             free/trial users who haven't yet taken any meaningful action.
             Collapses (returns null) once user has activated.
           */}
+          {shouldShowPatternHero && <DiscoverPatternHeroCard />}
           {activated === false && (
             <>
-              <DiscoverPatternHeroCard />
               <CheckInHeroCard
                 firstName={firstName}
                 options={stateOptions}
