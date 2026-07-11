@@ -29,33 +29,55 @@ export function useSubscription() {
     }
 
     const fetchSubscription = async () => {
-      const { data, error } = await supabase
-        .from("subscriptions")
-        .select("tier, status, plan_name, founding_member, cancel_at_period_end, current_period_end, billing_interval")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const [{ data, error }, { data: profileData }] = await Promise.all([
+        supabase
+          .from("subscriptions")
+          .select("tier, status, plan_name, founding_member, cancel_at_period_end, current_period_end, billing_interval")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("profiles")
+          .select("subscription_tier, code_access_expires_at, access_source")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+      ]);
 
+      let baseTier = "free";
       if (data && !error && data.status === "active") {
         setSubscription(data as Subscription);
-        setEffectiveTier(data.tier.toLowerCase());
+        baseTier = data.tier.toLowerCase();
       } else if (data && data.status === "past_due") {
-        // Still grant access during past_due (Stripe retry period)
         setSubscription(data as Subscription);
-        setEffectiveTier(data.tier.toLowerCase());
+        baseTier = data.tier.toLowerCase();
       } else if (data && data.status === "canceled" && data.cancel_at_period_end && data.current_period_end) {
-        // Check if still within paid period
         const endDate = new Date(data.current_period_end);
         if (endDate > new Date()) {
           setSubscription(data as Subscription);
-          setEffectiveTier(data.tier.toLowerCase());
+          baseTier = data.tier.toLowerCase();
         } else {
           setSubscription(data as Subscription);
-          setEffectiveTier("free");
+          baseTier = "free";
         }
       } else {
         setSubscription(null);
-        setEffectiveTier("free");
       }
+
+      // Code-redemption override: if the profile has active code access, honor it
+      const codeExpires = (profileData as any)?.code_access_expires_at as string | null | undefined;
+      const codeTier = (profileData as any)?.subscription_tier as string | null | undefined;
+      const accessSource = (profileData as any)?.access_source as string | null | undefined;
+      if (
+        accessSource === "code_redemption" &&
+        codeExpires &&
+        new Date(codeExpires) > new Date() &&
+        codeTier
+      ) {
+        const codeIdx = TIER_ORDER.indexOf(codeTier.toLowerCase());
+        const baseIdx = TIER_ORDER.indexOf(baseTier);
+        if (codeIdx > baseIdx) baseTier = codeTier.toLowerCase();
+      }
+
+      setEffectiveTier(baseTier);
       setIsLoading(false);
     };
 

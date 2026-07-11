@@ -54,6 +54,8 @@ import Mission from "./pages/Mission";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import FoundingMemberWelcome from "./pages/FoundingMemberWelcome";
 import WhatsMyPattern from "./pages/WhatsMyPattern";
+import Workshop from "./pages/Workshop";
+import RedeemCode from "./pages/RedeemCode";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -118,6 +120,8 @@ const App = () => (
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/founding-member-welcome" element={<FoundingMemberWelcome />} />
                 <Route path="/whats-my-pattern" element={<WhatsMyPattern />} />
+                <Route path="/workshop" element={<Workshop />} />
+                <Route path="/redeem" element={<RedeemCode />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

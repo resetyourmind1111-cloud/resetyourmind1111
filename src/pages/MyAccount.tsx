@@ -256,6 +256,11 @@ export default function MyAccount() {
           </Button>
         </Link>
 
+        {/* Redeem a code */}
+        <Link to="/redeem">
+          <Button variant="outline" className="w-full mb-2">Redeem a code</Button>
+        </Link>
+
         {/* Sign Out */}
         <Button variant="outline" className="w-full" onClick={signOut}>
           Sign Out
