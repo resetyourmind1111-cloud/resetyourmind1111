@@ -1102,10 +1102,12 @@ export type Database = {
       profiles: {
         Row: {
           access_expires_at: string | null
+          access_source: string | null
           ai_checkin_days_shown: Json
           body_type: string | null
           body_type_completed_at: string | null
           buddy_requested: boolean
+          code_access_expires_at: string | null
           comeback_card_shown: boolean
           created_at: string
           current_streak: number | null
@@ -1153,6 +1155,9 @@ export type Database = {
           primary_wound: string | null
           profile_photo_url: string | null
           recognition_deficit_count: number | null
+          redeemed_at: string | null
+          redeemed_code: string | null
+          redemption_source: string | null
           reset_goal: string | null
           reset_plan_generated: boolean
           resets_completed_count: number
@@ -1186,10 +1191,12 @@ export type Database = {
         }
         Insert: {
           access_expires_at?: string | null
+          access_source?: string | null
           ai_checkin_days_shown?: Json
           body_type?: string | null
           body_type_completed_at?: string | null
           buddy_requested?: boolean
+          code_access_expires_at?: string | null
           comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
@@ -1237,6 +1244,9 @@ export type Database = {
           primary_wound?: string | null
           profile_photo_url?: string | null
           recognition_deficit_count?: number | null
+          redeemed_at?: string | null
+          redeemed_code?: string | null
+          redemption_source?: string | null
           reset_goal?: string | null
           reset_plan_generated?: boolean
           resets_completed_count?: number
@@ -1270,10 +1280,12 @@ export type Database = {
         }
         Update: {
           access_expires_at?: string | null
+          access_source?: string | null
           ai_checkin_days_shown?: Json
           body_type?: string | null
           body_type_completed_at?: string | null
           buddy_requested?: boolean
+          code_access_expires_at?: string | null
           comeback_card_shown?: boolean
           created_at?: string
           current_streak?: number | null
@@ -1321,6 +1333,9 @@ export type Database = {
           primary_wound?: string | null
           profile_photo_url?: string | null
           recognition_deficit_count?: number | null
+          redeemed_at?: string | null
+          redeemed_code?: string | null
+          redemption_source?: string | null
           reset_goal?: string | null
           reset_plan_generated?: boolean
           resets_completed_count?: number
@@ -1375,6 +1390,48 @@ export type Database = {
           item_text?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      redemption_codes: {
+        Row: {
+          access_days: number
+          active: boolean
+          code: string
+          created_at: string
+          expires_at: string | null
+          grants_tier: string
+          id: string
+          label: string
+          max_redemptions: number | null
+          redemption_count: number
+          updated_at: string
+        }
+        Insert: {
+          access_days?: number
+          active?: boolean
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          grants_tier?: string
+          id?: string
+          label: string
+          max_redemptions?: number | null
+          redemption_count?: number
+          updated_at?: string
+        }
+        Update: {
+          access_days?: number
+          active?: boolean
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          grants_tier?: string
+          id?: string
+          label?: string
+          max_redemptions?: number | null
+          redemption_count?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1701,6 +1758,7 @@ export type Database = {
     }
     Functions: {
       increment_user_usage: { Args: never; Returns: number }
+      redeem_code: { Args: { _code: string; _source?: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
