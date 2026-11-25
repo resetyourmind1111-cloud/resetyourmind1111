@@ -1,8 +1,6 @@
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
-const PURPLE = "#2d1a4d";
-const GOLD = "#c9a84c";
-const LAVENDER = "#9b7fc7";
 const SERIF = "'Cormorant Garamond', serif";
 const SANS = "'Montserrat', sans-serif";
 
@@ -22,7 +20,7 @@ const DAYS = [
 ];
 
 const H2 = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-6" style={{ fontFamily: SERIF, color: GOLD }}>{children}</h2>
+  <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-6 text-primary" style={{ fontFamily: SERIF }}>{children}</h2>
 );
 
 export default function TwelveDaysHub() {
@@ -37,21 +35,21 @@ export default function TwelveDaysHub() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: PURPLE, color: "#ffffff", fontFamily: SERIF }}>
+    <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: SERIF }}>
       <div className="max-w-5xl mx-auto px-5 sm:px-8 py-14 sm:py-20">
         <header className="text-center mb-14">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl leading-tight mb-5" style={{ color: GOLD }}>12 Days of Permission Granted™ — The Abundance Edition</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl leading-tight mb-5 text-primary">12 Days of Permission Granted™ — The Abundance Edition</h1>
           <p className="text-xl sm:text-2xl italic mb-5">Welcome in. Your 12 days live here — a new day opens each morning, December 12–23, 2026.</p>
-          <p className="text-xs sm:text-sm tracking-[0.15em] uppercase" style={{ fontFamily: SANS, color: LAVENDER }}>Permission Granted™ — the gift you don't need anyone else to give you.</p>
+          <p className="text-xs sm:text-sm tracking-[0.15em] uppercase text-muted-foreground" style={{ fontFamily: SANS }}>Permission Granted™ — the gift you don't need anyone else to give you.</p>
         </header>
 
         <section className="mb-16">
           <H2>Welcome</H2>
-          <p className="text-center text-xs sm:text-sm tracking-[0.2em] uppercase mb-6" style={{ fontFamily: SANS, color: LAVENDER }}>Opens December 11</p>
-          <div className="rounded-xl p-6 sm:p-8 border-2 text-center" style={{ borderColor: "rgba(201,168,76,0.4)", backgroundColor: "rgba(255,255,255,0.03)" }}>
-            <h3 className="text-2xl sm:text-3xl mb-4" style={{ color: GOLD }}>Start Here — Discover Your Pattern (December 11)</h3>
+          <p className="text-center text-xs sm:text-sm tracking-[0.2em] uppercase mb-6 text-muted-foreground" style={{ fontFamily: SANS }}>Opens December 11</p>
+          <div className="rounded-xl p-6 sm:p-8 border-2 border-primary/30 bg-card text-center">
+            <h3 className="text-2xl sm:text-3xl mb-4 text-primary">Start Here — Discover Your Pattern (December 11)</h3>
             <p className="text-lg sm:text-xl leading-relaxed mb-7">Before Day 1, take the six-question Pattern Discovery™ and note the pattern you receive — your 12 days are personalized around it.</p>
-            <a href="#" className="inline-block px-8 py-4 rounded-md font-semibold tracking-wider uppercase text-sm" style={{ backgroundColor: GOLD, color: PURPLE, fontFamily: SANS }}>Discover Your Pattern</a>
+            <Button asChild className="inline-block h-auto px-8 py-4 rounded-md font-semibold tracking-wider uppercase text-sm" style={{ fontFamily: SANS }}><a href="#">Discover Your Pattern</a></Button>
           </div>
         </section>
 
@@ -59,14 +57,13 @@ export default function TwelveDaysHub() {
           <H2>The 12 Days</H2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {DAYS.map((d) => (
-              <a key={d.day} href="#" className="block rounded-xl p-5 border transition hover:-translate-y-0.5"
-                style={{ borderColor: "rgba(201,168,76,0.3)", backgroundColor: "rgba(255,255,255,0.03)" }}>
+              <a key={d.day} href="#" className="block rounded-xl p-5 border border-primary/30 bg-card transition hover:-translate-y-0.5 hover:border-primary">
                 <div className="flex items-baseline justify-between gap-3 mb-2">
-                  <span className="text-xs tracking-[0.2em] uppercase" style={{ fontFamily: SANS, color: LAVENDER }}>Day {d.day} · {d.date}</span>
+                  <span className="text-xs tracking-[0.2em] uppercase text-muted-foreground" style={{ fontFamily: SANS }}>Day {d.day} · {d.date}</span>
                 </div>
-                <h3 className="text-2xl leading-snug mb-3" style={{ color: GOLD }}>{d.title}</h3>
+                <h3 className="text-2xl leading-snug mb-3 text-primary">{d.title}</h3>
                 {d.gift && <p className="text-base leading-relaxed mb-3 italic">{d.gift}</p>}
-                <p className="text-xs tracking-[0.15em] uppercase" style={{ fontFamily: SANS, color: LAVENDER }}>Opens {d.opens}</p>
+                <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground" style={{ fontFamily: SANS }}>Opens {d.opens}</p>
               </a>
             ))}
           </div>
@@ -76,7 +73,7 @@ export default function TwelveDaysHub() {
           <p>Pattern Discovery™ and the Worth Thermostat™ are self-reflection tools created by Lorie Wu — not medical, psychological, or financial assessments. This program is a practical educational experience, not therapy. Participation in every exercise is voluntary.</p>
         </section>
 
-        <footer className="text-center text-sm" style={{ fontFamily: SANS, color: LAVENDER }}>
+        <footer className="text-center text-sm text-muted-foreground" style={{ fontFamily: SANS }}>
           Questions: <a href="mailto:resetyourmind1111@gmail.com" className="underline">resetyourmind1111@gmail.com</a>
         </footer>
       </div>

@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-const PURPLE = "#2d1a4d";
-const GOLD = "#c9a84c";
-const LAVENDER = "#9b7fc7";
 const SERIF = "'Cormorant Garamond', serif";
 const SANS = "'Montserrat', sans-serif";
 const ZELLE = "resetyourmind1111@gmail.com (recipient name: Lorie Wu)";
@@ -24,7 +22,7 @@ const schema = z.object({
 });
 
 const H2 = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-6" style={{ fontFamily: SERIF, color: GOLD }}>{children}</h2>
+  <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-6 text-primary" style={{ fontFamily: SERIF }}>{children}</h2>
 );
 
 export default function TwelveDaysAbundance() {
@@ -59,15 +57,15 @@ export default function TwelveDaysAbundance() {
     setDone(true);
   };
 
-  const input = "w-full rounded-md px-4 py-3 bg-white/5 border border-white/20 focus:outline-none focus:border-[#c9a84c]";
+  const input = "w-full rounded-md px-4 py-3 bg-background text-foreground border border-input focus:outline-none focus:border-primary focus:ring-2 focus:ring-ring";
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: PURPLE, color: "#ffffff", fontFamily: SERIF }}>
+    <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: SERIF }}>
       <div className="max-w-3xl mx-auto px-5 sm:px-8 py-14 sm:py-20">
         <header className="text-center mb-14">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl leading-tight mb-5" style={{ color: GOLD }}>12 Days of Permission Granted™ — The Abundance Edition</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl leading-tight mb-5 text-primary">12 Days of Permission Granted™ — The Abundance Edition</h1>
           <p className="text-xl sm:text-2xl italic mb-5">Permission Granted™ — the gift you don't need anyone else to give you.</p>
-          <p className="text-xs sm:text-sm tracking-[0.15em] uppercase" style={{ fontFamily: SANS, color: LAVENDER }}>December 12–23, 2026 · 12 days · about 10 minutes a day, delivered to your inbox.</p>
+          <p className="text-xs sm:text-sm tracking-[0.15em] uppercase text-muted-foreground" style={{ fontFamily: SANS }}>December 12–23, 2026 · 12 days · about 10 minutes a day, delivered to your inbox.</p>
         </header>
 
         <p className="text-lg sm:text-xl leading-relaxed mb-16 text-center">This December, give yourself the gift you keep waiting for someone else to give you: permission. For 12 days you'll receive a daily permission, a short teaching, a guided emotional reset, and a declaration — built around your own pattern, so it lands where you actually live. Three surprise Christmas gifts are tucked inside the 12 days, including the Worth Thermostat™ assessment and your personalized 2027 Permission Granted™ Blueprint.</p>
@@ -78,16 +76,15 @@ export default function TwelveDaysAbundance() {
             {TIERS.map((t) => {
               const sel = tier === t.id;
               return (
-                <button type="button" key={t.id} onClick={() => setTier(t.id)} aria-pressed={sel}
-                  className="text-left rounded-xl p-6 border-2 transition"
-                  style={{ borderColor: sel ? GOLD : "rgba(255,255,255,0.15)", backgroundColor: sel ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.03)" }}>
+                <Button variant="ghost" type="button" key={t.id} onClick={() => setTier(t.id)} aria-pressed={sel}
+                  className={"block h-auto whitespace-normal text-base font-normal text-left rounded-xl p-6 border-2 transition hover:bg-muted hover:text-foreground " + (sel ? "border-primary bg-primary/10" : "border-border bg-card")}>
                   <div className="flex justify-between items-baseline gap-4 mb-2">
-                    <h3 className="text-2xl" style={{ color: GOLD }}>{t.name}</h3>
+                    <h3 className="text-2xl text-primary">{t.name}</h3>
                     <span className="text-2xl font-semibold" style={{ fontFamily: SANS }}>{t.price}</span>
                   </div>
                   <p className="text-lg leading-relaxed">{t.desc}</p>
-                  {"note" in t && t.note && <p className="text-sm mt-3 italic" style={{ color: LAVENDER }}>{t.note}</p>}
-                </button>
+                  {"note" in t && t.note && <p className="text-sm mt-3 italic text-muted-foreground">{t.note}</p>}
+                </Button>
               );
             })}
           </div>
@@ -99,12 +96,12 @@ export default function TwelveDaysAbundance() {
             {["Register below with your name and email, and choose your tier.",
               `Pay by Zelle to ${ZELLE} — or pay cash if you are registering with Lorie in person.`,
               "We confirm your payment and email your confirmation and access instructions. Your welcome experience opens December 11, and Day 1 arrives December 12."].map((s, i) => (
-              <li key={i} className="flex gap-4"><span className="font-semibold" style={{ color: GOLD, fontFamily: SANS }}>{i + 1}.</span><span>{s}</span></li>
+              <li key={i} className="flex gap-4"><span className="font-semibold text-primary" style={{ fontFamily: SANS }}>{i + 1}.</span><span>{s}</span></li>
             ))}
           </ol>
         </section>
 
-        <section className="mb-16 rounded-xl p-6 sm:p-8 border" style={{ borderColor: "rgba(201,168,76,0.4)" }}>
+        <section className="mb-16 rounded-xl p-6 sm:p-8 border border-primary/30">
           <H2>Register</H2>
           {done ? (
             <p className="text-xl text-center leading-relaxed">You're registered! Next step: complete your payment by Zelle to {ZELLE}. We'll email your confirmation once payment is verified.</p>
@@ -116,26 +113,26 @@ export default function TwelveDaysAbundance() {
                 <legend className="text-sm mb-2">Choose your tier *</legend>
                 {TIERS.map((t) => (
                   <label key={t.id} className="flex items-center gap-3 py-1 text-sm">
-                    <input type="radio" name="tier" value={t.id} checked={tier === t.id} onChange={() => setTier(t.id)} required />
+                    <input type="radio" name="tier" value={t.id} checked={tier === t.id} onChange={() => setTier(t.id)} required className="accent-primary" />
                     {t.name} — {t.price}
                   </label>
                 ))}
               </fieldset>
-              <label className="flex gap-3 text-sm"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required className="mt-1" />Yes, email me the program materials and delivery emails for the 12 Days of Permission Granted™.</label>
-              <label className="flex gap-3 text-sm"><input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} className="mt-1" />Also send me occasional news and offers from Reset Your Mind 1111™.</label>
-              {error && <p className="text-sm" style={{ color: "#f5b5b5" }}>{error}</p>}
-              <button type="submit" disabled={loading} className="w-full py-4 rounded-md font-semibold tracking-wider uppercase disabled:opacity-60" style={{ backgroundColor: GOLD, color: PURPLE }}>{loading ? "Registering…" : "Register"}</button>
+              <label className="flex gap-3 text-sm"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required className="mt-1 accent-primary" />Yes, email me the program materials and delivery emails for the 12 Days of Permission Granted™.</label>
+              <label className="flex gap-3 text-sm"><input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} className="mt-1 accent-primary" />Also send me occasional news and offers from Reset Your Mind 1111™.</label>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <Button type="submit" disabled={loading} className="w-full h-auto py-4 rounded-md font-semibold tracking-wider uppercase disabled:opacity-60">{loading ? "Registering…" : "Register"}</Button>
             </form>
           )}
         </section>
 
         <section className="mb-10 text-sm leading-relaxed opacity-80" style={{ fontFamily: SANS }}>
-          <h3 className="uppercase tracking-[0.2em] text-xs mb-2" style={{ color: GOLD }}>Please note</h3>
+          <h3 className="uppercase tracking-[0.2em] text-xs mb-2 text-primary">Please note</h3>
           <p>Pattern Discovery™ and the Worth Thermostat™ are self-reflection tools created by Lorie Wu. They are not medical, psychological, or financial assessments, and this program is a practical educational experience — not therapy. Participation in every exercise is voluntary, and you always choose how much you share.</p>
         </section>
 
         <section className="mb-14 text-sm leading-relaxed opacity-80" style={{ fontFamily: SANS }}>
-          <h3 className="uppercase tracking-[0.2em] text-xs mb-2" style={{ color: GOLD }}>Refund terms</h3>
+          <h3 className="uppercase tracking-[0.2em] text-xs mb-2 text-primary">Refund terms</h3>
           <ul className="list-disc pl-5 space-y-2">
             <li>Full refund if you cancel before the program begins on December 12, 2026 — just email us.</li>
             <li>If you cancel after the program begins, days already delivered aren't refundable, but the unused portion can be applied as credit toward a future Reset Your Mind 1111™ program or session.</li>
@@ -144,7 +141,7 @@ export default function TwelveDaysAbundance() {
           </ul>
         </section>
 
-        <footer className="text-center text-sm" style={{ fontFamily: SANS, color: LAVENDER }}>
+        <footer className="text-center text-sm text-muted-foreground" style={{ fontFamily: SANS }}>
           Questions: <a href="mailto:resetyourmind1111@gmail.com" className="underline">resetyourmind1111@gmail.com</a>
         </footer>
       </div>
