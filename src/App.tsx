@@ -51,6 +51,7 @@ import SacredCircle from "./pages/SacredCircle";
 import Admin from "./pages/Admin";
 import AdminGiftedEmails from "./pages/AdminGiftedEmails";
 import Mission from "./pages/Mission";
+import TwelveDaysAbundance from "./pages/TwelveDaysAbundance";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import FoundingMemberWelcome from "./pages/FoundingMemberWelcome";
 import WhatsMyPattern from "./pages/WhatsMyPattern";
@@ -115,6 +116,7 @@ const App = () => (
                 <Route path="/sacred-circle" element={<SacredCircle />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/gifted-emails" element={<AdminGiftedEmails />} />
+                <Route path="/12-days-abundance" element={<TwelveDaysAbundance />} />
                 <Route path="/mission" element={<Mission />} />
                 <Route path="/about" element={<Mission />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />

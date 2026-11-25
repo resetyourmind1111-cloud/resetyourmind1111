@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      abundance_registrations: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          marketing_consent: boolean
+          program_consent: boolean
+          tier: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          marketing_consent?: boolean
+          program_consent?: boolean
+          tier: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          marketing_consent?: boolean
+          program_consent?: boolean
+          tier?: string
+        }
+        Relationships: []
+      }
       accountability_buddies: {
         Row: {
           active: boolean
