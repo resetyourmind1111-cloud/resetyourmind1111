@@ -7,7 +7,7 @@ const GOLD = "#c9a84c";
 const LAVENDER = "#9b7fc7";
 const SERIF = "'Cormorant Garamond', serif";
 const SANS = "'Montserrat', sans-serif";
-const ZELLE = "[ZELLE ID PLACEHOLDER]";
+const ZELLE = "resetyourmind1111@gmail.com (recipient name: Lorie Wu)";
 
 const TIERS = [
   { id: "experience", name: "The Abundance Experience", price: "$11.11", desc: "12 days of Permission Granted™ · 12 emotional resets · three surprise Christmas gifts · automated daily delivery." },
