@@ -1,0 +1,27 @@
+.worth-gift {
+  --background: 263 50% 20%;
+  --foreground: 0 0% 100%;
+  --primary: 43 54% 54%;
+  --primary-foreground: 263 50% 20%;
+  --secondary: 263 50% 24%;
+  --secondary-foreground: 0 0% 100%;
+  --muted-foreground: 264 39% 72%;
+  --border: 43 54% 54%;
+  --input: 264 39% 64%;
+  --ring: 43 54% 54%;
+  --card: 263 50% 24%;
+  --card-foreground: 0 0% 100%;
+  --destructive: 0 70% 80%;
+  --radius: 8px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+.worth-gift h1, .worth-gift h2, .worth-gift h3 { font-family: inherit; }
+.worth-gift .worth-label, .worth-gift button, .worth-gift input, .worth-gift textarea {
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0;
+}
+.worth-gift button { white-space: normal; height: auto; min-height: 48px; }
+.worth-gift progress { appearance: none; border: 0; border-radius: 4px; background: hsl(var(--input) / 0.3); overflow: hidden; }
+.worth-gift progress::-webkit-progress-bar { background: hsl(var(--input) / 0.3); }
+.worth-gift progress::-webkit-progress-value { background: hsl(var(--primary)); }
+.worth-gift progress::-moz-progress-bar { background: hsl(var(--primary)); }

@@ -53,6 +53,7 @@ import AdminGiftedEmails from "./pages/AdminGiftedEmails";
 import Mission from "./pages/Mission";
 import TwelveDaysAbundance from "./pages/TwelveDaysAbundance";
 import TwelveDaysHub from "./pages/TwelveDaysHub";
+import TwelveDaysWorthThermostat from "./pages/TwelveDaysWorthThermostat";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import FoundingMemberWelcome from "./pages/FoundingMemberWelcome";
 import WhatsMyPattern from "./pages/WhatsMyPattern";
@@ -71,6 +72,9 @@ const App = () => (
           <Sonner />
           <PwaInstallBanner />
           <BrowserRouter>
+            <Routes>
+              <Route path="/12-days-worth-thermostat" element={<TwelveDaysWorthThermostat />} />
+              <Route path="*" element={
             <OnboardingGuard>
               <Routes>
                 <Route path="/" element={<Landing />} />
@@ -130,6 +134,8 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </OnboardingGuard>
+              } />
+            </Routes>
           </BrowserRouter>
         </UsageProvider>
       </AuthProvider>

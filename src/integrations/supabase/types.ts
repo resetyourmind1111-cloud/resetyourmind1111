@@ -1782,6 +1782,39 @@ export type Database = {
         }
         Relationships: []
       }
+      worth_thermostat_results: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          percentage: number
+          raw_score: number
+          reflection: string | null
+          result_type: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          percentage: number
+          raw_score: number
+          reflection?: string | null
+          result_type: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          percentage?: number
+          raw_score?: number
+          reflection?: string | null
+          result_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1789,6 +1822,10 @@ export type Database = {
     Functions: {
       increment_user_usage: { Args: never; Returns: number }
       redeem_code: { Args: { _code: string; _source?: string }; Returns: Json }
+      save_worth_thermostat_reflection: {
+        Args: { _id: string; _reflection: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
