@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { scoreAnswers } from "./worthThermostatFormB";
+import { QUESTIONS, scoreAnswers } from "./worthThermostatFormB";
 
 function answersForRaw(raw: number) {
   const answers = Array<number>(25).fill(1);
@@ -9,6 +9,12 @@ function answersForRaw(raw: number) {
 }
 
 describe("owner-approved Form B scoring", () => {
+  it("contains exactly 25 approved questions", () => {
+    expect(QUESTIONS).toHaveLength(25);
+  });
+  it.each(Array.from({ length: 25 }, (_, index) => index))("question index %i has exactly five answer choices", index => {
+    expect(QUESTIONS[index]?.options).toHaveLength(5);
+  });
   it("scores all first options as raw 25, 20%, The Settler", () => {
     expect(scoreAnswers(Array(25).fill(1))).toEqual({ raw_score: 25, percentage: 20, result_type: "The Settler" });
   });
